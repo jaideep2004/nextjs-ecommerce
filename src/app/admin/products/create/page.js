@@ -17,7 +17,7 @@ export default function CreateProductPage() {
 
   useEffect(() => {
     // Redirect if not admin
-    if (!authLoading && (!user || user.role !== 'admin')) {
+    if (!authLoading && (!user || !user.isAdmin)) {
       router.push('/login?redirect=/admin/products/create');
       return;
     }
@@ -39,7 +39,7 @@ export default function CreateProductPage() {
       }
     };
 
-    if (user && user.role === 'admin') {
+    if (user && user.isAdmin) {
       fetchCategories();
     }
   }, [user, authLoading, router]);

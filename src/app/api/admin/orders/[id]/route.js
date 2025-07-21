@@ -1,7 +1,9 @@
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
+import User from '@/models/User';
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
+import { sendOrderStatusUpdate } from '@/utils/email';
 
 // Get a single order (admin only)
 export async function GET(req, { params }) {
@@ -48,7 +50,7 @@ export async function PUT(req, { params }) {
     
     // Update order fields
     if (status) {
-      order.status = status;
+      order.orderStatus = status;
       
       // Update related fields based on status
       if (status === 'Processing') {
@@ -75,7 +77,28 @@ export async function PUT(req, { params }) {
       order.statusNote = statusNote;
     }
     
+    // Save the updated order
     await order.save();
+    
+    // Send email notification about status update
+    try {
+      // Get user information
+      const user = await User.findById(order.user);
+      
+      if (user) {
+        await sendOrderStatusUpdate({
+          user,
+          order: {
+            ...order.toObject(),
+            _id: order._id.toString(),
+            createdAt: order.createdAt
+          }
+        });
+      }
+    } catch (emailError) {
+      console.error('Failed to send order status email:', emailError);
+      // Continue with the response even if email fails
+    }
     
     return Response.json(
       apiResponse(200, order),

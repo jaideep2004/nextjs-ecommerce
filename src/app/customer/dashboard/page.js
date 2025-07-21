@@ -596,7 +596,9 @@ const RecentOrders = () => {
         }
         
         const data = await res.json();
-        setOrders(data.orders);
+        // Handle both data formats and ensure orders is always an array
+        const ordersData = data.data?.orders || data.orders || [];
+        setOrders(ordersData);
       } catch (err) {
         console.error('Error fetching orders:', err);
         setError(err.message || 'Failed to load orders');

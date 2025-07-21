@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -63,8 +66,29 @@ const QuickActionButtons = styled(CardActions)(({ theme }) => ({
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const [isFavorite, setIsFavorite] = useState(false);
+  const router = useRouter();
 
   const { user } = useAuth();
+  
+  // Check if product is in wishlist on component mount
+  useEffect(() => {
+    if (user && product) {
+      const checkWishlist = async () => {
+        try {
+          const res = await axios.get('/api/wishlist');
+          const wishlistItems = res.data.wishlist || [];
+          const isInWishlist = wishlistItems.some(item => 
+            item.product?._id === product._id || item.productId === product._id
+          );
+          setIsFavorite(isInWishlist);
+        } catch (error) {
+          console.error('Error checking wishlist status:', error);
+        }
+      };
+      
+      checkWishlist();
+    }
+  }, [user, product]);
   
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -72,11 +96,30 @@ const ProductCard = ({ product }) => {
     addToCart(product, 1, '', '', user);
   };
 
-  const toggleFavorite = (e) => {
+  const toggleFavorite = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    // Here you would typically call an API to add/remove from wishlist
+    
+    if (!user) {
+      // Redirect to login if not authenticated
+      router.push('/login?redirect=/products');
+      return;
+    }
+    
+    try {
+      if (isFavorite) {
+        // Remove from wishlist
+        await axios.delete(`/api/wishlist/${product._id}`);
+      } else {
+        // Add to wishlist
+        await axios.post('/api/wishlist', { productId: product._id });
+      }
+      
+      // Toggle state after successful API call
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Wishlist operation failed:', error);
+    }
   };
 
   // Calculate discounted price

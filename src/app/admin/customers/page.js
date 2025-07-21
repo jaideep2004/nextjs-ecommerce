@@ -106,11 +106,38 @@ export default function CustomersPage() {
       const url = `/api/admin/customers?${params.toString()}`;
       console.log('Fetching customers from URL:', url);
       
-      const { data } = await axios.get(url);
-      console.log('Customers data received:', data);
+      const response = await axios.get(url);
+      console.log('Full API response:', response.data);
       
-      setCustomers(data.customers || []);
-      setTotalCustomers(data.totalCustomers || 0);
+      // The API is now consistently returning { status, data, message, timestamp }
+      // where data contains { customers, totalCustomers }
+      if (response.data && response.data.data) {
+        const apiData = response.data.data;
+        console.log('API data object:', apiData);
+        
+        // Log customers object type and structure
+        console.log('Customers data type:', Array.isArray(apiData.customers) ? 'Array' : typeof apiData.customers);
+        console.log('Customers data length:', Array.isArray(apiData.customers) ? apiData.customers.length : 'N/A');
+        
+        if (Array.isArray(apiData.customers)) {
+          console.log('Found customers array with length:', apiData.customers.length);
+          // Sample the first customer if available
+          if (apiData.customers.length > 0) {
+            console.log('Sample customer data:', apiData.customers[0]);
+          }
+          setCustomers(apiData.customers);
+          setTotalCustomers(apiData.totalCustomers || 0);
+        } else {
+          console.error('API data does not contain customers array:', apiData);
+          setCustomers([]);
+          setTotalCustomers(0);
+        }
+      } else {
+        console.error('Unexpected API response format:', response.data);
+        setError('Received unexpected data format from server');
+        setCustomers([]);
+        setTotalCustomers(0);
+      }
     } catch (err) {
       console.error('Error fetching customers:', err);
       setError('Failed to load customers. Please try again.');
@@ -353,12 +380,14 @@ export default function CustomersPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {customers.length > 0 ? (
-                        customers.map((customer) => (
-                          <TableRow key={customer._id}>
-                            <TableCell>{customer.name}</TableCell>
-                            <TableCell>{customer.email}</TableCell>
-                            <TableCell>{formatDate(customer.createdAt)}</TableCell>
+                      {customers && customers.length > 0 ? (
+                        customers.map((customer) => {
+                          console.log('Rendering customer:', customer);
+                          return (
+                            <TableRow key={customer._id || Math.random()}>
+                              <TableCell>{customer.name || 'Unknown'}</TableCell>
+                              <TableCell>{customer.email || 'No Email'}</TableCell>
+                              <TableCell>{customer.createdAt ? formatDate(customer.createdAt) : 'N/A'}</TableCell>
                             <TableCell>
                               <Chip 
                                 label={customer.orderCount || 0} 
@@ -420,7 +449,8 @@ export default function CustomersPage() {
                               </IconButton>
                             </TableCell>
                           </TableRow>
-                        ))
+                          );
+                        })
                       ) : (
                         <TableRow>
                           <TableCell colSpan={7} align="center">

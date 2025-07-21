@@ -22,7 +22,7 @@ export default function EditProductPage() {
 
   useEffect(() => {
     // Redirect if not admin
-    if (!authLoading && (!user || user.role !== 'admin')) {
+    if (!authLoading && (!user || !user.isAdmin)) {
       router.push(`/login?redirect=/admin/products/edit/${productId}`);
       return;
     }
@@ -51,7 +51,7 @@ export default function EditProductPage() {
       }
     };
 
-    if (user && user.role === 'admin' && productId) {
+    if (user && user.isAdmin && productId) {
       fetchData();
     }
   }, [user, authLoading, router, productId]);

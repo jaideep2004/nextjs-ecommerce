@@ -94,12 +94,12 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     // Redirect if not admin
-    if (!authLoading && (!user || user.role !== 'admin')) {
+    if (!authLoading && (!user || !user.isAdmin)) {
       router.push(`/login?redirect=/admin/orders/${orderId}`);
       return;
     }
 
-    if (user && user.role === 'admin' && orderId) {
+    if (user && user.isAdmin && orderId) {
       fetchOrder();
     }
   }, [user, authLoading, router, orderId]);
@@ -238,7 +238,7 @@ export default function OrderDetailPage() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Box>
                 <Typography variant="h6" component="h2">
-                  Order #{order._id.substring(order._id.length - 8).toUpperCase()}
+                  Order #{order._id && order._id.substring(order._id.length - 8).toUpperCase()}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Placed on {formatDate(order.createdAt)}

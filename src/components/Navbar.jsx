@@ -241,7 +241,7 @@ const Navbar = () => {
             </IconButton>
 
             {/* User menu */}
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <Box sx={{ flexGrow: 0, ml: 1 }}>
                 <Tooltip title={user?.name || 'User Settings'}>
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -295,9 +295,14 @@ const Navbar = () => {
                 </Menu>
               </Box>
             ) : (
-              <Button color="inherit" component={Link} href="/login">
-                Login
-              </Button>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button color="inherit" component={Link} href="/login">
+                  Login
+                </Button>
+                <Button color="inherit" component={Link} href="/register">
+                  Sign Up
+                </Button>
+              </Box>
             )}
           </Box>
         </Toolbar>

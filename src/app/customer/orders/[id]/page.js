@@ -92,6 +92,7 @@ export default function OrderDetails({ params }) {
   
   // Get active step based on order status
   const getActiveStep = (status) => {
+    if (!status) return 0;
     switch (status) {
       case 'Pending':
         return 0;
@@ -193,28 +194,28 @@ export default function OrderDetails({ params }) {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
                 <Typography variant="h6" component="h2">
-                  Order #{order._id.substring(0, 8)}
+                  Order #{order._id && order._id.substring(0, 8)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Placed on {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
                 </Typography>
               </Box>
               <Chip 
-                label={order.status} 
-                color={order.status === 'Cancelled' ? 'error' : 
-                       order.status === 'Delivered' ? 'success' : 
-                       order.status === 'Shipped' ? 'primary' : 
-                       order.status === 'Processing' ? 'info' : 'warning'}
+                label={order.orderStatus} 
+                color={order.orderStatus === 'Cancelled' ? 'error' : 
+                       order.orderStatus === 'Delivered' ? 'success' : 
+                       order.orderStatus === 'Shipped' ? 'primary' : 
+                       order.orderStatus === 'Processing' ? 'info' : 'warning'}
               />
             </Box>
             
-            {order.status !== 'Cancelled' && (
-              <Stepper activeStep={getActiveStep(order.status)} alternativeLabel>
+            {order.orderStatus !== 'Cancelled' && (
+              <Stepper activeStep={getActiveStep(order.orderStatus)} alternativeLabel>
                 <Step>
                   <StepLabel StepIconProps={{ 
                     icon: <AccessTime />,
-                    active: order.status === 'Pending',
-                    completed: getActiveStep(order.status) > 0,
+                    active: order.orderStatus === 'Pending',
+                    completed: getActiveStep(order.orderStatus) > 0,
                   }}>
                     Order Placed
                     {order.createdAt && (
@@ -227,8 +228,8 @@ export default function OrderDetails({ params }) {
                 <Step>
                   <StepLabel StepIconProps={{ 
                     icon: <Payment />,
-                    active: order.status === 'Processing',
-                    completed: getActiveStep(order.status) > 1,
+                    active: order.orderStatus === 'Processing',
+                    completed: getActiveStep(order.orderStatus) > 1,
                   }}>
                     Processing
                     {order.paidAt && (
@@ -241,8 +242,8 @@ export default function OrderDetails({ params }) {
                 <Step>
                   <StepLabel StepIconProps={{ 
                     icon: <LocalShipping />,
-                    active: order.status === 'Shipped',
-                    completed: getActiveStep(order.status) > 2,
+                    active: order.orderStatus === 'Shipped',
+                    completed: getActiveStep(order.orderStatus) > 2,
                   }}>
                     Shipped
                     {order.shippedAt && (
@@ -255,8 +256,8 @@ export default function OrderDetails({ params }) {
                 <Step>
                   <StepLabel StepIconProps={{ 
                     icon: <CheckCircle />,
-                    active: order.status === 'Delivered',
-                    completed: order.status === 'Delivered',
+                    active: order.orderStatus === 'Delivered',
+                    completed: order.orderStatus === 'Delivered',
                   }}>
                     Delivered
                     {order.deliveredAt && (
@@ -269,7 +270,7 @@ export default function OrderDetails({ params }) {
               </Stepper>
             )}
             
-            {order.status === 'Cancelled' && (
+            {order.orderStatus === 'Cancelled' && (
               <Alert severity="error" sx={{ mt: 2 }}>
                 This order was cancelled on {formatDate(order.updatedAt)}.
                 {order.cancelReason && (
@@ -280,7 +281,7 @@ export default function OrderDetails({ params }) {
               </Alert>
             )}
             
-            {order.status === 'Shipped' && order.trackingNumber && (
+            {order.orderStatus === 'Shipped' && order.trackingNumber && (
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
                   <strong>Tracking Number:</strong> {order.trackingNumber}
@@ -334,7 +335,7 @@ export default function OrderDetails({ params }) {
                               </Box>
                               <Box>
                                 <Typography variant="body1">
-                                  <Link href={`/product/${item.slug}`} passHref>
+                                  <Link href={item.slug ? `/product/${item.slug}` : `/product`} passHref>
                                     <Typography 
                                       component="span" 
                                       sx={{ 
@@ -478,7 +479,7 @@ export default function OrderDetails({ params }) {
               Back to Orders
             </Button>
             
-            {order.status === 'Delivered' && (
+            {order.orderStatus === 'Delivered' && (
               <Button 
                 component={Link} 
                 href={`/product/${order.orderItems[0].slug}#review`}

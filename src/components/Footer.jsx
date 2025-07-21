@@ -11,7 +11,7 @@ const Footer = () => {
     console.log('Subscribed to newsletter');
   };
 
-  return (
+  return (  
     <Box
       component="footer"
       sx={{

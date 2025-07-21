@@ -1,11 +1,14 @@
 // Helper function to handle API responses
 export const apiResponse = (status, data = null, message = '') => {
-  return {
+  const response = {
     status,
     data,
     message,
     timestamp: new Date().toISOString(),
   };
+  
+  console.log('API Response generated:', response);
+  return response;
 };
 
 // Helper function to handle API errors

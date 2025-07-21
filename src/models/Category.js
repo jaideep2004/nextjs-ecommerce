@@ -43,6 +43,7 @@ categorySchema.virtual('productCount', {
   localField: '_id',
   foreignField: 'category',
   count: true,
+  options: { lean: true }
 });
 
 // Set virtuals to true in toJSON

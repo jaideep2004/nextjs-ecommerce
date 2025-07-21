@@ -85,12 +85,12 @@ export default function CustomerDetailPage() {
 
   useEffect(() => {
     // Redirect if not admin
-    if (!authLoading && (!user || user.role !== 'admin')) {
+    if (!authLoading && (!user || !user.isAdmin)) {
       router.push(`/login?redirect=/admin/customers/${customerId}`);
       return;
     }
 
-    if (user && user.role === 'admin' && customerId) {
+    if (user && user.isAdmin && customerId) {
       fetchCustomerData();
     }
   }, [user, authLoading, router, customerId]);

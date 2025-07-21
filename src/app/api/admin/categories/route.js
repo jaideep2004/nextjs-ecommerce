@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Category from '@/models/Category';
+import Product from '@/models/Product';
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 
@@ -13,14 +14,27 @@ export async function GET(request) {
     
     await connectToDatabase();
     
-    // Get all categories with product counts
+    // Get all categories with populated product counts
     const categories = await Category.find({})
       .sort({ name: 1 })
+      .populate('productCount')
       .lean();
+    
+    // Add product counts to categories
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (category) => {
+        // Get product count for this category
+        const productCount = await Product.countDocuments({ category: category._id });
+        return {
+          ...category,
+          productCount
+        };
+      })
+    );
       
     // Return proper response format with simplified structure
     return Response.json(
-      apiResponse(200, { categories }, 'Categories retrieved successfully'),
+      apiResponse(200, { categories: categoriesWithCounts }, 'Categories retrieved successfully'),
       { status: 200 }
     );
   });

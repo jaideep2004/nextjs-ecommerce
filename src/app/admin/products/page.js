@@ -143,12 +143,23 @@ export default function AdminProducts() {
         const url = `/api/admin/products?${params.toString()}`;
         console.log('Fetching products from URL:', url);
         
-        const res = await axios.get(url);
-        console.log('Products data received:', res.data);
+        const response = await axios.get(url);
+        console.log('Products data received:', response.data);
         
-        const responseData = res.data.data;
-        setProducts(responseData.products);
-        setTotalCount(responseData.totalCount);
+        // Check if response has the expected structure
+        if (response.data && response.data.data) {
+          // New API format with nested data
+          const responseData = response.data.data;
+          setProducts(responseData.products || []);
+          setTotalCount(responseData.totalCount || 0);
+        } else if (response.data && response.data.products) {
+          // Old API format with direct data
+          setProducts(response.data.products || []);
+          setTotalCount(response.data.totalCount || 0);
+        } else {
+          console.error('Unexpected API response format:', response.data);
+          setError('Received unexpected data format from server');
+        }
       } catch (err) {
         console.error('Error fetching products:', err);
         setError(err.message || 'Failed to load products');

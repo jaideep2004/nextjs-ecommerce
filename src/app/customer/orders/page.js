@@ -75,8 +75,13 @@ export default function CustomerOrders() {
         }
         
         const data = await res.json();
-        setOrders(data.orders);
-        setTotalPages(Math.ceil(data.totalCount / limit));
+        if (!data.orders || !Array.isArray(data.orders)) {
+          setOrders([]);
+          setTotalPages(0);
+        } else {
+          setOrders(data.orders);
+          setTotalPages(Math.ceil(data.totalCount / limit));
+        }
       } catch (err) {
         console.error('Error fetching orders:', err);
         setError(err.message || 'Failed to load orders');
@@ -256,7 +261,7 @@ export default function CustomerOrders() {
                   {orders.map((order) => (
                     <TableRow key={order._id}>
                       <TableCell component="th" scope="row">
-                        #{order._id.substring(0, 8)}
+                        #{order._id && order._id.substring(0, 8)}
                       </TableCell>
                       <TableCell>
                         {new Date(order.createdAt).toLocaleDateString()}
@@ -271,8 +276,8 @@ export default function CustomerOrders() {
                       </TableCell>
                       <TableCell align="center">
                         <Chip 
-                          label={order.status} 
-                          color={getStatusColor(order.status)}
+                          label={order.orderStatus} 
+                          color={getStatusColor(order.orderStatus)}
                           size="small"
                         />
                       </TableCell>

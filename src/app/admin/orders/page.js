@@ -59,6 +59,15 @@ const statusColors = {
   cancelled: { bg: '#FFEBEE', color: '#C62828' },
 };
 
+// Get order status
+const getOrderStatus = (order) => {
+  if (order.orderStatus) return order.orderStatus;
+  if (order.isDelivered) return 'Delivered';
+  if (order.isShipped) return 'Shipped';
+  if (order.isPaid) return 'Processing';
+  return 'Pending';
+};
+
 export default function OrdersPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -108,11 +117,38 @@ export default function OrdersPage() {
       const url = `/api/admin/orders?${params.toString()}`;
       console.log('Fetching orders from URL:', url);
       
-      const { data } = await axios.get(url);
-      console.log('Orders data received:', data);
+      const response = await axios.get(url);
+      console.log('Full API response:', response.data);
       
-      setOrders(data.orders);
-      setTotalOrders(data.totalOrders);
+      // The API is now consistently returning { status, data, message, timestamp }
+      // where data contains { orders, totalOrders }
+      if (response.data && response.data.data) {
+        const apiData = response.data.data;
+        console.log('API data object:', apiData);
+        
+        // Log orders object type and structure
+        console.log('Orders data type:', Array.isArray(apiData.orders) ? 'Array' : typeof apiData.orders);
+        console.log('Orders data length:', Array.isArray(apiData.orders) ? apiData.orders.length : 'N/A');
+        
+        if (Array.isArray(apiData.orders)) {
+          console.log('Found orders array with length:', apiData.orders.length);
+          // Sample the first order if available
+          if (apiData.orders.length > 0) {
+            console.log('Sample order data:', apiData.orders[0]);
+          }
+          setOrders(apiData.orders);
+          setTotalOrders(apiData.totalOrders || 0);
+        } else {
+          console.error('API data does not contain orders array:', apiData);
+          setOrders([]);
+          setTotalOrders(0);
+        }
+      } else {
+        console.error('Unexpected API response format:', response.data);
+        setError('Received unexpected data format from server');
+        setOrders([]);
+        setTotalOrders(0);
+      }
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError('Failed to load orders. Please try again.');
@@ -277,15 +313,17 @@ export default function OrdersPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {orders.length > 0 ? (
-                        orders.map((order) => (
-                          <TableRow key={order._id}>
+                      {orders && orders.length > 0 ? (
+                        orders.map((order) => {
+                          console.log('Rendering order:', order);
+                          return (
+                            <TableRow key={order._id || Math.random()}>
                             <TableCell>
                               <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                {order._id.substring(order._id.length - 8).toUpperCase()}
+                                  {order._id ? order._id.slice(-8).toUpperCase() : 'UNKNOWN'}
                               </Typography>
                             </TableCell>
-                            <TableCell>{formatDate(order.createdAt)}</TableCell>
+                              <TableCell>{order.createdAt ? formatDate(order.createdAt) : 'N/A'}</TableCell>
                             <TableCell>
                               <Typography variant="body2">{order.user?.name || 'Guest'}</Typography>
                               <Typography variant="caption" color="text.secondary">
@@ -293,14 +331,14 @@ export default function OrdersPage() {
                               </Typography>
                             </TableCell>
                             <TableCell>{order.orderItems?.length || 0}</TableCell>
-                            <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                              <TableCell>{formatCurrency(order.totalPrice || 0)}</TableCell>
                             <TableCell>
                               <Chip
-                                label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                  label={getOrderStatus(order).charAt(0).toUpperCase() + getOrderStatus(order).slice(1) || 'Pending'}
                                 size="small"
                                 sx={{
-                                  bgcolor: statusColors[order.status]?.bg || '#f5f5f5',
-                                  color: statusColors[order.status]?.color || 'text.primary',
+                                    bgcolor: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.bg || '#f5f5f5',
+                                    color: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.color || 'text.primary',
                                 }}
                               />
                             </TableCell>
@@ -314,7 +352,8 @@ export default function OrdersPage() {
                               </IconButton>
                             </TableCell>
                           </TableRow>
-                        ))
+                          );
+                        })
                       ) : (
                         <TableRow>
                           <TableCell colSpan={7} align="center">

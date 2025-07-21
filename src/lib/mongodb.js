@@ -7,8 +7,10 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://jai2004bgmi:jai200
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
-} 
- 
+}
+
+console.log('MongoDB connection string available:', !!MONGODB_URI);
+
 let cached = global.mongoose;
 
 if (!cached) {
@@ -17,6 +19,7 @@ if (!cached) {
 
 async function connectToDatabase() {
   if (cached.conn) { 
+    console.log('Using cached database connection');
     return cached.conn;
   }
 
@@ -25,15 +28,26 @@ async function connectToDatabase() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    console.log('Creating new database connection...');
+    
+    try {
+      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+        console.log('MongoDB connection successful');
+        return mongoose;
+      });
+    } catch (error) {
+      console.error('Error connecting to MongoDB:', error);
+      throw error;
+    }
   }
 
   try {
+    console.log('Waiting for MongoDB connection promise to resolve...');
     cached.conn = await cached.promise;
+    console.log('MongoDB connection established successfully');
   } catch (e) {
     cached.promise = null;
+    console.error('Error establishing MongoDB connection:', e);
     throw e;
   }
 

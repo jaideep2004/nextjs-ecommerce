@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import Link from 'next/link';
+import AdminSidebar from '@/components/admin/AdminSidebar';
 import {
   Container,
   Typography,
@@ -28,6 +29,7 @@ import {
   TableHead,
   TableRow,
   Chip,
+  Breadcrumbs,
 } from '@mui/material';
 import {
   Dashboard,
@@ -118,10 +120,11 @@ const RecentOrders = ({ orders }) => {
   
   // Get order status
   const getOrderStatus = (order) => {
+    if (order.orderStatus) return order.orderStatus;
     if (order.isDelivered) return 'Delivered';
     if (order.isShipped) return 'Shipped';
     if (order.isPaid) return 'Processing';
-    return 'Pending';
+    return order.orderStatus || 'Pending';
   };
   
   if (!orders || orders.length === 0) {
@@ -148,7 +151,7 @@ const RecentOrders = ({ orders }) => {
         </TableHead>
         <TableBody>
           {orders.map((order) => {
-            const orderStatus = order.status || getOrderStatus(order);
+            const orderStatus = order.orderStatus || getOrderStatus(order);
             const userName = order.user?.name || order.user?.email || 'Unknown';
             
             return (
@@ -162,7 +165,7 @@ const RecentOrders = ({ orders }) => {
                         '&:hover': { textDecoration: 'underline' },
                       }}
                     >
-                      #{order._id.substring(0, 8)}
+                      #{order._id && order._id.substring(0, 8)}
                     </Typography>
                   </Link>
                 </TableCell>
@@ -275,22 +278,36 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         console.log('Fetching dashboard data...');
-        const { data } = await axios.get('/api/admin/dashboard');
-        console.log('Dashboard data received:', data);
+        const response = await axios.get('/api/admin/dashboard');
+        console.log('Dashboard data received:', response.data);
+        
+        // Check if response has the expected structure
+        let apiData;
+        if (response.data && response.data.data) {
+          // New API format with nested data
+          apiData = response.data.data;
+        } else if (response.data) {
+          // Old API format with direct data
+          apiData = response.data;
+        } else {
+          console.error('Unexpected API response format:', response.data);
+          setError('Received unexpected data format from server');
+          return;
+        }
         
         // Transform API data to match the expected format
         const formattedData = {
           stats: {
-            totalSales: data.totalSales || 0,
-            totalOrders: data.totalOrders || 0,
-            totalCustomers: data.totalUsers || 0,
-            totalProducts: data.totalProducts || 0,
+            totalSales: apiData.totalSales || 0,
+            totalOrders: apiData.totalOrders || 0,
+            totalCustomers: apiData.totalUsers || 0,
+            totalProducts: apiData.totalProducts || 0,
           },
           salesChange: 0, // We don't have this data yet
           ordersChange: 0, // We don't have this data yet
           customersChange: 0, // We don't have this data yet
-          recentOrders: data.recentOrders || [],
-          lowStockProducts: data.lowStockProducts || [],
+          recentOrders: apiData.recentOrders || [],
+          lowStockProducts: apiData.lowStockProducts || [],
         };
         
         console.log('Formatted dashboard data:', formattedData);
@@ -334,171 +351,136 @@ export default function AdminDashboard() {
   };
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          Admin Dashboard
-        </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<Add />}
-          component={Link}
-          href="/admin/products/new"
-          sx={{ 
-            bgcolor: '#8D6E63',
-            '&:hover': { bgcolor: '#6D4C41' },
-          }}
-        >
-          Add New Product
-        </Button>
-      </Box>
-      
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress sx={{ color: '#8D6E63' }} />
-        </Box>
-      ) : error ? (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      ) : (
-        <>
-          {/* Stats Cards */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard 
-                title="Total Sales" 
-                value={`$${data.stats.totalSales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
-                icon={<AttachMoney />} 
-                color="success"
-                percentChange={data.salesChange}
-                changeType="increase"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard 
-                title="Total Orders" 
-                value={data.stats.totalOrders} 
-                icon={<ShoppingBag />} 
-                color="info"
-                percentChange={data.ordersChange}
-                changeType="increase"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard 
-                title="Total Customers" 
-                value={data.stats.totalCustomers} 
-                icon={<People />} 
-                color="warning"
-                percentChange={data.customersChange}
-                changeType="increase"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard 
-                title="Total Products" 
-                value={data.stats.totalProducts} 
-                icon={<Inventory />} 
-                color="error"
-              />
-            </Grid>
-          </Grid>
+    <Box sx={{ display: 'flex' }}>
+      <AdminSidebar />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          bgcolor: '#f5f5f5',
+          minHeight: '100vh',
+        }}
+      >
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Paper sx={{ p: 2, mb: 3 }}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+              <Typography color="text.primary">Dashboard</Typography>
+            </Breadcrumbs>
+          </Paper>
           
-          <Grid container spacing={4}>
-            {/* Admin Menu */}
-            <Grid item xs={12} md={3}>
-              <Paper sx={{ p: 2, mb: { xs: 4, md: 0 } }}>
-                <Typography variant="h6" component="h2" sx={{ p: 2, pb: 1 }}>
-                  Admin Menu
-                </Typography>
-                <Divider sx={{ mb: 1 }} />
-                <List component="nav" sx={{ p: 1 }}>
-                  <ListItem button component={Link} href="/admin/dashboard" selected>
-                    <ListItemIcon>
-                      <Dashboard />
-                    </ListItemIcon>
-                    <ListItemText primary="Dashboard" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/products">
-                    <ListItemIcon>
-                      <Inventory />
-                    </ListItemIcon>
-                    <ListItemText primary="Products" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/orders">
-                    <ListItemIcon>
-                      <ShoppingBag />
-                    </ListItemIcon>
-                    <ListItemText primary="Orders" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/customers">
-                    <ListItemIcon>
-                      <People />
-                    </ListItemIcon>
-                    <ListItemText primary="Customers" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/categories">
-                    <ListItemIcon>
-                      <Category />
-                    </ListItemIcon>
-                    <ListItemText primary="Categories" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/analytics">
-                    <ListItemIcon>
-                      <TrendingUp />
-                    </ListItemIcon>
-                    <ListItemText primary="Analytics" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/admin/settings">
-                    <ListItemIcon>
-                      <Settings />
-                    </ListItemIcon>
-                    <ListItemText primary="Settings" />
-                  </ListItem>
-                </List>
-              </Paper>
-            </Grid>
-            
-            {/* Main Content */}
-            <Grid item xs={12} md={9}>
-              {/* Recent Orders */}
-              <Paper sx={{ p: 3, mb: 4 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" component="h2">
-                    Recent Orders
-                  </Typography>
-                  <Button 
-                    component={Link} 
-                    href="/admin/orders"
-                    size="small"
-                  >
-                    View All
-                  </Button>
-                </Box>
-                <RecentOrders orders={data.recentOrders} />
-              </Paper>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Typography variant="h6" component="h1">
+              Admin Dashboard
+            </Typography>
+            <Button 
+              variant="contained" 
+              startIcon={<Add />}
+              component={Link}
+              href="/admin/products/new"
+              sx={{ 
+                bgcolor: '#8D6E63',
+                '&:hover': { bgcolor: '#6D4C41' },
+              }}
+            >
+              Add New Product
+            </Button>
+          </Box>
+          
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress sx={{ color: '#8D6E63' }} />
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ mb: 4 }}>
+              {error}
+            </Alert>
+          ) : (
+            <>
+              {/* Stats Cards */}
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard 
+                    title="Total Sales" 
+                    value={`$${data.stats.totalSales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
+                    icon={<AttachMoney />} 
+                    color="success"
+                    percentChange={data.salesChange}
+                    changeType="increase"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard 
+                    title="Total Orders" 
+                    value={data.stats.totalOrders} 
+                    icon={<ShoppingBag />} 
+                    color="info"
+                    percentChange={data.ordersChange}
+                    changeType="increase"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard 
+                    title="Total Customers" 
+                    value={data.stats.totalCustomers} 
+                    icon={<People />} 
+                    color="warning"
+                    percentChange={data.customersChange}
+                    changeType="increase"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <StatCard 
+                    title="Total Products" 
+                    value={data.stats.totalProducts} 
+                    icon={<Inventory />} 
+                    color="error"
+                  />
+                </Grid>
+              </Grid>
               
-              {/* Low Stock Products */}
-              <Paper sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" component="h2">
-                    Low Stock Products
-                  </Typography>
-                  <Button 
-                    component={Link} 
-                    href="/admin/products"
-                    size="small"
-                  >
-                    View All
-                  </Button>
-                </Box>
-                <LowStockProducts products={data.lowStockProducts} />
-              </Paper>
-            </Grid>
-          </Grid>
-        </>
-      )}
-    </Container>
+              <Grid container spacing={4}>
+                {/* Main Content */}
+                <Grid item xs={12}>
+                  {/* Recent Orders */}
+                  <Paper sx={{ p: 3, mb: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6" component="h2">
+                        Recent Orders
+                      </Typography>
+                      <Button 
+                        component={Link} 
+                        href="/admin/orders"
+                        size="small"
+                      >
+                        View All
+                      </Button>
+                    </Box>
+                    <RecentOrders orders={data.recentOrders} />
+                  </Paper>
+                  
+                  {/* Low Stock Products */}
+                  <Paper sx={{ p: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6" component="h2">
+                        Low Stock Products
+                      </Typography>
+                      <Button 
+                        component={Link} 
+                        href="/admin/products"
+                        size="small"
+                      >
+                        View All
+                      </Button>
+                    </Box>
+                    <LowStockProducts products={data.lowStockProducts} />
+                  </Paper>
+                </Grid>
+              </Grid>
+            </>
+          )}
+        </Container>
+      </Box>
+    </Box>
   );
 }

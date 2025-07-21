@@ -1,7 +1,9 @@
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
+import User from '@/models/User';
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
+import { sendOrderConfirmation } from '@/utils/email';
 
 // Get all orders (admin) or user orders (customer)
 export async function GET(req) {
@@ -95,7 +97,28 @@ export async function POST(req) {
       user: decoded._id,
     });
     
+    // Save the order
     await order.save();
+    
+    // Send order confirmation email
+    try {
+      // Get user information
+      const user = await User.findById(decoded._id);
+      
+      if (user) {
+        await sendOrderConfirmation({
+          user,
+          order: {
+            ...order.toObject(),
+            _id: order._id.toString(),
+            createdAt: order.createdAt
+          }
+        });
+      }
+    } catch (emailError) {
+      console.error('Failed to send order confirmation email:', emailError);
+      // Continue with the response even if email fails
+    }
     
     return Response.json(
       apiResponse(201, order, 'Order created successfully'),
