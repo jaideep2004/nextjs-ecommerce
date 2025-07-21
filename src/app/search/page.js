@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 import {
@@ -56,14 +56,16 @@ export default function SearchPage() {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    // Reset page when search query changes
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q') || '';
+    
     setPage(1);
     setSearchQuery(query);
     fetchProducts(1, query, filters);
     fetchCategories();
-  }, [query]);
+  }, [query, filters]);
 
-  const fetchProducts = async (pageNum, searchTerm, filterOptions) => {
+  const fetchProducts = useCallback(async (pageNum, searchTerm, filterOptions) => {
     try {
       setLoading(true);
       
@@ -99,7 +101,7 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const fetchCategories = async () => {
     try {

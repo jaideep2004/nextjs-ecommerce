@@ -78,7 +78,7 @@ export default function LoginPage() {
       setError('');
       await login(formData.email, formData.password);
       // Redirect is handled in the AuthContext after successful login
-      // Don't set loading to false here as we're redirecting
+      // Don&apos;t set loading to false here as we're redirecting
       return;
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -170,7 +170,7 @@ export default function LoginPage() {
         
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body1" gutterBottom>
-            Don't have an account?
+            Don&apos;t have an account?
           </Typography>
           <Button
             component={Link}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
   Box,
@@ -70,19 +70,7 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  useEffect(() => {
-    // Redirect if not admin
-    if (!authLoading && (!user || !user.isAdmin)) {
-      router.push('/login?redirect=/admin/customers');
-      return;
-    }
-
-    if (user && user.isAdmin) {
-      fetchCustomers();
-    }
-  }, [user, authLoading, router, page, rowsPerPage, statusFilter, sortBy, sortOrder]);
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Fetching customers with params:', { page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery });
@@ -144,7 +132,23 @@ export default function CustomersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery]);
+
+  useEffect(() => {
+    // Redirect if not admin
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !user.isAdmin) {
+      router.push('/login?redirect=/admin/customers');
+      return;
+    }
+
+    if (user && user.isAdmin) {
+      fetchCustomers();
+    }
+  }, [user, authLoading, router, fetchCustomers]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

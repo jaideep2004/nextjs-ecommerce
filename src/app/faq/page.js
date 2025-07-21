@@ -26,7 +26,7 @@ import {
   LocalShipping as ShippingIcon,
   Payment as PaymentIcon,
   AssignmentReturn as ReturnIcon,
-  ShoppingCart as CartIcon,
+  ShoppingCart,
   AccountCircle as AccountIcon,
   Help as HelpIcon,
 } from '@mui/icons-material';
@@ -224,7 +224,7 @@ export default function FAQPage() {
               No results found
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Try adjusting your search or filter to find what you're looking for.
+              Try adjusting your search or filter to find what you&apos;re looking for.
             </Typography>
           </Box>
         )}

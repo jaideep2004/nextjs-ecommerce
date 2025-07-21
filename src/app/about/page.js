@@ -161,7 +161,7 @@ export default function AboutPage() {
           </Typography>
           <Divider sx={{ mb: 3, width: 100, borderWidth: 2, borderColor: 'primary.main' }} />
           <Typography variant="body1" paragraph>
-            At our core, we believe in providing exceptional products that enhance our customers' lives. 
+            At our core, we believe in providing exceptional products that enhance our customers&apos; lives. 
             We are committed to sourcing sustainable materials, working with ethical manufacturers, and 
             delivering outstanding value.
           </Typography>

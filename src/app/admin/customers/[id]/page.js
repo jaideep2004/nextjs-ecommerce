@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -83,19 +83,7 @@ export default function CustomerDetailPage() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [tabValue, setTabValue] = useState(0);
 
-  useEffect(() => {
-    // Redirect if not admin
-    if (!authLoading && (!user || !user.isAdmin)) {
-      router.push(`/login?redirect=/admin/customers/${customerId}`);
-      return;
-    }
-
-    if (user && user.isAdmin && customerId) {
-      fetchCustomerData();
-    }
-  }, [user, authLoading, router, customerId]);
-
-  const fetchCustomerData = async () => {
+  const fetchCustomerData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -105,23 +93,44 @@ export default function CustomerDetailPage() {
         throw new Error('Failed to fetch customer details');
       }
       const customerData = await customerResponse.json();
+      setCustomer(customerData.data || customerData);
       
-      // Fetch customer orders
-      const ordersResponse = await fetch(`/api/admin/customers/${customerId}/orders`);
-      if (!ordersResponse.ok) {
-        throw new Error('Failed to fetch customer orders');
+      try {
+        // Fetch customer orders
+        const ordersResponse = await fetch(`/api/admin/customers/${customerId}/orders`);
+        if (ordersResponse.ok) {
+          const ordersData = await ordersResponse.json();
+          setOrders(ordersData.data?.orders || []);
+        } else {
+          console.warn('Failed to fetch customer orders, showing empty orders list');
+          setOrders([]);
+        }
+      } catch (ordersErr) {
+        console.error('Error fetching customer orders:', ordersErr);
+        setOrders([]);
       }
-      const ordersData = await ordersResponse.json();
-      
-      setCustomer(customerData);
-      setOrders(ordersData.orders);
     } catch (err) {
       console.error('Error fetching customer data:', err);
       setError(err.message || 'Failed to load customer data. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !user.isAdmin) {
+      router.push('/login');
+      return;
+    }
+
+    if (user && user.isAdmin && customerId) {
+      fetchCustomerData();
+    }
+  }, [user, authLoading, router, customerId, fetchCustomerData]);
 
   const handleOpenDialog = (action) => {
     setDialogAction(action);
@@ -456,7 +465,7 @@ export default function CustomerDetailPage() {
                     <Typography variant="subtitle1" sx={{ mb: 2 }}>
                       Recent Orders
                     </Typography>
-                    {orders.length > 0 ? (
+                    {orders && orders.length > 0 ? (
                       <TableContainer>
                         <Table>
                           <TableHead>
@@ -479,23 +488,23 @@ export default function CustomerDetailPage() {
                                 </TableCell>
                                 <TableCell>{formatDate(order.createdAt)}</TableCell>
                                 <TableCell>{order.orderItems?.length || 0}</TableCell>
-                                <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                                <TableCell>{formatCurrency(order.totalAmount || order.totalPrice || 0)}</TableCell>
                                 <TableCell>
                                   <Chip
-                                    label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                    label={(order.status || order.orderStatus || 'pending').charAt(0).toUpperCase() + (order.status || order.orderStatus || 'pending').slice(1)}
                                     size="small"
                                     sx={{
                                       bgcolor: 
-                                        order.status === 'pending' ? '#FFF8E1' :
-                                        order.status === 'processing' ? '#E3F2FD' :
-                                        order.status === 'shipped' ? '#E8F5E9' :
-                                        order.status === 'delivered' ? '#E0F2F1' :
+                                        (order.status || order.orderStatus) === 'pending' ? '#FFF8E1' :
+                                        (order.status || order.orderStatus) === 'processing' ? '#E3F2FD' :
+                                        (order.status || order.orderStatus) === 'shipped' ? '#E8F5E9' :
+                                        (order.status || order.orderStatus) === 'delivered' ? '#E0F2F1' :
                                         '#FFEBEE',
                                       color: 
-                                        order.status === 'pending' ? '#F57F17' :
-                                        order.status === 'processing' ? '#1565C0' :
-                                        order.status === 'shipped' ? '#2E7D32' :
-                                        order.status === 'delivered' ? '#00695C' :
+                                        (order.status || order.orderStatus) === 'pending' ? '#F57F17' :
+                                        (order.status || order.orderStatus) === 'processing' ? '#1565C0' :
+                                        (order.status || order.orderStatus) === 'shipped' ? '#2E7D32' :
+                                        (order.status || order.orderStatus) === 'delivered' ? '#00695C' :
                                         '#C62828',
                                     }}
                                   />

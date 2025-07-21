@@ -119,7 +119,7 @@ export default function TermsPage() {
             4. Optional Tools
           </Typography>
           <Typography paragraph>
-            We may provide you with access to third-party tools over which we neither monitor nor have any control nor input. You acknowledge and agree that we provide access to such tools "as is" and "as available" without any warranties, representations, or conditions of any kind and without any endorsement.
+            We may provide you with access to third-party tools over which we neither monitor nor have any control nor input. You acknowledge and agree that we provide access to such tools &quot;as is&quot; and "as available" without any warranties, representations, or conditions of any kind and without any endorsement.
           </Typography>
           <Typography paragraph>
             We shall have no liability whatsoever arising from or relating to your use of optional third-party tools. Any use by you of the optional tools offered through the site is entirely at your own risk and discretion and you should ensure that you are familiar with and approve of the terms on which tools are provided by the relevant third-party provider(s).

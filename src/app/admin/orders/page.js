@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Container,
@@ -69,32 +69,21 @@ const getOrderStatus = (order) => {
 };
 
 export default function OrdersPage() {
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { user, authLoading } = useAuth();
+  
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalOrders, setTotalOrders] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
-
-  useEffect(() => {
-    // Redirect if not admin
-    if (!authLoading && (!user || !user.isAdmin)) {
-      router.push('/login?redirect=/admin/orders');
-      return;
-    }
-
-    if (user && user.isAdmin) {
-      fetchOrders();
-    }
-  }, [user, authLoading, router, page, rowsPerPage, statusFilter, sortBy, sortOrder]);
-
-  const fetchOrders = async () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -155,7 +144,22 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery]);
+  
+  useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !user.isAdmin) {
+      router.push('/login?redirect=/admin/orders');
+      return;
+    }
+
+    if (user && user.isAdmin) {
+      fetchOrders();
+    }
+  }, [user, authLoading, router, fetchOrders]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

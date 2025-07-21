@@ -47,7 +47,7 @@ const MenuProps = {
   },
 };
 
-export default function ProductForm({ product, categories, isEdit = false }) {
+export default function ProductForm({ product, categories = [], isEdit = false }) {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -498,7 +498,7 @@ export default function ProductForm({ product, categories, isEdit = false }) {
                 label="Category"
               >
                 <MenuItem value=""><em>Select a category</em></MenuItem>
-                {categories?.map((category) => (
+                {Array.isArray(categories) && categories.map((category) => (
                   <MenuItem key={category._id} value={category._id}>
                     {category.name}
                   </MenuItem>

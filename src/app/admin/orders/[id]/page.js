@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
@@ -93,19 +93,7 @@ export default function OrderDetailPage() {
   const [statusNote, setStatusNote] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  useEffect(() => {
-    // Redirect if not admin
-    if (!authLoading && (!user || !user.isAdmin)) {
-      router.push(`/login?redirect=/admin/orders/${orderId}`);
-      return;
-    }
-
-    if (user && user.isAdmin && orderId) {
-      fetchOrder();
-    }
-  }, [user, authLoading, router, orderId]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Fetching order details for ID:', orderId);
@@ -130,7 +118,19 @@ export default function OrderDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    // Redirect if not admin
+    if (!authLoading && (!user || !user.isAdmin)) {
+      router.push(`/login?redirect=/admin/orders/${orderId}`);
+      return;
+    }
+
+    if (user && user.isAdmin && orderId) {
+      fetchOrder();
+    }
+  }, [user, authLoading, router, orderId, fetchOrder]);
 
   const handleOpenStatusDialog = () => {
     setOpenStatusDialog(true);

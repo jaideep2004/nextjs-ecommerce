@@ -411,6 +411,8 @@ export default function CheckoutPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  // State for PayPal client ID
+  const [paypalClientId, setPaypalClientId] = useState('test');
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -439,6 +441,33 @@ export default function CheckoutPage() {
       router.push('/login?redirect=/checkout');
     }
   }, [isAuthenticated, router]);
+
+  // Fetch PayPal client ID from settings
+  useEffect(() => {
+    const fetchPaypalSettings = async () => {
+      try {
+        const response = await axios.get('/api/settings');
+        if (response.data?.data?.payment?.paypalClientId) {
+          setPaypalClientId(response.data.data.payment.paypalClientId);
+        }
+      } catch (err) {
+        console.error('Error fetching PayPal settings:', err);
+        // Continue with default test client ID
+      }
+    };
+
+    fetchPaypalSettings();
+  }, []);
+
+  // Effect to handle payment success
+  useEffect(() => {
+    if (paymentSuccess && orderId) {
+      // Clear cart and set order complete
+      clearCart();
+      setOrderComplete(true);
+      setActiveStep(steps.length);
+    }
+  }, [paymentSuccess, orderId, clearCart, steps.length]);
   
   // Steps for the checkout process
   const steps = ['Shipping', 'Payment', 'Review Order'];
@@ -626,36 +655,6 @@ export default function CheckoutPage() {
       </Container>
     );
   }
-  
-  // State for PayPal client ID
-  const [paypalClientId, setPaypalClientId] = useState('test');
-
-  // Fetch PayPal client ID from settings
-  useEffect(() => {
-    const fetchPaypalSettings = async () => {
-      try {
-        const response = await axios.get('/api/settings');
-        if (response.data?.data?.payment?.paypalClientId) {
-          setPaypalClientId(response.data.data.payment.paypalClientId);
-        }
-      } catch (err) {
-        console.error('Error fetching PayPal settings:', err);
-        // Continue with default test client ID
-      }
-    };
-
-    fetchPaypalSettings();
-  }, []);
-
-  // Effect to handle payment success
-  useEffect(() => {
-    if (paymentSuccess && orderId) {
-      // Clear cart and set order complete
-      clearCart();
-      setOrderComplete(true);
-      setActiveStep(steps.length);
-    }
-  }, [paymentSuccess, orderId, clearCart, steps.length]);
 
   return (
     <PayPalScriptProvider options={{ "client-id": paypalClientId }}>
