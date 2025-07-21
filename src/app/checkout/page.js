@@ -399,6 +399,9 @@ const ReviewOrder = ({ formData, cart, cartTotal, shippingCost, taxAmount, final
 };
 
 export default function CheckoutPage() {
+  // Steps for the checkout process
+  const steps = ['Shipping', 'Payment', 'Review Order'];
+
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -467,10 +470,7 @@ export default function CheckoutPage() {
       setOrderComplete(true);
       setActiveStep(steps.length);
     }
-  }, [paymentSuccess, orderId, clearCart, steps.length]);
-  
-  // Steps for the checkout process
-  const steps = ['Shipping', 'Payment', 'Review Order'];
+  }, [paymentSuccess, orderId, clearCart, steps]);
   
   // Shipping cost calculation (simplified for demo)
   const shippingCost = cartTotal > 100 ? 0 : 10;
