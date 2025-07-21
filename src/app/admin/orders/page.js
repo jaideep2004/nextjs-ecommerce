@@ -82,7 +82,7 @@ export default function OrdersPage() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);

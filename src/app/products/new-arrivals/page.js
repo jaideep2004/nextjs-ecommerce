@@ -24,8 +24,12 @@ export default function NewArrivalsPage() {
     const fetchNewArrivals = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get('/api/products?sort=-createdAt&limit=12');
-        setProducts(data.products || []);
+        const response = await axios.get('/api/products?sort=-createdAt&limit=12');
+        console.log('New arrivals API response:', response.data);
+        
+        // Handle different response structures
+        const productsData = response.data.products || response.data.data?.products || [];
+        setProducts(productsData);
       } catch (err) {
         console.error('Error fetching new arrivals:', err);
         setError(err.response?.data?.message || 'Failed to load new arrivals');

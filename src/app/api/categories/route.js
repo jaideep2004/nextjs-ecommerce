@@ -27,13 +27,18 @@ export async function GET(request) {
     // Get product counts for each category
     const categoriesWithCounts = await Promise.all(
       categories.map(async (category) => {
-        const productCount = await Product.countDocuments({ category: category._id });
+        // Use the category._id to find products with this category
+        const productCount = await Product.countDocuments({ category: category.name });
         return {
           ...category,
           productCount,
         };
       })
     );
+    
+    console.log('Categories API response:', categoriesWithCounts);
+    
+    console.log('Categories API response:', categoriesWithCounts);
     
     return Response.json(
       apiResponse(200, {

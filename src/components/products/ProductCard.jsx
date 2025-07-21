@@ -90,7 +90,7 @@ export default function ProductCard({
             />
           )}
           <Image
-            src={product.images[0] || '/images/placeholder.png'}
+            src={product.image || (product.images && product.images.length > 0 ? product.images[0] : '/images/placeholder.png')}
             alt={product.name}
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"

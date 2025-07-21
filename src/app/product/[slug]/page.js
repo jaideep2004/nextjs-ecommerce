@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'react-toastify';
 import axios from 'axios';
-import Image from 'next/image';
-import Link from 'next/link';
+import ProductGrid from '@/components/products/ProductGrid';
 import {
   Container,
   Grid,
@@ -37,6 +39,7 @@ import {
   NavigateNext,
 } from '@mui/icons-material';
 
+
 export default function ProductPage() {
   const params = useParams();
   const { slug } = params;
@@ -49,34 +52,30 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [tabValue, setTabValue] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState([]);
   
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`/api/products/slug/${slug}`);
-        
-        const productData = res.data.data;
-        setProduct(productData);
-        
-        // Set default color and size if available
-        if (productData.colors && productData.colors.length > 0) {
-          setSelectedColor(productData.colors[0]);
-        }
-        
-        if (productData.sizes && productData.sizes.length > 0) {
-          setSelectedSize(productData.sizes[0]);
-        }
-      } catch (err) {
-        console.error('Error fetching product:', err);
-        setError(err.response?.data?.message || 'Failed to load product');
-      } finally {
-        setLoading(false);
+  const fetchProduct = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/products/slug/${slug}`);
+      
+      const productData = res.data.data;
+      setProduct(productData);
+      
+      // Set default color and size if available
+      if (productData.colors && productData.colors.length > 0) {
+        setSelectedColor(productData.colors[0]);
       }
-    };
-    
-    if (slug) {
-      fetchProduct();
+      
+      if (productData.sizes && productData.sizes.length > 0) {
+        setSelectedSize(productData.sizes[0]);
+      }
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      setError(err.response?.data?.message || 'Failed to load product');
+    } finally {
+      setLoading(false);
     }
   }, [slug]);
   
@@ -88,21 +87,105 @@ export default function ProductPage() {
   const router = useRouter();
   
   const handleAddToCart = () => {
+    if (product) {
+      // Check if the product has colors but none is selected
+      if (product.colors?.length > 0 && !selectedColor) {
+        toast.error('Please select a color');
+        return;
+      }
+      
+      // Check if the product has sizes but none is selected
+      if (product.sizes?.length > 0 && !selectedSize) {
+        toast.error('Please select a size');
+        return;
+      }
+      
+      const success = addToCart(
+        product,
+        quantity,
+        selectedColor,
+        selectedSize,
+        user
+      );
+      
+      if (success) {
+        // Optional: Show a success message or navigate to cart
+        // router.push('/cart');
+      }
+    }
+  };
+  
+  const handleAddToWishlist = async (product) => {
     if (!user) {
-      // Redirect to login page if user is not logged in
+      // Redirect to login if not authenticated
       router.push(`/login?redirect=/product/${slug}`);
       return;
     }
     
-    if (product) {
-      addToCart({
-        ...product,
-        quantity,
-        color: selectedColor,
-        size: selectedSize,
-      });
+    try {
+      await axios.post('/api/wishlist', { productId: product._id });
+      setWishlistItems(prev => [...prev, product]);
+      toast.success('Added to wishlist');
+    } catch (error) {
+      console.error('Add to wishlist failed:', error);
+      toast.error('Failed to add to wishlist');
     }
   };
+  
+  const handleRemoveFromWishlist = async (productId) => {
+    try {
+      await axios.delete(`/api/wishlist/${productId}`);
+      setWishlistItems(prev => prev.filter(item => item._id !== productId));
+      toast.success('Removed from wishlist');
+    } catch (error) {
+      console.error('Remove from wishlist failed:', error);
+      toast.error('Failed to remove from wishlist');
+    }
+  };
+
+  // Fetch product data
+  useEffect(() => {
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug, fetchProduct]);
+  
+  // Fetch related products when product category is available
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (product?.category) {
+        try {
+          const res = await axios.get(`/api/products?category=${product.category}&limit=4&exclude=${product._id}`);
+          console.log('Related products response:', res.data);
+          
+          // Handle different response structures
+          const productsData = res.data.products || res.data.data?.products || [];
+          setRelatedProducts(productsData.filter(p => p._id !== product._id).slice(0, 4));
+        } catch (err) {
+          console.error('Error fetching related products:', err);
+        }
+      }
+    };
+    
+    fetchRelatedProducts();
+  }, [product]);
+  
+  // Fetch wishlist items if user is logged in
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      if (user) {
+        try {
+          const res = await axios.get('/api/wishlist');
+          const items = res.data.wishlist || [];
+          setWishlistItems(items.map(item => item.product || { _id: item.productId }));
+        } catch (error) {
+          console.error('Error fetching wishlist:', error);
+        }
+      }
+    };
+    
+    fetchWishlist();
+  }, [user]);
   
   if (loading) {
     return (
@@ -177,7 +260,7 @@ export default function ProductPage() {
               />
             )}
             <Image 
-              src={product.image} 
+              src={product.image || (product.images && product.images.length > 0 ? product.images[0] : '/images/placeholder.png')} 
               alt={product.name}
               fill
               style={{ objectFit: 'contain' }}
@@ -419,6 +502,24 @@ export default function ProductPage() {
           )}
         </Box>
       </Paper>
+      
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <Box sx={{ mt: 8 }}>
+          <Typography variant="h4" component="h2" sx={{ mb: 4, fontWeight: 'bold' }}>
+            Related Products
+          </Typography>
+          
+          <ProductGrid 
+            products={relatedProducts}
+            wishlistItems={wishlistItems}
+            onAddToCart={handleAddToCart}
+            onAddToWishlist={handleAddToWishlist}
+            onRemoveFromWishlist={handleRemoveFromWishlist}
+            gridProps={{ spacing: 3 }}
+          />
+        </Box>
+      )}
     </Container>
   );
 }

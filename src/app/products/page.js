@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
 	Container,
 	Grid,
@@ -29,15 +32,19 @@ import {
 	InputAdornment,
 } from "@mui/material";
 import { NavigateNext, FilterList, Search, Clear } from "@mui/icons-material";
-import ProductGrid from "@/components/ProductGrid";
+import ProductGrid from "@/components/products/ProductGrid";
 
 export default function ProductsPage() {
 	const searchParams = useSearchParams();
+	const router = useRouter();
+	const { addToCart } = useCart();
+	const { user } = useAuth();
 
 	// State for products and loading
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [wishlistItems, setWishlistItems] = useState([]);
 
 	// State for pagination
 	const [pagination, setPagination] = useState({
@@ -118,13 +125,21 @@ export default function ProductsPage() {
 				queryParams.append("limit", 12); // Products per page
 
 				const res = await axios.get(`/api/products?${queryParams.toString()}`);
+				console.log('Products API response:', res.data);
 
-				const responseData = res.data.data;
-				setProducts(responseData.products);
+				// Handle different response structures
+				const productsData = res.data.products || res.data.data?.products || [];
+				const paginationData = res.data.pagination || res.data.data?.pagination || {
+					page: 1,
+					pages: 1,
+					total: productsData.length,
+				};
+
+				setProducts(productsData);
 				setPagination({
-					page: responseData.pagination.page,
-					pages: responseData.pagination.pages,
-					total: responseData.pagination.total,
+					page: paginationData.page,
+					pages: paginationData.pages,
+					total: paginationData.total,
 				});
 			} catch (err) {
 				console.error("Error fetching products:", err);
@@ -136,6 +151,23 @@ export default function ProductsPage() {
 
 		fetchProducts();
 	}, [filters, pagination.page]);
+	
+	// Fetch wishlist items if user is logged in
+	useEffect(() => {
+		const fetchWishlist = async () => {
+			if (user) {
+				try {
+					const res = await axios.get('/api/wishlist');
+					const items = res.data.wishlist || [];
+					setWishlistItems(items.map(item => item.product || { _id: item.productId }));
+				} catch (error) {
+					console.error('Error fetching wishlist:', error);
+				}
+			}
+		};
+		
+		fetchWishlist();
+	}, [user]);
 
 	// Handle filter changes
 	const handleFilterChange = (name, value) => {
@@ -184,6 +216,35 @@ export default function ProductsPage() {
 			sort: "createdAt:desc",
 		});
 		setPagination((prev) => ({ ...prev, page: 1 }));
+	};
+	
+	// Cart and wishlist handlers
+	const handleAddToCart = (product) => {
+		addToCart(product, 1, '', '', user);
+	};
+	
+	const handleAddToWishlist = async (product) => {
+		if (!user) {
+			// Redirect to login if not authenticated
+			router.push('/login?redirect=/products');
+			return;
+		}
+		
+		try {
+			await axios.post('/api/wishlist', { productId: product._id });
+			setWishlistItems(prev => [...prev, product]);
+		} catch (error) {
+			console.error('Add to wishlist failed:', error);
+		}
+	};
+	
+	const handleRemoveFromWishlist = async (productId) => {
+		try {
+			await axios.delete(`/api/wishlist/${productId}`);
+			setWishlistItems(prev => prev.filter(item => item._id !== productId));
+		} catch (error) {
+			console.error('Remove from wishlist failed:', error);
+		}
 	};
 
 	return (
@@ -361,9 +422,33 @@ export default function ProductsPage() {
 						products={products}
 						loading={loading}
 						error={error}
-						pagination={pagination}
-						onPageChange={handlePageChange}
+						wishlistItems={wishlistItems}
+						onAddToCart={handleAddToCart}
+						onAddToWishlist={handleAddToWishlist}
+						onRemoveFromWishlist={handleRemoveFromWishlist}
 					/>
+					
+					{/* Pagination */}
+					{!loading && !error && pagination.pages > 1 && (
+						<Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+							<Pagination
+								count={pagination.pages}
+								page={pagination.page}
+								onChange={handlePageChange}
+								color="primary"
+								size="large"
+								sx={{
+									'& .MuiPaginationItem-root': {
+										color: '#5D4037',
+									},
+									'& .Mui-selected': {
+										backgroundColor: '#8D6E63 !important',
+										color: 'white',
+									},
+								}}
+							/>
+						</Box>
+					)}
 				</Grid>
 			</Grid>
 		</Container>

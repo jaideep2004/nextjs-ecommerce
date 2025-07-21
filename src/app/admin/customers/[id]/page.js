@@ -96,8 +96,8 @@ export default function CustomerDetailPage() {
       setCustomer(customerData.data || customerData);
       
       try {
-        // Fetch customer orders
-        const ordersResponse = await fetch(`/api/admin/customers/${customerId}/orders`);
+      // Fetch customer orders
+      const ordersResponse = await fetch(`/api/admin/customers/${customerId}/orders`);
         if (ordersResponse.ok) {
           const ordersData = await ordersResponse.json();
           setOrders(ordersData.data?.orders || []);
