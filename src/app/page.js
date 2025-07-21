@@ -1,95 +1,67 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Container, Typography, Box, Divider } from '@mui/material';
+import axios from 'axios';
+import Hero from '@/components/Hero';
+import ProductGrid from '@/components/ProductGrid';
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch featured products
+        const featuredRes = await axios.get('/api/products?featured=true&limit=8');
+        
+        // Fetch new arrivals
+        const newArrivalsRes = await axios.get('/api/products?sort=createdAt:desc&limit=8');
+        
+        setFeaturedProducts(featuredRes.data.data.products);
+        setNewArrivals(newArrivalsRes.data.data.products);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products. Please try again later.');
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  return (
+    <Box>
+      <Hero />
+      
+      <Container maxWidth="lg">
+        <Box sx={{ py: 6 }}>
+          <ProductGrid 
+            products={featuredProducts} 
+            loading={loading} 
+            error={error}
+            title="Featured Products"
           />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          
+          <Divider sx={{ my: 6 }} />
+          
+          <ProductGrid 
+            products={newArrivals} 
+            loading={loading} 
+            error={error}
+            title="New Arrivals"
           />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </Box>
+      </Container>
+    </Box>
   );
 }
