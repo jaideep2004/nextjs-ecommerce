@@ -65,7 +65,7 @@ export default function CustomerOrders() {
         });
         
         if (statusFilter !== 'all') {
-          params.append('status', statusFilter);
+          params.append('orderStatus', statusFilter);
         }
         
         const res = await fetch(`/api/orders?${params.toString()}`);
@@ -75,12 +75,12 @@ export default function CustomerOrders() {
         }
         
         const data = await res.json();
-        if (!data.orders || !Array.isArray(data.orders)) {
+        if (!data.data || !data.data.orders || !Array.isArray(data.data.orders)) {
           setOrders([]);
           setTotalPages(0);
         } else {
-          setOrders(data.orders);
-          setTotalPages(Math.ceil(data.totalCount / limit));
+          setOrders(data.data.orders);
+          setTotalPages(Math.ceil(data.data.pagination.total / limit));
         }
       } catch (err) {
         console.error('Error fetching orders:', err);

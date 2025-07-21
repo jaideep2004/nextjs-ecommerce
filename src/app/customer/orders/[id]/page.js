@@ -77,8 +77,17 @@ export default function OrderDetails({ params }) {
           }
         }
         
-        const data = await res.json();
-        setOrder(data);
+        const response = await res.json();
+        
+        // Handle the API response structure correctly
+        if (response.data) {
+          setOrder(response.data);
+        } else if (response._id) {
+          // In case the API returns order directly without wrapping in 'data'
+          setOrder(response);
+        } else {
+          throw new Error('Invalid response format');
+        }
       } catch (err) {
         console.error('Error fetching order details:', err);
         setError(err.message || 'Failed to load order details');
@@ -126,6 +135,12 @@ export default function OrderDetails({ params }) {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+  
+  // Safe access to nested properties
+  const getOrderId = () => {
+    if (!order?._id) return 'N/A';
+    return typeof order._id === 'string' ? order._id.substring(0, 8) : order._id.toString().substring(0, 8);
   };
   
   if (authLoading) {
@@ -194,7 +209,7 @@ export default function OrderDetails({ params }) {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
                 <Typography variant="h6" component="h2">
-                  Order #{order._id && order._id.substring(0, 8)}
+                  Order #{getOrderId()}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Placed on {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
@@ -321,50 +336,62 @@ export default function OrderDetails({ params }) {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {order.orderItems.map((item) => (
-                        <TableRow key={item._id}>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <Box sx={{ position: 'relative', width: 60, height: 60, mr: 2 }}>
-                                <Image
-                                  src={item.image || '/images/placeholder.png'}
-                                  alt={item.name}
-                                  fill
-                                  style={{ objectFit: 'cover' }}
-                                />
-                              </Box>
-                              <Box>
-                                <Typography variant="body1">
-                                  <Link href={item.slug ? `/product/${item.slug}` : `/product`} passHref>
-                                    <Typography 
-                                      component="span" 
-                                      sx={{ 
-                                        color: 'inherit', 
-                                        '&:hover': { color: '#8D6E63' } 
-                                      }}
-                                    >
-                                      {item.name}
+                      {order.orderItems && order.orderItems.length > 0 ? (
+                        order.orderItems.map((item, index) => (
+                          <TableRow key={item._id || index}>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Box sx={{ position: 'relative', width: 60, height: 60, mr: 2 }}>
+                                  <Image
+                                    src={item.image || '/images/placeholder.png'}
+                                    alt={item.name || 'Product'}
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                </Box>
+                                <Box>
+                                  <Typography variant="body1">
+                                    {item.slug ? (
+                                      <Link href={`/product/${item.slug}`} passHref>
+                                        <Typography 
+                                          component="span" 
+                                          sx={{ 
+                                            color: 'inherit', 
+                                            '&:hover': { color: '#8D6E63' } 
+                                          }}
+                                        >
+                                          {item.name || 'Product Name'}
+                                        </Typography>
+                                      </Link>
+                                    ) : (
+                                      <Typography component="span">
+                                        {item.name || 'Product Name'}
+                                      </Typography>
+                                    )}
+                                  </Typography>
+                                  {item.color && (
+                                    <Typography variant="body2" color="text.secondary">
+                                      Color: {item.color}
                                     </Typography>
-                                  </Link>
-                                </Typography>
-                                {item.color && (
-                                  <Typography variant="body2" color="text.secondary">
-                                    Color: {item.color}
-                                  </Typography>
-                                )}
-                                {item.size && (
-                                  <Typography variant="body2" color="text.secondary">
-                                    Size: {item.size}
-                                  </Typography>
-                                )}
+                                  )}
+                                  {item.size && (
+                                    <Typography variant="body2" color="text.secondary">
+                                      Size: {item.size}
+                                    </Typography>
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
-                          </TableCell>
-                          <TableCell>${item.price.toFixed(2)}</TableCell>
-                          <TableCell align="center">{item.quantity}</TableCell>
-                          <TableCell align="right">${(item.price * item.quantity).toFixed(2)}</TableCell>
+                            </TableCell>
+                            <TableCell>${(item.price || 0).toFixed(2)}</TableCell>
+                            <TableCell align="center">{item.quantity || 0}</TableCell>
+                            <TableCell align="right">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center">No items in this order</TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -381,24 +408,24 @@ export default function OrderDetails({ params }) {
                 <List disablePadding>
                   <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Subtotal" />
-                    <Typography variant="body2">${order.itemsPrice.toFixed(2)}</Typography>
+                    <Typography variant="body2">${(order.itemsPrice || 0).toFixed(2)}</Typography>
                   </ListItem>
                   
                   <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Shipping" />
-                    <Typography variant="body2">${order.shippingPrice.toFixed(2)}</Typography>
+                    <Typography variant="body2">${(order.shippingPrice || 0).toFixed(2)}</Typography>
                   </ListItem>
                   
                   <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Tax" />
-                    <Typography variant="body2">${order.taxPrice.toFixed(2)}</Typography>
+                    <Typography variant="body2">${(order.taxPrice || 0).toFixed(2)}</Typography>
                   </ListItem>
                   
-                  {order.discount > 0 && (
+                  {(order.discount || 0) > 0 && (
                     <ListItem sx={{ py: 1, px: 0 }}>
                       <ListItemText primary="Discount" />
                       <Typography variant="body2" color="error.main">
-                        -${order.discount.toFixed(2)}
+                        -${(order.discount || 0).toFixed(2)}
                       </Typography>
                     </ListItem>
                   )}
@@ -408,7 +435,7 @@ export default function OrderDetails({ params }) {
                   <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Total" />
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      ${order.totalPrice.toFixed(2)}
+                      ${(order.totalPrice || 0).toFixed(2)}
                     </Typography>
                   </ListItem>
                 </List>
@@ -421,7 +448,7 @@ export default function OrderDetails({ params }) {
                 </Typography>
                 
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Payment Method:</strong> {order.paymentMethod}
+                  <strong>Payment Method:</strong> {order.paymentMethod ? order.paymentMethod.toUpperCase() : 'N/A'}
                 </Typography>
                 
                 <Typography variant="body2" sx={{ mb: 1 }}>
@@ -453,14 +480,17 @@ export default function OrderDetails({ params }) {
                 </Typography>
                 
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Name:</strong> {order.shippingAddress.fullName}
+                  <strong>Name:</strong> {order.shippingAddress?.fullName || 'N/A'}
                 </Typography>
                 
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+                  <strong>Address:</strong> {order.shippingAddress?.address || 'N/A'}
+                  {order.shippingAddress?.city && `, ${order.shippingAddress.city}`}
+                  {order.shippingAddress?.postalCode && ` ${order.shippingAddress.postalCode}`}
+                  {order.shippingAddress?.country && `, ${order.shippingAddress.country}`}
                 </Typography>
                 
-                {order.shippingAddress.phone && (
+                {order.shippingAddress?.phone && (
                   <Typography variant="body2">
                     <strong>Phone:</strong> {order.shippingAddress.phone}
                   </Typography>
@@ -479,7 +509,7 @@ export default function OrderDetails({ params }) {
               Back to Orders
             </Button>
             
-            {order.orderStatus === 'Delivered' && (
+            {order.orderStatus === 'Delivered' && order.orderItems && order.orderItems.length > 0 && order.orderItems[0]?.slug && (
               <Button 
                 component={Link} 
                 href={`/product/${order.orderItems[0].slug}#review`}

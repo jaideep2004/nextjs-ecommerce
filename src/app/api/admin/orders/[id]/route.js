@@ -37,7 +37,7 @@ export async function PUT(req, { params }) {
     await connectToDatabase();
     
     const { id } = params;
-    const { status, trackingNumber, trackingUrl, statusNote } = await req.json();
+    const { orderStatus, trackingNumber, trackingUrl, statusNote } = await req.json();
     
     const order = await Order.findById(id);
     
@@ -49,17 +49,17 @@ export async function PUT(req, { params }) {
     }
     
     // Update order fields
-    if (status) {
-      order.orderStatus = status;
+    if (orderStatus) {
+      order.orderStatus = orderStatus;
       
       // Update related fields based on status
-      if (status === 'Processing') {
+      if (orderStatus === 'Processing') {
         order.isPaid = true;
         if (!order.paidAt) order.paidAt = new Date();
-      } else if (status === 'Shipped') {
+      } else if (orderStatus === 'Shipped') {
         order.isShipped = true;
         order.shippedAt = new Date();
-      } else if (status === 'Delivered') {
+      } else if (orderStatus === 'Delivered') {
         order.isDelivered = true;
         order.deliveredAt = new Date();
       }

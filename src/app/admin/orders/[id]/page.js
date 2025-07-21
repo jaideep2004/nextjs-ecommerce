@@ -58,6 +58,7 @@ const formatDate = (dateString) => {
 
 // Helper function to format currency
 const formatCurrency = (amount) => {
+  if (!amount) return '$0.00';
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -65,7 +66,7 @@ const formatCurrency = (amount) => {
 };
 
 // Status steps mapping
-const statusSteps = ['pending', 'processing', 'shipped', 'delivered'];
+const statusSteps = ['Pending', 'Processing', 'Shipped', 'Delivered'];
 
 // Status colors
 const statusColors = {
@@ -112,13 +113,16 @@ export default function OrderDetailPage() {
       const { data } = await axios.get(`/api/admin/orders/${orderId}`);
       console.log('Order data received:', data);
       
-      setOrder(data);
+      // Handle the API response structure - data might be nested under 'data' property
+      const orderData = data.data || data;
+      setOrder(orderData);
       
       // Initialize dialog fields with current values
-      if (data) {
-        setNewStatus(data.status);
-        setTrackingNumber(data.trackingNumber || '');
-        setTrackingUrl(data.trackingUrl || '');
+      if (orderData) {
+        setNewStatus(orderData.orderStatus || 'Pending');
+        setTrackingNumber(orderData.trackingNumber || '');
+        setTrackingUrl(orderData.trackingUrl || '');
+        setStatusNote(orderData.statusNote || '');
       }
     } catch (err) {
       console.error('Error fetching order:', err);
@@ -141,7 +145,7 @@ export default function OrderDetailPage() {
       setLoading(true);
       
       const updateData = {
-        status: newStatus,
+        orderStatus: newStatus,
         trackingNumber: trackingNumber.trim() || undefined,
         trackingUrl: trackingUrl.trim() || undefined,
         statusNote: statusNote.trim() || undefined,
@@ -176,8 +180,18 @@ export default function OrderDetailPage() {
   };
 
   const getActiveStep = () => {
-    if (order?.status === 'cancelled') return -1;
-    return statusSteps.indexOf(order?.status);
+    if (order?.orderStatus === 'Cancelled') return -1;
+    const stepIndex = statusSteps.indexOf(order?.orderStatus);
+    return stepIndex === -1 ? 0 : stepIndex;
+  };
+
+  // Helper function to parse full name
+  const parseFullName = (fullName) => {
+    if (!fullName) return { firstName: '', lastName: '' };
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    return { firstName, lastName };
   };
 
   if (authLoading || loading) {
@@ -203,6 +217,9 @@ export default function OrderDetailPage() {
       </Container>
     );
   }
+
+  const { firstName, lastName } = parseFullName(order.shippingAddress?.fullName);
+  const customerEmail = order.user?.email || order.shippingAddress?.email || 'No email available';
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -238,7 +255,7 @@ export default function OrderDetailPage() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Box>
                 <Typography variant="h6" component="h2">
-                  Order #{order._id && order._id.substring(order._id.length - 8).toUpperCase()}
+                  Order #{order._id ? order._id.toString().substring(order._id.toString().length - 8).toUpperCase() : 'N/A'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Placed on {formatDate(order.createdAt)}
@@ -257,7 +274,7 @@ export default function OrderDetailPage() {
                   variant="outlined"
                   size="small"
                   startIcon={<EmailIcon />}
-                  onClick={() => window.location.href = `mailto:${order.user?.email || order.shippingAddress?.email}`}
+                  onClick={() => window.location.href = `mailto:${customerEmail}`}
                 >
                   Email Customer
                 </Button>
@@ -284,16 +301,16 @@ export default function OrderDetailPage() {
                   Status:
                 </Typography>
                 <Chip
-                  label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  label={order.orderStatus ? (order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)) : 'Pending'}
                   sx={{
-                    bgcolor: statusColors[order.status]?.bg || '#f5f5f5',
-                    color: statusColors[order.status]?.color || 'text.primary',
+                    bgcolor: statusColors[order.orderStatus?.toLowerCase()]?.bg || statusColors['pending'].bg,
+                    color: statusColors[order.orderStatus?.toLowerCase()]?.color || statusColors['pending'].color,
                     fontWeight: 'medium',
                   }}
                 />
               </Box>
 
-              {order.status !== 'cancelled' && (
+              {order.orderStatus !== 'Cancelled' && (
                 <Stepper activeStep={getActiveStep()} alternativeLabel sx={{ mt: 3 }}>
                   <Step>
                     <StepLabel>Order Placed</StepLabel>
@@ -352,20 +369,20 @@ export default function OrderDetailPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {order.orderItems.map((item) => (
-                        <TableRow key={item._id}>
+                      {order.orderItems?.map((item, index) => (
+                        <TableRow key={item._id || index}>
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <Box sx={{ position: 'relative', width: 60, height: 60, mr: 2 }}>
                                 <Image
                                   src={item.image || '/images/placeholder.png'}
-                                  alt={item.name}
+                                  alt={item.name || 'Product'}
                                   fill
                                   style={{ objectFit: 'contain' }}
                                 />
                               </Box>
                               <Box>
-                                <Typography variant="body2">{item.name}</Typography>
+                                <Typography variant="body2">{item.name || 'Product Name'}</Typography>
                                 {item.color && (
                                   <Typography variant="caption" color="text.secondary" display="block">
                                     Color: {item.color}
@@ -380,8 +397,8 @@ export default function OrderDetailPage() {
                             </Box>
                           </TableCell>
                           <TableCell>{formatCurrency(item.price)}</TableCell>
-                          <TableCell align="center">{item.quantity}</TableCell>
-                          <TableCell align="right">{formatCurrency(item.price * item.quantity)}</TableCell>
+                          <TableCell align="center">{item.quantity || 1}</TableCell>
+                          <TableCell align="right">{formatCurrency((item.price || 0) * (item.quantity || 1))}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -398,9 +415,9 @@ export default function OrderDetailPage() {
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2">Subtotal</Typography>
-                  <Typography variant="body2">{formatCurrency(order.subtotal)}</Typography>
+                  <Typography variant="body2">{formatCurrency(order.itemsPrice)}</Typography>
                 </Box>
-                {order.discount > 0 && (
+                {order.discount && order.discount > 0 && (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2">Discount</Typography>
                     <Typography variant="body2" color="error">
@@ -422,7 +439,7 @@ export default function OrderDetailPage() {
                     Total
                   </Typography>
                   <Typography variant="subtitle1" fontWeight="bold">
-                    {formatCurrency(order.totalAmount)}
+                    {formatCurrency(order.totalPrice)}
                   </Typography>
                 </Box>
                 {order.couponCode && (
@@ -447,7 +464,7 @@ export default function OrderDetailPage() {
                     Payment Method
                   </Typography>
                   <Typography variant="body1">
-                    {order.paymentMethod || 'Not specified'}
+                    {order.paymentMethod === 'cod' ? 'Cash on Delivery' : (order.paymentMethod || 'Not specified')}
                   </Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
@@ -496,12 +513,12 @@ export default function OrderDetailPage() {
                     Customer
                   </Typography>
                   <Typography variant="body1">
-                    {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+                    {firstName} {lastName}
                   </Typography>
                   <Typography variant="body2">
-                    {order.user?.email || order.shippingAddress.email}
+                    {customerEmail}
                   </Typography>
-                  {order.shippingAddress.phone && (
+                  {order.shippingAddress?.phone && (
                     <Typography variant="body2">{order.shippingAddress.phone}</Typography>
                   )}
                 </Box>
@@ -510,15 +527,17 @@ export default function OrderDetailPage() {
                     Address
                   </Typography>
                   <Typography variant="body1">
-                    {order.shippingAddress.address}
+                    {order.shippingAddress?.address}
                   </Typography>
-                  {order.shippingAddress.address2 && (
-                    <Typography variant="body1">{order.shippingAddress.address2}</Typography>
+                  {order.shippingAddress?.address2 && (
+                    <Typography variant="body1">{order.shippingAddress?.address2}</Typography>
                   )}
                   <Typography variant="body1">
-                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                    {order.shippingAddress?.city}
+                    {order.shippingAddress?.state && `, ${order.shippingAddress.state}`}
+                    {' '}{order.shippingAddress?.postalCode || order.shippingAddress?.zipCode}
                   </Typography>
-                  <Typography variant="body1">{order.shippingAddress.country}</Typography>
+                  <Typography variant="body1">{order.shippingAddress?.country}</Typography>
                 </Box>
               </Paper>
             </Grid>
@@ -541,11 +560,11 @@ export default function OrderDetailPage() {
               label="Status"
               onChange={(e) => setNewStatus(e.target.value)}
             >
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="processing">Processing</MenuItem>
-              <MenuItem value="shipped">Shipped</MenuItem>
-              <MenuItem value="delivered">Delivered</MenuItem>
-              <MenuItem value="cancelled">Cancelled</MenuItem>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Processing">Processing</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+              <MenuItem value="Cancelled">Cancelled</MenuItem>
             </Select>
           </FormControl>
           <TextField

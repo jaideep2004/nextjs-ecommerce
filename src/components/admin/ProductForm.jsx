@@ -498,7 +498,7 @@ export default function ProductForm({ product, categories, isEdit = false }) {
                 label="Category"
               >
                 <MenuItem value=""><em>Select a category</em></MenuItem>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <MenuItem key={category._id} value={category._id}>
                     {category.name}
                   </MenuItem>

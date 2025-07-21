@@ -24,9 +24,11 @@ export async function GET(req) {
     
     // Filter by status
     const status = searchParams.get('status');
+    const orderStatus = searchParams.get('orderStatus');
     const filter = {};
     
     if (status) filter.orderStatus = status;
+    if (orderStatus) filter.orderStatus = orderStatus;
     
     // If not admin, only show user's orders
     if (!decoded.isAdmin) {
