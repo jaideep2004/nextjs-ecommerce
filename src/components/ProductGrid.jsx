@@ -2,6 +2,7 @@
 
 import { Grid, Box, Typography, Pagination, CircularProgress } from '@mui/material';
 import ProductCard from './ProductCard';
+import { useEffect } from 'react';
 
 const ProductGrid = ({ products, loading, error, title, pagination, onPageChange }) => {
   if (loading) {
@@ -41,8 +42,17 @@ const ProductGrid = ({ products, loading, error, title, pagination, onPageChange
       )}
 
       <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
+        {products.map((product, index) => (
+          <Grid 
+            item 
+            key={product._id} 
+            xs={12} 
+            sm={6} 
+            md={4} 
+            lg={3}
+            data-aos="fade-up"
+            data-aos-delay={index % 4 * 100}
+          >
             <ProductCard product={product} />
           </Grid>
         ))}

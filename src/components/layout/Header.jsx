@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useThemeContext } from '@/theme';
 import {
   AppBar,
   Box,
@@ -43,6 +44,8 @@ import {
   ExitToApp as LogoutIcon,
   Dashboard as DashboardIcon,
   Notifications as NotificationsIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
 } from '@mui/icons-material';
 
 // Styled search component
@@ -110,6 +113,7 @@ export default function Header() {
   const { cartItems } = useCart();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [wishlistItemCount, setWishlistItemCount] = useState(0); // We'll keep this for now but not display it
+  const { mode, toggleTheme } = useThemeContext();
 
   // Get real data from contexts
   useEffect(() => {
@@ -380,6 +384,16 @@ export default function Header() {
                   </Button>
                 ))}
               </Box>
+
+              {/* Theme Toggle */}
+              <IconButton
+                sx={{ ml: 1 }}
+                onClick={toggleTheme}
+                color="inherit"
+                aria-label="toggle theme"
+              >
+                {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
 
               {/* Search */}
               <Search>
