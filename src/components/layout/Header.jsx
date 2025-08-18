@@ -56,6 +56,7 @@ const Search = styled('div')(({ theme }) => ({
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   marginRight: theme.spacing(2),
   marginLeft: 0,
   width: '100%',
@@ -298,7 +299,15 @@ export default function Header() {
   return (
     <>
       <HideOnScroll>
-        <AppBar position="sticky">
+        <AppBar 
+          position="sticky"
+          sx={{
+            bgcolor: 'background.paper',
+            color: 'text.primary',
+            boxShadow: 1,
+            padding: '10px 0',
+          }}
+        >
           <Container maxWidth="xl">
             <Toolbar disableGutters>
               {/* Logo - Desktop */}
@@ -315,9 +324,11 @@ export default function Header() {
                   letterSpacing: '.3rem',
                   color: 'inherit',
                   textDecoration: 'none',
+                  textAlign: 'center',
                 }}
               >
-                SHOP
+                <img src="/images/l2.png" alt="" style={{width: '90px',borderRadius: '20%', marginRight: '30px'}}/>
+                {/* INDIA<br/> INSPIRED */}
               </Typography>
 
               {/* Mobile menu button */}
@@ -355,7 +366,7 @@ export default function Header() {
               </Typography>
 
               {/* Desktop Navigation */}
-              <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} style={{ gap: '13px !important' }}>
                 {pages.map((page) => (
                   <Button
                     key={page.name}
@@ -364,11 +375,17 @@ export default function Header() {
                     onClick={handleCloseNavMenu}
                     sx={{
                       my: 2, 
-                      color: 'white', 
+                      color: 'text.primary',
                       display: 'flex',
+                      // gap: '15px !important',
                       alignItems: 'center',
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
                       ...(pathname === page.path && {
-                        borderBottom: '2px solid white',
+                        color: 'primary.main',
+                        borderBottom: '2px solid',
+                        borderColor: 'primary.main',
                       }),
                     }}
                   >
@@ -387,9 +404,14 @@ export default function Header() {
 
               {/* Theme Toggle */}
               <IconButton
-                sx={{ ml: 1 }}
+                sx={{ 
+                  ml: 1,
+                  color: 'text.primary',
+                  '&:hover': {
+                    color: 'primary.main',
+                  },
+                }}
                 onClick={toggleTheme}
-                color="inherit"
                 aria-label="toggle theme"
               >
                 {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}

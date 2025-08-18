@@ -3,63 +3,47 @@
 import { createTheme } from '@mui/material/styles';
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 
-// Color palette - Soft and modern color scheme
+// Luxury color palette
 const themeColors = {
   light: {
     primary: {
-      main: '#6366F1', // Soft indigo
-      light: '#818CF8',
-      dark: '#4F46E5',
+      main: '#a29278', // Gold
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#EC4899', // Soft pink
-      light: '#F472B6',
-      dark: '#DB2777',
+      main: '#000000', // Black
       contrastText: '#FFFFFF',
     },
     background: {
-      default: '#FAFAFA', // Very light gray
-      paper: '#FFFFFF',
-      accent: '#F8FAFC', // Subtle blue-gray tint
+      default: '#FFFFFF', // Clean white
+      paper: '#FAFAFA',   // Light gray for cards
+      accent: '#F8F8F8',  // Subtle contrast
     },
     text: {
-      primary: '#1F2937', // Dark gray
-      secondary: '#6B7280', // Medium gray
+      primary: '#111111', // Near black for readability
+      secondary: '#444444', // Softer dark gray
     },
     divider: 'rgba(0, 0, 0, 0.08)',
-    success: { main: '#10B981' }, // Soft green
-    error: { main: '#EF4444' }, // Soft red
-    warning: { main: '#F59E0B' }, // Soft amber
-    info: { main: '#3B82F6' }, // Soft blue
   },
   dark: {
     primary: {
-      main: '#818CF8', // Lighter indigo for dark mode
-      light: '#A5B4FC',
-      dark: '#6366F1',
-      contrastText: '#FFFFFF',
+      main: '#a29278', // Gold
+      contrastText: '#000000',
     },
     secondary: {
-      main: '#F472B6', // Lighter pink for dark mode
-      light: '#F9A8D4',
-      dark: '#EC4899',
+      main: '#FFFFFF', // White accents
       contrastText: '#000000',
     },
     background: {
-      default: '#0F172A', // Dark slate
-      paper: '#1E293B', // Lighter slate
-      accent: '#334155', // Medium slate
+      default: '#000000', // Deep black
+      paper: '#111111',   // Slightly lighter black
+      accent: '#1A1A1A',  // Subtle gray-black
     },
     text: {
-      primary: '#F1F5F9', // Light gray
-      secondary: '#94A3B8', // Medium gray
+      primary: '#FFFFFF', // Clean white
+      secondary: '#CCCCCC', // Softer gray
     },
-    divider: 'rgba(255, 255, 255, 0.08)',
-    success: { main: '#34D399' }, // Bright green
-    error: { main: '#F87171' }, // Bright red
-    warning: { main: '#FBBF24' }, // Bright amber
-    info: { main: '#60A5FA' }, // Bright blue
+    divider: 'rgba(255, 255, 255, 0.12)',
   },
 };
 
@@ -74,11 +58,9 @@ export const ThemeContext = createContext({
 export const useThemeContext = () => useContext(ThemeContext);
 
 export function ThemeContextProvider({ children }) {
-  // Check if we're in the browser and if there's a stored preference
   const [mode, setMode] = useState('light');
   const [customColors, setCustomColors] = useState(themeColors);
 
-  // Load saved theme preference
   useEffect(() => {
     const savedMode = localStorage.getItem('themeMode');
     if (savedMode) {
@@ -92,18 +74,16 @@ export function ThemeContextProvider({ children }) {
     localStorage.setItem('themeMode', newMode);
   };
 
-  // Function to change theme colors
   const changeThemeColors = (newColors) => {
-    setCustomColors(prevColors => ({
+    setCustomColors((prevColors) => ({
       ...prevColors,
       [mode]: {
         ...prevColors[mode],
         ...newColors,
-      }
+      },
     }));
   };
 
-  // Create the theme
   const theme = useMemo(
     () =>
       createTheme({
@@ -120,42 +100,40 @@ export function ThemeContextProvider({ children }) {
           h5: { fontWeight: 500 },
           h6: { fontWeight: 500 },
           button: {
-            fontWeight: 500,
+            fontWeight: 600,
             textTransform: 'none',
+            letterSpacing: '0.5px',
           },
         },
         shape: {
-          borderRadius: 8,
+          borderRadius: 10,
         },
         components: {
           MuiButton: {
             styleOverrides: {
               root: {
+                borderRadius: 10,
                 boxShadow: 'none',
-                '&:hover': {
-                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                },
-              },
-              contained: {
+                transition: 'all 0.2s ease-in-out',
                 '&:hover': {
                   transform: 'translateY(-2px)',
-                  transition: 'transform 0.2s ease-in-out',
+                  boxShadow: mode === 'light'
+                    ? '0px 2px 6px rgba(0,0,0,0.15)'
+                    : '0px 2px 8px rgba(255,255,255,0.15)',
                 },
               },
-            },
-          },
-          MuiCard: {
-            styleOverrides: {
-              root: {
-                boxShadow: mode === 'light' 
-                  ? '0px 2px 8px rgba(0, 0, 0, 0.08)'
-                  : '0px 2px 8px rgba(0, 0, 0, 0.25)',
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+              containedPrimary: {
+                backgroundColor: customColors[mode].primary.main,
+                color: customColors[mode].primary.contrastText,
                 '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: mode === 'light'
-                    ? '0px 4px 12px rgba(0, 0, 0, 0.12)'
-                    : '0px 4px 12px rgba(0, 0, 0, 0.35)',
+                  backgroundColor: '#8b7d65', // darker gold hover
+                },
+              },
+              containedSecondary: {
+                backgroundColor: customColors[mode].secondary.main,
+                color: customColors[mode].secondary.contrastText,
+                '&:hover': {
+                  backgroundColor: mode === 'light' ? '#222222' : '#e6e6e6',
                 },
               },
             },
@@ -163,24 +141,34 @@ export function ThemeContextProvider({ children }) {
           MuiAppBar: {
             styleOverrides: {
               root: {
-                boxShadow: mode === 'light'
-                  ? '0px 1px 4px rgba(0, 0, 0, 0.1)'
-                  : '0px 1px 4px rgba(0, 0, 0, 0.3)',
+                backgroundColor:
+                  mode === 'dark'
+                    ? '#000000' // Black header in dark mode
+                    : '#FFFFFF', // White header in light mode
+                color: mode === 'dark' ? '#FFFFFF' : '#000000',
+                boxShadow: 'none',
+                borderBottom: mode === 'light'
+                  ? '1px solid rgba(0,0,0,0.08)'
+                  : '1px solid rgba(255,255,255,0.12)',
               },
             },
           },
-          MuiTab: {
+          MuiCard: {
             styleOverrides: {
               root: {
-                textTransform: 'none',
-                fontWeight: 500,
-              },
-            },
-          },
-          MuiChip: {
-            styleOverrides: {
-              root: {
-                fontWeight: 500,
+                borderRadius: 12,
+                boxShadow:
+                  mode === 'light'
+                    ? '0px 2px 10px rgba(0, 0, 0, 0.08)'
+                    : '0px 2px 12px rgba(0, 0, 0, 0.35)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-6px)',
+                  boxShadow:
+                    mode === 'light'
+                      ? '0px 6px 20px rgba(0, 0, 0, 0.12)'
+                      : '0px 6px 24px rgba(0, 0, 0, 0.5)',
+                },
               },
             },
           },
@@ -198,56 +186,5 @@ export function ThemeContextProvider({ children }) {
 
 export default function useTheme() {
   const context = useContext(ThemeContext);
-  return context.theme || createTheme({
-    palette: {
-      ...themeColors.light,
-    },
-    typography: {
-      fontFamily: '"Geist", "Roboto", "Helvetica", "Arial", sans-serif',
-      h1: { fontWeight: 700 },
-      h2: { fontWeight: 700 },
-      h3: { fontWeight: 600 },
-      h4: { fontWeight: 600 },
-      h5: { fontWeight: 500 },
-      h6: { fontWeight: 500 },
-      button: {
-        fontWeight: 500,
-        textTransform: 'none',
-      },
-    },
-    shape: {
-      borderRadius: 8,
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-            },
-          },
-        },
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.12)',
-            },
-          },
-        },
-      },
-      MuiAppBar: {
-        styleOverrides: {
-          root: {
-            boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.1)',
-          },
-        },
-      },
-    },
-  });
+  return context.theme || createTheme({ palette: { ...themeColors.light } });
 }
