@@ -32,11 +32,14 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
+  CloudUpload as CloudUploadIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/contexts/AuthContext';
 
 export default function CategoriesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -47,7 +50,10 @@ export default function CategoriesPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '', slug: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', slug: '', image: '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -66,14 +72,13 @@ export default function CategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/categories');
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      const data = await response.json();
+      const { data } = await api.get('/admin/categories');
       
       // Check if response has the expected structure
-      if (data && data.data && data.data.categories) {
+      if (data && data.categories) {
+        setCategories(data.categories);
+      } else if (data && data.data && data.data.categories) {
+        // Handle both response formats for backward compatibility
         setCategories(data.data.categories);
       } else {
         console.error('Unexpected API response format:', data);
@@ -94,12 +99,17 @@ export default function CategoriesPage() {
         name: category.name,
         description: category.description || '',
         slug: category.slug,
+        image: category.image || '',
       });
+      setImagePreview(category.image || '');
     } else {
       setCurrentCategory(null);
-      setFormData({ name: '', description: '', slug: '' });
+      setFormData({ name: '', description: '', slug: '', image: '' });
+      setImageFile(null);
+      setImagePreview('');
     }
     setFormErrors({});
+    setUploadingImage(false);
     setOpenDialog(true);
   };
 
@@ -151,29 +161,33 @@ export default function CategoriesPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name) {
+      setFormErrors({ name: 'Category name is required' });
+      return;
+    }
+    
     try {
       setLoading(true);
+      
+      // Use the locally selected/previewed image (same approach as ProductForm)
+      // If a new image has been selected and previewed, it will be in imagePreview
+      const imageUrl = imagePreview || formData.image || '';
+
+      const dataToSubmit = {
+        ...formData,
+        image: imageUrl,
+      };
+
       const url = currentCategory
-        ? `/api/admin/categories/${currentCategory._id}`
-        : '/api/admin/categories';
+        ? `/admin/categories/${currentCategory._id}`
+        : '/admin/categories';
       const method = currentCategory ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save category');
-      }
-
+      await api[method.toLowerCase()](url, dataToSubmit);
       await fetchCategories();
       handleCloseDialog();
       setSnackbar({ 
@@ -200,15 +214,7 @@ export default function CategoriesPage() {
 
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/categories/${currentCategory._id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete category');
-      }
-
+      await api.delete(`/admin/categories/${currentCategory._id}`);
       await fetchCategories();
       handleCloseDeleteDialog();
       setSnackbar({
@@ -226,6 +232,29 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Match ProductForm: on image select, create a base64 preview and store in formData.image
+  // (No server-side upload at this step)
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        setImagePreview(dataUrl);
+        setFormData(prev => ({ ...prev, image: dataUrl }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setFormData(prev => ({ ...prev, image: '' }));
   };
 
   const handleCloseSnackbar = () => {
@@ -365,65 +394,172 @@ export default function CategoriesPage() {
       </Box>
 
       {/* Add/Edit Category Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>{currentCategory ? 'Edit Category' : 'Add New Category'}</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="name"
-            label="Category Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.name}
-            onChange={handleChange}
-            error={!!formErrors.name}
-            helperText={formErrors.name}
-            sx={{ mb: 2, mt: 1 }}
-          />
-          <TextField
-            margin="dense"
-            name="slug"
-            label="Category Slug"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.slug}
-            onChange={handleChange}
-            error={!!formErrors.slug}
-            helperText={formErrors.slug || 'URL-friendly version of the name'}
-            InputProps={{
-              endAdornment: (
-                <Button 
-                  onClick={handleSlugGeneration}
-                  size="small"
+          <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+            {/* Left Column - Form Fields */}
+            <Box sx={{ flex: 1 }}>
+              <TextField
+                autoFocus
+                margin="dense"
+                name="name"
+                label="Category Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.name}
+                onChange={handleChange}
+                error={!!formErrors.name}
+                helperText={formErrors.name}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="dense"
+                name="slug"
+                label="Category Slug"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.slug}
+                onChange={handleChange}
+                error={!!formErrors.slug}
+                helperText={formErrors.slug || 'URL-friendly version of the name'}
+                InputProps={{
+                  endAdornment: (
+                    <Button 
+                      onClick={handleSlugGeneration}
+                      size="small"
+                    >
+                      Generate
+                    </Button>
+                  ),
+                }}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="dense"
+                name="description"
+                label="Description (Optional)"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.description}
+                onChange={handleChange}
+                multiline
+                rows={3}
+              />
+            </Box>
+
+            {/* Right Column - Image Upload */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
+                Category Image
+              </Typography>
+              
+              {/* Image Preview */}
+              {imagePreview ? (
+                <Box sx={{ mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: 200,
+                      border: '2px dashed #ddd',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <img
+                      src={imagePreview}
+                      alt="Category preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleRemoveImage}
+                      color="error"
+                    >
+                      Remove
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      component="label"
+                    >
+                      Change Image
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </Button>
+                  </Box>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 200,
+                    border: '2px dashed #ddd',
+                    borderRadius: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'rgba(0,0,0,0.02)',
+                    },
+                    mb: 2,
+                  }}
+                  component="label"
                 >
-                  Generate
-                </Button>
-              ),
-            }}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="description"
-            label="Description (Optional)"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.description}
-            onChange={handleChange}
-            multiline
-            rows={3}
-          />
+                  <CloudUploadIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
+                  <Typography variant="body2" color="text.secondary" align="center">
+                    Click to upload category image
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" align="center">
+                    Recommended: 400x300px, JPG or PNG
+                  </Typography>
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </Box>
+              )}
+
+              {uploadingImage && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CircularProgress size={20} />
+                  <Typography variant="body2" color="text.secondary">
+                    Uploading image...
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button 
             onClick={handleSubmit} 
             variant="contained"
-            disabled={loading}
+            disabled={loading || uploadingImage}
             sx={{ 
               bgcolor: '#8D6E63',
               '&:hover': { bgcolor: '#6D4C41' },

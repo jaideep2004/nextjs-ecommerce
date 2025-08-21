@@ -16,8 +16,18 @@ const float = keyframes`
 `;
 
 const shimmer = keyframes`
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { 
+    background-position: -200% 0; 
+    filter: brightness(1.0);
+  }
+  50% { 
+    background-position: 0% 0; 
+    filter: brightness(1.15);
+  }
+  100% { 
+    background-position: 200% 0; 
+    filter: brightness(1.0);
+  }
 `;
 
 const fadeIn = keyframes`
@@ -28,6 +38,67 @@ const fadeIn = keyframes`
 const rotate = keyframes`
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+`;
+
+const swirl = keyframes`
+  0% { 
+    transform: rotate(0deg) scale(1);
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% { 
+    transform: rotate(90deg) scale(1.1);
+    filter: hue-rotate(90deg) brightness(1.2);
+  }
+  50% { 
+    transform: rotate(180deg) scale(1.2);
+    filter: hue-rotate(180deg) brightness(1.4);
+  }
+  75% { 
+    transform: rotate(270deg) scale(1.1);
+    filter: hue-rotate(270deg) brightness(1.2);
+  }
+  100% { 
+    transform: rotate(360deg) scale(1);
+    filter: hue-rotate(360deg) brightness(1);
+  }
+`;
+
+const etherealGlow = keyframes`
+  0%, 100% { 
+    box-shadow: 
+      0 0 20px rgba(162, 146, 120, 0.3),
+      0 0 40px rgba(212, 192, 158, 0.2),
+      0 0 60px rgba(162, 146, 120, 0.1);
+  }
+  50% { 
+    box-shadow: 
+      0 0 30px rgba(162, 146, 120, 0.5),
+      0 0 60px rgba(212, 192, 158, 0.3),
+      0 0 90px rgba(162, 146, 120, 0.2);
+  }
+`;
+
+const dimensionalShift = keyframes`
+  0% { 
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    filter: blur(0px) saturate(1);
+  }
+  25% { 
+    transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateZ(20px);
+    filter: blur(1px) saturate(1.2);
+  }
+  50% { 
+    transform: perspective(1000px) rotateX(0deg) rotateY(10deg) translateZ(40px);
+    filter: blur(2px) saturate(1.5);
+  }
+  75% { 
+    transform: perspective(1000px) rotateX(-5deg) rotateY(5deg) translateZ(20px);
+    filter: blur(1px) saturate(1.2);
+  }
+  100% { 
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    filter: blur(0px) saturate(1);
+  }
 `;
 
 // Styled components
@@ -53,12 +124,14 @@ const HeroSection = styled(Box)(({ theme }) => ({
 }));
 
 const GoldText = styled('span')(({ theme }) => ({
-  background: 'linear-gradient(90deg, #a29278, #d4c19c, #a29278)',
+  background: 'linear-gradient(90deg, #8b7355, #c4a876, #8b7355)',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
-  backgroundSize: '200% auto',
-  animation: `${shimmer} 4s linear infinite`,
-  fontWeight: 600,
+  backgroundSize: '300% auto',
+  animation: `${shimmer} 6s ease-in-out infinite`,
+  fontWeight: 700,
+  textShadow: '1px 1px 4px rgba(139, 115, 85, 0.3)',
+  filter: 'drop-shadow(0 1px 2px rgba(139, 115, 85, 0.2))',
 }));
 
 const HeroContent = styled(Box)(({ theme }) => ({
@@ -80,6 +153,7 @@ const TextContent = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   padding: theme.spacing(8),
+  fontFamily: '"Cinzel", "Playfair Display", "Times New Roman", serif',
   [theme.breakpoints.down('md')]: {
     flex: '1 1 100%',
     padding: theme.spacing(4, 2),
@@ -92,6 +166,7 @@ const ImageContainer = styled(Box)(({ theme }) => ({
   height: '100%',
   minHeight: '85vh',
   overflow: 'hidden',
+  transformStyle: 'preserve-3d',
   [theme.breakpoints.down('md')]: {
     display: 'none',
   },
@@ -100,6 +175,24 @@ const ImageContainer = styled(Box)(({ theme }) => ({
     height: '100%',
     objectFit: 'cover',
     objectPosition: 'center',
+    transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  '&:hover': {
+    '& img': {
+      transform: 'scale(1.05)',
+      filter: 'brightness(1.1) contrast(1.1)',
+    },
+    '& .swirl-effect': {
+      opacity: 1,
+      animation: `${swirl} 3s ease-in-out infinite`,
+    },
+    '& .ethereal-glow': {
+      animation: `${etherealGlow} 2s ease-in-out infinite`,
+    },
+    '& .dimensional-overlay': {
+      opacity: 0.8,
+      animation: `${dimensionalShift} 4s ease-in-out infinite`,
+    },
   },
 }));
 
@@ -294,10 +387,14 @@ const Hero = () => {
                 variant="overline"
                 sx={{
                   color: '#a29278',
-                  letterSpacing: 2,
-                  fontWeight: 500,
+                  letterSpacing: 3,
+                  fontWeight: 600,
                   display: 'block',
                   mb: 2,
+                  fontFamily: '"Cinzel", "Playfair Display", serif',
+                  textTransform: 'uppercase',
+                  fontSize: '0.9rem',
+                  textShadow: '0 2px 4px rgba(162, 146, 120, 0.3)',
                 }}
               >
                 New Collection 2024
@@ -309,15 +406,17 @@ const Hero = () => {
                 variant="h1"
                 component="h1"
                 sx={{
-                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
-                  fontWeight: 700,
+                  fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                  fontWeight: 900,
                   mb: 2,
                   lineHeight: 1.1,
                   textTransform: 'uppercase',
-                  letterSpacing: '-0.5px',
-                  color: 'inherit',
-                  fontFamily: "Playfair Display", 
+                  letterSpacing: '2px',
+                  color: theme => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a',
+                  fontFamily: '"Cinzel", "Playfair Display", serif',
                   whiteSpace: 'nowrap',
+                  textShadow: '3px 3px 12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(162, 146, 120, 0.3)',
+                  filter: 'drop-shadow(0 6px 12px rgba(162, 146, 120, 0.4))',
                 }}
               >
                 India <GoldText>Inspired</GoldText>
@@ -327,11 +426,15 @@ const Hero = () => {
                 component="h2"
                 sx={{
                   fontWeight: 400,
-                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  fontSize: { xs: '1.3rem', md: '1.8rem' },
                   color: 'text.secondary',
                   mb: 4,
                   maxWidth: '90%',
-                  lineHeight: 1.4,
+                  lineHeight: 1.6,
+                  fontFamily: '"Playfair Display", "Georgia", serif',
+                  fontStyle: 'italic',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  letterSpacing: '0.5px',
                 }}
               >
                 Discover our <GoldText>exclusive collection</GoldText> of premium ethnic wear that blends tradition with contemporary style.
@@ -360,15 +463,22 @@ const Hero = () => {
         <ImageContainer>
           <motion.div
             key={currentImageIndex}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.9, rotateY: 15 }}
+            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+            exit={{ opacity: 0, scale: 0.9, rotateY: -15 }}
+            transition={{ 
+              duration: 1.2,
+              ease: [0.4, 0, 0.2, 1],
+              opacity: { duration: 0.8 },
+              scale: { duration: 1.0 },
+              rotateY: { duration: 1.2 }
+            }}
             style={{ 
               width: '100%', 
               height: '100%',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              transformStyle: 'preserve-3d'
             }}
           >
             <Image
@@ -383,29 +493,160 @@ const Hero = () => {
                 height: '100%',
               }}
             />
-            {/* Decorative elements */}
+            
+            {/* Swirling Color Effects */}
+            <Box 
+              className="swirl-effect"
+              sx={{
+                position: 'absolute',
+                top: '-20%',
+                left: '-20%',
+                width: '140%',
+                height: '140%',
+                background: `
+                  conic-gradient(
+                    from 0deg,
+                    transparent 0deg,
+                    rgba(162, 146, 120, 0.1) 60deg,
+                    rgba(212, 192, 158, 0.15) 120deg,
+                    rgba(162, 146, 120, 0.1) 180deg,
+                    transparent 240deg,
+                    rgba(212, 192, 158, 0.08) 300deg,
+                    transparent 360deg
+                  )
+                `,
+                opacity: 0,
+                transition: 'opacity 0.5s ease',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+            
+            {/* Ethereal Glow Ring */}
+            <Box 
+              className="ethereal-glow"
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '300px',
+                height: '300px',
+                transform: 'translate(-50%, -50%)',
+                border: '2px solid rgba(162, 146, 120, 0.2)',
+                borderRadius: '50%',
+                opacity: 0.6,
+                zIndex: 2,
+                pointerEvents: 'none',
+              }}
+            />
+            
+            {/* 4th Dimensional Overlay */}
+            <Box 
+              className="dimensional-overlay"
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: `
+                  radial-gradient(
+                    ellipse at center,
+                    rgba(162, 146, 120, 0.05) 0%,
+                    rgba(212, 192, 158, 0.08) 30%,
+                    rgba(162, 146, 120, 0.03) 60%,
+                    transparent 100%
+                  )
+                `,
+                opacity: 0,
+                transition: 'opacity 0.8s ease',
+                pointerEvents: 'none',
+                zIndex: 3,
+                mixBlendMode: 'overlay',
+              }}
+            />
+            
+            {/* Decorative Rotating Elements */}
             <Box 
               sx={{
                 position: 'absolute',
-                top: '10%',
-                right: '10%',
-                width: '100px',
-                height: '100px',
-                border: '2px solid rgba(162, 146, 120, 0.3)',
+                top: '15%',
+                right: '15%',
+                width: '120px',
+                height: '120px',
+                border: '3px solid rgba(162, 146, 120, 0.3)',
                 borderRadius: '50%',
-                animation: `${rotate} 20s linear infinite`,
+                animation: `${rotate} 25s linear infinite`,
+                zIndex: 4,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: '60%',
+                  height: '60%',
+                  transform: 'translate(-50%, -50%)',
+                  border: '2px solid rgba(212, 192, 158, 0.4)',
+                  borderRadius: '50%',
+                  animation: `${rotate} 15s linear infinite reverse`,
+                },
+              }}
+            />
+            
+            <Box 
+              sx={{
+                position: 'absolute',
+                bottom: '15%',
+                left: '15%',
+                width: '80px',
+                height: '80px',
+                border: '2px solid rgba(162, 146, 120, 0.4)',
+                borderRadius: '50%',
+                animation: `${rotate} 35s linear infinite reverse`,
+                zIndex: 4,
+                background: 'rgba(162, 146, 120, 0.05)',
+                backdropFilter: 'blur(2px)',
+              }}
+            />
+            
+            {/* Floating Particles */}
+            <Box 
+              sx={{
+                position: 'absolute',
+                top: '25%',
+                left: '25%',
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
+                background: 'rgba(162, 146, 120, 0.6)',
+                animation: `${float} 4s ease-in-out infinite`,
+                zIndex: 5,
               }}
             />
             <Box 
               sx={{
                 position: 'absolute',
-                bottom: '10%',
-                left: '10%',
-                width: '60px',
-                height: '60px',
-                border: '1px solid rgba(162, 146, 120, 0.3)',
+                top: '70%',
+                right: '30%',
+                width: '6px',
+                height: '6px',
                 borderRadius: '50%',
-                animation: `${rotate} 30s linear infinite reverse`,
+                background: 'rgba(212, 192, 158, 0.7)',
+                animation: `${float} 6s ease-in-out infinite 2s`,
+                zIndex: 5,
+              }}
+            />
+            <Box 
+              sx={{
+                position: 'absolute',
+                top: '40%',
+                right: '20%',
+                width: '3px',
+                height: '3px',
+                borderRadius: '50%',
+                background: 'rgba(162, 146, 120, 0.8)',
+                animation: `${float} 5s ease-in-out infinite 1s`,
+                zIndex: 5,
               }}
             />
           </motion.div>

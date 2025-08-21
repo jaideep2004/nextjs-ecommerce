@@ -83,7 +83,7 @@ export default function ProductGrid({
           const inWishlist = wishlistItems.some(item => item._id === product._id);
           
           return (
-            <Grid item key={product._id} xs={12} sm={6} md={4} lg={3} {...itemProps}>
+            <Grid item key={product._id} xs={12} sm={6} md={4} lg={3} xl={3} {...itemProps}>
               <AnimatedGridItem index={index}>
                 <ProductCard
                   product={product}

@@ -8,21 +8,8 @@ import { isAuthenticated, isAdmin } from '@/utils/auth';
 export async function GET(request, { params }) {
   try {
     // Check if user is authenticated and is an admin
-    const authResult = await isAuthenticated(request);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { message: authResult.message },
-        { status: 401 }
-      );
-    }
-    
-    const adminResult = await isAdmin(authResult.user);
-    if (!adminResult.success) {
-      return NextResponse.json(
-        { message: adminResult.message },
-        { status: 403 }
-      );
-    }
+    const decoded = await isAuthenticated(request);
+    await isAdmin(decoded);
     
     await connectToDatabase();
     
@@ -55,21 +42,8 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     // Check if user is authenticated and is an admin
-    const authResult = await isAuthenticated(request);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { message: authResult.message },
-        { status: 401 }
-      );
-    }
-    
-    const adminResult = await isAdmin(authResult.user);
-    if (!adminResult.success) {
-      return NextResponse.json(
-        { message: adminResult.message },
-        { status: 403 }
-      );
-    }
+    const decoded = await isAuthenticated(request);
+    await isAdmin(decoded);
     
     await connectToDatabase();
     
@@ -135,21 +109,8 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     // Check if user is authenticated and is an admin
-    const authResult = await isAuthenticated(request);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { message: authResult.message },
-        { status: 401 }
-      );
-    }
-    
-    const adminResult = await isAdmin(authResult.user);
-    if (!adminResult.success) {
-      return NextResponse.json(
-        { message: adminResult.message },
-        { status: 403 }
-      );
-    }
+    const decoded = await isAuthenticated(request);
+    await isAdmin(decoded);
     
     await connectToDatabase();
     
