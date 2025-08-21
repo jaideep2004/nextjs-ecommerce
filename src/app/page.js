@@ -604,6 +604,49 @@ const marqueeScroll = keyframes`
   }
 `;
 
+// About Us Animation Keyframes
+const float = keyframes`
+  0%, 100% { 
+    transform: translateY(0px);
+  }
+  50% { 
+    transform: translateY(-10px);
+  }
+`;
+
+const slideInUp = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideInLeft = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const slideInRight = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
 // Styled components
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 'bold',
@@ -2198,10 +2241,336 @@ export default function Home() {
           </Grid>
         </Container>
       </Box>
+
+      
+       {/* About Us Section */}
+       <Box sx={{ 
+        py: 12, 
+        bgcolor: '#ffffff',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={6} alignItems="center" sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+            {/* Left Side - Images Grid */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{ 
+                position: 'relative',
+                height: 600,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
+              }}>
+                {/* Top Row - Two Images */}
+                <Box sx={{ display: 'flex', gap: 2, height: '48%' }}>
+                  <Box sx={{ 
+                    flex: 1,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    transform: 'perspective(1000px) rotateY(-5deg)',
+                    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'perspective(1000px) rotateY(0deg) scale(1.02)',
+                      boxShadow: '0 20px 40px rgba(162, 146, 120, 0.3)'
+                    }
+                  }}>
+                    <Box
+                      component="img"
+                      src="/images/img1.jpg"
+                      alt="Fashion Model 1"
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        filter: 'brightness(1.1) contrast(1.1)'
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ 
+                    flex: 1,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    transform: 'perspective(1000px) rotateY(5deg)',
+                    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'perspective(1000px) rotateY(0deg) scale(1.02)',
+                      boxShadow: '0 20px 40px rgba(162, 146, 120, 0.3)'
+                    }
+                  }}>
+                    <Box
+                      component="img"
+                      src="/images/img2.jpg"
+                      alt="Fashion Model 2"
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        filter: 'brightness(1.1) contrast(1.1)'
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                {/* Bottom Row - Single Large Image */}
+                <Box sx={{ 
+                  height: '48%',
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transform: 'perspective(1000px) rotateX(2deg)',
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    transform: 'perspective(1000px) rotateX(0deg) scale(1.02)',
+                    boxShadow: '0 25px 50px rgba(162, 146, 120, 0.4)'
+                  }
+                }}>
+                  <Box
+                    component="img"
+                    src="/images/img3.jpg"
+                    alt="Fashion Collection"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      filter: 'brightness(1.1) contrast(1.1)'
+                    }}
+                  />
+                </Box>
+
+                {/* Floating Stats Badge */}
+                <Box sx={{
+                  position: 'absolute',
+                  bottom: 20,
+                  right: 20,
+                  bgcolor: '#a29278',
+                  borderRadius: '50%',
+                  width: 120,
+                  height: 120,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  transform: 'perspective(1000px) rotateZ(0deg)',
+                  animation: 'float 3s ease-in-out infinite',
+                  boxShadow: '0 15px 30px rgba(162, 146, 120, 0.4)',
+                  zIndex: 10
+                }}>
+                  <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1 }}>
+                    25
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center' }}>
+                    Year's Experience
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Right Side - Content */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{ pl: { md: 4 } }}>
+                {/* Section Tag */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  mb: 3,
+                  transform: 'translateX(0)',
+                  animation: 'slideInRight 1s ease-out'
+                }}>
+                  <Box sx={{
+                    width: 8,
+                    height: 8,
+                    bgcolor: '#a29278',
+                    borderRadius: '50%',
+                    mr: 2
+                  }} />
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      color: '#a29278',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    About us
+                  </Typography>
+                </Box>
+
+                {/* Main Heading */}
+                <Typography 
+                  variant="h2" 
+                  sx={{ 
+                    fontWeight: 700,
+                    color: '#2c2c2c',
+                    mb: 4,
+                    fontSize: { xs: '2rem', md: '2.75rem' },
+                    lineHeight: 1.3,
+                    transform: 'translateY(0)',
+                    animation: 'slideInUp 1s ease-out 0.2s both'
+                  }}
+                >
+                  Traditional Punjabi Attire With Contemporary Style.
+                </Typography>
+
+                {/* Description */}
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    color: '#666',
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    mb: 4,
+                    transform: 'translateY(0)',
+                    animation: 'slideInUp 1s ease-out 0.4s both'
+                  }}
+                >
+                  There are many variations of passages of Lorem Ipsum available, but the our majority have 
+                  suffered alteration in some form, by injected humour, or randomised words which don't look 
+                  even slightly believable you are going to.
+                </Typography>
+
+                {/* Features List */}
+                <Box sx={{ mb: 6 }}>
+                  {[
+                    'We are provide 100% best products',
+                    'Flexible and affordable price',
+                    'All products is imported'
+                  ].map((feature, index) => (
+                    <Box 
+                      key={index}
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mb: 2,
+                        transform: 'translateX(0)',
+                        animation: `slideInLeft 1s ease-out ${0.6 + index * 0.1}s both`
+                      }}
+                    >
+                      <Box sx={{
+                        width: 6,
+                        height: 6,
+                        bgcolor: '#a29278',
+                        borderRadius: '50%',
+                        mr: 3,
+                        flexShrink: 0
+                      }} />
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          color: '#555',
+                          fontSize: '1rem',
+                          fontWeight: 500
+                        }}
+                      >
+                        {feature}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* Team Member Card */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 3,
+                  bgcolor: '#f8f8f8',
+                  borderRadius: 3,
+                  border: '1px solid rgba(162, 146, 120, 0.1)',
+                  transform: 'translateY(0)',
+                  animation: 'slideInUp 1s ease-out 1s both',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 15px 30px rgba(162, 146, 120, 0.2)'
+                  }
+                }}>
+                  <Avatar 
+                    src="/images/team-member.jpg"
+                    sx={{ 
+                      width: 60, 
+                      height: 60,
+                      mr: 3,
+                      border: '3px solid #a29278'
+                    }}
+                  />
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 700,
+                        color: '#2c2c2c',
+                        mb: 0.5
+                      }}
+                    >
+                      INDIA INSPIRED
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: '#a29278',
+                        fontWeight: 500
+                      }}
+                    >
+                      INDIA INSPIRED
+                    </Typography>
+                  </Box>
+                  <Box sx={{
+                    width: 2,
+                    height: 40,
+                    bgcolor: '#a29278',
+                    mx: 3
+                  }} />
+                  <Typography 
+                    variant="h4" 
+                    sx={{ 
+                      fontWeight: 300,
+                      color: '#a29278',
+                      fontStyle: 'italic',
+                      fontSize: '2rem'
+                    }}
+                  >
+                    INDIA
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+
+        {/* Background Decorative Elements */}
+        <Box sx={{
+          position: 'absolute',
+          top: '10%',
+          right: '-5%',
+          width: 200,
+          height: 200,
+          bgcolor: 'rgba(162, 146, 120, 0.05)',
+          borderRadius: '50%',
+          animation: 'float 4s ease-in-out infinite reverse'
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          bottom: '20%',
+          left: '-3%',
+          width: 150,
+          height: 150,
+          bgcolor: 'rgba(162, 146, 120, 0.03)',
+          borderRadius: '50%',
+          animation: 'float 5s ease-in-out infinite'
+        }} />
+      </Box>
+
+
+
       
       {/* 4th Dimensional Premium Testimonials Section */}
       <Box sx={{ 
-        py: 15, 
+        py: 15,
+        pt: '0px !important',
         position: 'relative',
         overflow: 'hidden',
         background: '#ffffff'
@@ -2539,7 +2908,7 @@ export default function Home() {
         </Container>
       </Box>
       
-      
+     
      
     </Box>
   );
