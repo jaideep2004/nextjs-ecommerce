@@ -30,7 +30,9 @@ export default function CategoriesPage() {
       try {
         setLoading(true);
         const { data } = await axios.get('/api/categories');
-        setCategories(data.categories || []);
+        // API uses apiResponse wrapper: { status, data: { categories, ... } }
+        const list = data?.data?.categories || data?.categories || [];
+        setCategories(list);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError(err.response?.data?.message || 'Failed to load categories');
@@ -84,7 +86,7 @@ export default function CategoriesPage() {
       ) : (
         <Grid container spacing={4}>
           {categories.map((category) => (
-            <Grid item xs={12} sm={6} md={4} key={category._id}>
+            <Grid item xs={12} sm={6} md={4} key={category._id || category.slug || category.name}>
               <Link href={`/category/${category.slug}`} passHref style={{ textDecoration: 'none' }}>
                 <Card 
                   sx={{ 

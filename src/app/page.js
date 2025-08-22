@@ -1760,7 +1760,7 @@ export default function Home() {
      
       
       {/* Products Section with Tabs */}
-      <Box sx={{ py: 8, bgcolor: '#ffffff' }}>
+      <Box sx={{ py: 8, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff' }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 5 }}>
             <Typography variant="subtitle1" color="primary" fontWeight="bold" sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 1 }} data-aos="fade-up" data-aos-delay="100">
@@ -2363,20 +2363,25 @@ export default function Home() {
        {/* About Us Section */}
        <Box sx={{ 
         py: 12, 
-        bgcolor: '#ffffff',
+        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
         position: 'relative',
         overflow: 'hidden'
       }}>
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center" sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
             {/* Left Side - Images Grid */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6} sx={{ 
+              minWidth: { xs: '100%', sm: '360px', md: '440px' },
+              maxWidth: { xs: '100%', md: '50%' }
+            }}>
               <Box sx={{ 
                 position: 'relative',
-                height: 600,
+                height: { xs: 400, sm: 500, md: 600 },
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 2
+                gap: 2,
+                width: '100%',
+                maxWidth: '100%'
               }}>
                 {/* Top Row - Two Images */}
                 <Box sx={{ display: 'flex', gap: 2, height: '48%' }}>
@@ -2394,7 +2399,7 @@ export default function Home() {
                   }}>
                     <Box
                       component="img"
-                      src="/images/img1.jpg"
+                      src="/images/abt1.png"
                       alt="Fashion Model 1"
                       sx={{
                         width: '100%',
@@ -2418,7 +2423,7 @@ export default function Home() {
                   }}>
                     <Box
                       component="img"
-                      src="/images/img2.jpg"
+                      src="/images/abt2.png"
                       alt="Fashion Model 2"
                       sx={{
                         width: '100%',
@@ -2445,7 +2450,7 @@ export default function Home() {
                 }}>
                   <Box
                     component="img"
-                    src="/images/img3.jpg"
+                    src="/images/abt3.png"
                     alt="Fashion Collection"
                     sx={{
                       width: '100%',
@@ -2487,7 +2492,7 @@ export default function Home() {
 
             {/* Right Side - Content */}
             <Grid item xs={12} md={6}>
-              <Box sx={{ pl: { md: 4 } }}>
+              <Box sx={{ pl: { md: 4 } }} >
                 {/* Section Tag */}
                 <Box sx={{ 
                   display: 'flex', 
@@ -2522,7 +2527,7 @@ export default function Home() {
                   variant="h2" 
                   sx={{ 
                     fontWeight: 700,
-                    color: '#2c2c2c',
+                    color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#2c2c2c',
                     mb: 4,
                     fontSize: { xs: '2rem', md: '2.75rem' },
                     lineHeight: 1.3,
@@ -2537,7 +2542,7 @@ export default function Home() {
                 <Typography 
                   variant="body1" 
                   sx={{ 
-                    color: '#666',
+                    color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#666',
                     fontSize: '1rem',
                     lineHeight: 1.6,
                     mb: 4,
@@ -2578,7 +2583,7 @@ export default function Home() {
                       <Typography 
                         variant="body1" 
                         sx={{ 
-                          color: '#555',
+                          color: (theme) => theme.palette.mode === 'dark' ? '#c0c0c0' : '#555',
                           fontSize: '1rem',
                           fontWeight: 500
                         }}
@@ -2594,9 +2599,11 @@ export default function Home() {
                   display: 'flex',
                   alignItems: 'center',
                   p: 3,
-                  bgcolor: '#f8f8f8',
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? '#2a2a2a' : '#f8f8f8',
                   borderRadius: 3,
-                  border: '1px solid rgba(162, 146, 120, 0.1)',
+                  border: (theme) => theme.palette.mode === 'dark' 
+                    ? '1px solid rgba(162, 146, 120, 0.3)' 
+                    : '1px solid rgba(162, 146, 120, 0.1)',
                   transform: 'translateY(0)',
                   animation: 'slideInUp 1s ease-out 1s both',
                   transition: 'all 0.3s ease',
@@ -2619,7 +2626,7 @@ export default function Home() {
                       variant="h6" 
                       sx={{ 
                         fontWeight: 700,
-                        color: '#2c2c2c',
+                        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#2c2c2c',
                         mb: 0.5
                       }}
                     >
@@ -2690,7 +2697,7 @@ export default function Home() {
         pt: '0px !important',
         position: 'relative',
         overflow: 'hidden',
-        background: '#ffffff'
+        background: (theme) => theme.palette.mode === 'dark' ? '#0f0f0f' : '#ffffff'
       }}>
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
@@ -2817,7 +2824,7 @@ export default function Home() {
                   sx={{ 
                     fontSize: '1.2rem',
                     lineHeight: 1.8,
-                    color: '#666',
+                    color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#666',
                     mb: 5,
                     maxWidth: '500px',
                     mx: { xs: 'auto', md: 0 }
@@ -2911,11 +2918,15 @@ export default function Home() {
                     width: '100%',
                     maxWidth: '600px',
                     height: '400px',
-                    background: '#ffffff',
+                    background: (theme) => theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
                     borderRadius: '30px',
                     padding: '50px 40px',
-                    boxShadow: '0 20px 60px rgba(162, 146, 120, 0.15)',
-                    border: '1px solid rgba(162, 146, 120, 0.1)',
+                    boxShadow: (theme) => theme.palette.mode === 'dark' 
+                      ? '0 20px 60px rgba(0, 0, 0, 0.4)' 
+                      : '0 20px 60px rgba(162, 146, 120, 0.15)',
+                    border: (theme) => theme.palette.mode === 'dark' 
+                      ? '1px solid rgba(162, 146, 120, 0.3)' 
+                      : '1px solid rgba(162, 146, 120, 0.1)',
                     overflow: 'hidden',
                     animation: 'testimonialSlide 3s ease-in-out',
                     transform: 'translateZ(0)',
@@ -2928,7 +2939,7 @@ export default function Home() {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: '#ffffff',
+                      background: (theme) => theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
                       zIndex: -1,
                       borderRadius: '30px'
                     }
@@ -2963,7 +2974,7 @@ export default function Home() {
                       fontSize: '1.3rem',
                       lineHeight: 1.8,
                       fontStyle: 'italic',
-                      color: '#444',
+                      color: (theme) => theme.palette.mode === 'dark' ? '#e0e0e0' : '#444',
                       textAlign: 'center',
                       mb: 4,
                       position: 'relative',
@@ -2997,7 +3008,7 @@ export default function Home() {
                         variant="h6" 
                         sx={{ 
                           fontWeight: 700,
-                          color: '#2c2c2c',
+                          color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#2c2c2c',
                           fontSize: '1.2rem',
                           zIndex: 10
                         }}

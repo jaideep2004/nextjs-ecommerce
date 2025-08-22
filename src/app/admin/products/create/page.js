@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Container, Paper, Typography, Breadcrumbs, Link as MuiLink } from '@mui/material';
-import Link from 'next/link';
+import NextLink from 'next/link';
+
 import { useRouter } from 'next/navigation';
 import ProductForm from '@/components/admin/ProductForm';
 import AdminSidebar from '@/components/admin/AdminSidebar';
@@ -75,16 +76,12 @@ export default function CreateProductPage() {
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Paper sx={{ p: 2, mb: 3 }}>
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <Link href="/admin/dashboard" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Dashboard
-                </MuiLink>
-              </Link>
-              <Link href="/admin/products" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Products
-                </MuiLink>
-              </Link>
+              <MuiLink component={NextLink} href="/admin/dashboard" underline="hover" color="inherit">
+                Dashboard
+              </MuiLink>
+              <MuiLink component={NextLink} href="/admin/products" underline="hover" color="inherit">
+                Products
+              </MuiLink>
               <Typography color="text.primary">Create New Product</Typography>
             </Breadcrumbs>
           </Paper>

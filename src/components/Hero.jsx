@@ -416,7 +416,7 @@ const Hero = () => {
                   fontFamily: '"Cinzel", "Playfair Display", serif',
                   whiteSpace: 'nowrap',
                   textShadow: '3px 3px 12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(162, 146, 120, 0.3)',
-                  filter: 'drop-shadow(0 6px 12px rgba(162, 146, 120, 0.4))',
+                  // filter: 'drop-shadow(0 6px 12px rgba(162, 146, 120, 0.4))',
                 }}
               >
                 India <GoldText>Inspired</GoldText>
