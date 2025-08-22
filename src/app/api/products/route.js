@@ -18,14 +18,32 @@ export async function GET(req) {
     const featured = searchParams.get('featured');
     const search = searchParams.get('search');
     
-    // Pagination
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    // Pagination (with sane caps)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10')));
     const skip = (page - 1) * limit;
     
     // Sorting
-    const sort = searchParams.get('sort') || 'createdAt';
-    const order = searchParams.get('order') || 'desc';
+    let sortParam = searchParams.get('sort') || 'createdAt';
+    let order = searchParams.get('order') || 'desc';
+    let sortField = 'createdAt';
+    let sortDir = order === 'asc' ? 1 : -1;
+
+    // Support formats: "field:asc", "-field", or legacy field+order
+    if (sortParam.includes(':')) {
+      const [field, dir] = sortParam.split(':');
+      sortField = field;
+      sortDir = dir?.toLowerCase() === 'asc' ? 1 : -1;
+    } else if (sortParam.startsWith('-')) {
+      sortField = sortParam.slice(1);
+      sortDir = -1;
+    } else if (sortParam.startsWith('+')) {
+      sortField = sortParam.slice(1);
+      sortDir = 1;
+    } else {
+      sortField = sortParam;
+      sortDir = order === 'asc' ? 1 : -1;
+    }
     
     // Build filter object
     const filter = {};
@@ -39,17 +57,32 @@ export async function GET(req) {
     
     // Search functionality
     if (search) {
+      // Use text index if available, fallback to regex
       filter.$or = [
+        { $text: { $search: search } },
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
       ];
     }
+
+    // Operator filters like discount[gt]=0 or price[lt]=1000
+    for (const [key, value] of searchParams.entries()) {
+      const match = key.match(/^(price|discount)\[(gt|gte|lt|lte|eq)\]$/);
+      if (match) {
+        const [, field, op] = match;
+        const mongoOp = `$${op}`;
+        filter[field] = { ...(filter[field] || {}), [mongoOp]: parseFloat(value) };
+      }
+    }
     
     // Execute query with pagination and sorting
+    const projection = 'name slug image price rating numReviews discount isFeatured category brand countInStock createdAt';
     const products = await Product.find(filter)
-      .sort({ [sort]: order === 'asc' ? 1 : -1 })
+      .select(projection)
+      .sort({ [sortField]: sortDir })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
     
     // Get total count for pagination
     const total = await Product.countDocuments(filter);

@@ -604,6 +604,128 @@ const marqueeScroll = keyframes`
   }
 `;
 
+// Newsletter 4th Dimensional Animations
+const cosmicOrbit = keyframes`
+  0% { 
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
+    opacity: 0.3;
+  }
+  25% { 
+    opacity: 0.8;
+  }
+  50% { 
+    transform: rotate(180deg) translateX(100px) rotate(-180deg);
+    opacity: 1;
+  }
+  75% { 
+    opacity: 0.8;
+  }
+  100% { 
+    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+    opacity: 0.3;
+  }
+`;
+
+const dimensionalPulse = keyframes`
+  0%, 100% { 
+    transform: scale(1) rotateZ(0deg);
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% { 
+    transform: scale(1.05) rotateZ(90deg);
+    filter: hue-rotate(90deg) brightness(1.1);
+  }
+  50% { 
+    transform: scale(1.1) rotateZ(180deg);
+    filter: hue-rotate(180deg) brightness(1.2);
+  }
+  75% { 
+    transform: scale(1.05) rotateZ(270deg);
+    filter: hue-rotate(270deg) brightness(1.1);
+  }
+`;
+
+const newsletterFloat = keyframes`
+  0%, 100% { 
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+  }
+  25% { 
+    transform: translateY(-15px) rotateX(5deg) rotateY(2deg);
+  }
+  50% { 
+    transform: translateY(-25px) rotateX(0deg) rotateY(5deg);
+  }
+  75% { 
+    transform: translateY(-15px) rotateX(-5deg) rotateY(2deg);
+  }
+`;
+
+const energyWave = keyframes`
+  0% { 
+    transform: translateX(-100%) scaleY(1);
+    opacity: 0;
+  }
+  50% { 
+    transform: translateX(0%) scaleY(1.2);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateX(100%) scaleY(1);
+    opacity: 0;
+  }
+`;
+
+const holographicShimmer = keyframes`
+  0% { 
+    background-position: -200% 0;
+    filter: hue-rotate(0deg);
+  }
+  50% { 
+    filter: hue-rotate(180deg);
+  }
+  100% { 
+    background-position: 200% 0;
+    filter: hue-rotate(360deg);
+  }
+`;
+
+const particleFloat = keyframes`
+  0% { 
+    transform: translate(0px, 0px) rotate(0deg);
+    opacity: 0;
+  }
+  10% { 
+    opacity: 1;
+  }
+  90% { 
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(-100px, -100px) rotate(360deg);
+    opacity: 0;
+  }
+`;
+
+const inputGlow = keyframes`
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(162, 146, 120, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(212, 192, 158, 0.6);
+  }
+`;
+
+const buttonPulse = keyframes`
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(162, 146, 120, 0.7);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 0 0 0 20px rgba(162, 146, 120, 0);
+  }
+`;
+
 // About Us Animation Keyframes
 const float = keyframes`
   0%, 100% { 
@@ -922,19 +1044,14 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        
-        // Fetch featured products
-        const featuredRes = await axios.get('/api/products?featured=true&limit=8');
-        
-        // Fetch new arrivals
-        const newArrivalsRes = await axios.get('/api/products?sort=-createdAt&limit=8');
-        
-        // Fetch sale products
-        const saleRes = await axios.get('/api/products?discount[gt]=0&limit=8');
+        // Fetch all product groups in parallel
+        const [featuredRes, newArrivalsRes, saleRes, trendingRes] = await Promise.all([
+          axios.get('/api/products?featured=true&limit=8'),
+          axios.get('/api/products?sort=createdAt:desc&limit=8'),
+          axios.get('/api/products?discount[gt]=0&limit=8'),
+          axios.get('/api/products?sort=rating:desc&limit=6'),
+        ]);
 
-        // Fetch trending products
-        const trendingRes = await axios.get('/api/products?sort=-rating&limit=6');
-        
         // Handle different response structures
         const featuredData = featuredRes.data.products || featuredRes.data.data?.products || [];
         const newArrivalsData = newArrivalsRes.data.products || newArrivalsRes.data.data?.products || [];
@@ -2906,6 +3023,451 @@ export default function Home() {
             </Grid>
           </Grid>
         </Container>
+      </Box>
+
+      {/* 4th Dimensional Newsletter Section */}
+      <Box sx={{
+        position: 'relative',
+        py: 8,
+        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(162, 146, 120, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(212, 192, 158, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 40% 70%, rgba(162, 146, 120, 0.05) 0%, transparent 50%)
+          `,
+          zIndex: 1
+        }
+      }}>
+        {/* Floating Cosmic Elements */}
+        <Box sx={{
+          position: 'absolute',
+          top: '10%',
+          left: '10%',
+          width: 4,
+          height: 4,
+          borderRadius: '50%',
+          background: 'linear-gradient(45deg, #a29278, #d4c09e)',
+          animation: `${cosmicOrbit} 20s linear infinite`,
+          zIndex: 2
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          top: '20%',
+          right: '15%',
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: 'linear-gradient(45deg, #d4c09e, #a29278)',
+          animation: `${cosmicOrbit} 25s linear infinite reverse`,
+          zIndex: 2
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          bottom: '15%',
+          left: '20%',
+          width: 3,
+          height: 3,
+          borderRadius: '50%',
+          background: 'linear-gradient(45deg, #a29278, #d4c09e)',
+          animation: `${cosmicOrbit} 30s linear infinite`,
+          zIndex: 2
+        }} />
+
+        {/* Energy Wave Effects */}
+        <Box sx={{
+          position: 'absolute',
+          top: '30%',
+          left: 0,
+          right: 0,
+          height: '2px',
+          background: 'linear-gradient(90deg, transparent, rgba(162, 146, 120, 0.5), transparent)',
+          animation: `${energyWave} 8s ease-in-out infinite`,
+          zIndex: 2
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          bottom: '40%',
+          left: 0,
+          right: 0,
+          height: '1px',
+          background: 'linear-gradient(90deg, transparent, rgba(212, 192, 158, 0.3), transparent)',
+          animation: `${energyWave} 12s ease-in-out infinite 2s`,
+          zIndex: 2
+        }} />
+
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3 }}>
+          <Grid container spacing={0} alignItems="center" justifyContent="center">
+            
+            {/* Left Side - Newsletter Content */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{
+                pr: { xs: 0, md: 8 },
+                textAlign: { xs: 'center', md: 'left' },
+                position: 'relative',
+                animation: `${newsletterFloat} 6s ease-in-out infinite`
+              }}>
+                {/* Premium Badge */}
+                <Box sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: 3,
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: '50px',
+                  background: `
+                    linear-gradient(135deg, 
+                      rgba(162, 146, 120, 0.15) 0%, 
+                      rgba(212, 192, 158, 0.2) 50%,
+                      rgba(162, 146, 120, 0.15) 100%
+                    )
+                  `,
+                  border: '1px solid rgba(162, 146, 120, 0.3)',
+                  backdropFilter: 'blur(10px)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(212, 192, 158, 0.3), transparent)',
+                    animation: `${holographicShimmer} 4s ease-in-out infinite`
+                  }
+                }}>
+                  <Box sx={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(45deg, #a29278, #d4c09e)',
+                    animation: `${dimensionalPulse} 3s ease-in-out infinite`
+                  }} />
+                  <Typography variant="body2" sx={{
+                    fontWeight: 600,
+                    color: '#d4c09e',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    fontSize: '0.8rem'
+                  }}>
+                    Stay Connected
+                  </Typography>
+                </Box>
+
+                {/* Main Heading */}
+                <Typography
+                  variant="h2"
+                  component="h2"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: '2rem', md: '2.8rem' },
+                    lineHeight: 1.2,
+                    mb: 2,
+                    background: `
+                      linear-gradient(135deg, 
+                        #ffffff 0%, 
+                        #d4c09e 25%,
+                        #ffffff 50%,
+                        #a29278 75%,
+                        #ffffff 100%
+                      )
+                    `,
+                    backgroundSize: '400% 400%',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    color: 'transparent',
+                    animation: `${holographicShimmer} 8s ease-in-out infinite`,
+                    position: 'relative'
+                  }}
+                >
+                  Join Our
+                  <br />
+                  <Box component="span" sx={{
+                    background: `
+                      linear-gradient(135deg, 
+                        #a29278 0%, 
+                        #d4c09e 50%,
+                        #a29278 100%
+                      )
+                    `,
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    color: 'transparent'
+                  }}>
+                    Newsletter
+                  </Box>
+                </Typography>
+
+                {/* Description */}
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: '1.1rem',
+                    lineHeight: 1.6,
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    mb: 4,
+                    maxWidth: '450px',
+                    mx: { xs: 'auto', md: 0 }
+                  }}
+                >
+                  Be the first to discover our latest collections, exclusive offers, and style inspirations delivered straight to your inbox.
+                </Typography>
+
+                {/* Benefits List */}
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  mb: 4
+                }}>
+                  {[
+                    'Exclusive early access to new collections',
+                    'Special subscriber-only discounts',
+                    'Style tips and fashion inspiration'
+                  ].map((benefit, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        animation: `${slideInLeft} 0.8s ease forwards ${index * 0.2}s`
+                      }}
+                    >
+                      <Box sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(45deg, #a29278, #d4c09e)',
+                        animation: `${dimensionalPulse} 2s ease-in-out infinite ${index * 0.3}s`
+                      }} />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          fontSize: '0.95rem',
+                          fontWeight: 500
+                        }}
+                      >
+                        {benefit}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Right Side - Newsletter Form */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{
+                position: 'relative',
+                pl: { xs: 0, md: 4 },
+                animation: `${newsletterFloat} 6s ease-in-out infinite 1s`
+              }}>
+                {/* Form Container */}
+                <Box sx={{
+                  position: 'relative',
+                  background: `
+                    linear-gradient(135deg, 
+                      rgba(255, 255, 255, 0.05) 0%, 
+                      rgba(162, 146, 120, 0.1) 50%,
+                      rgba(255, 255, 255, 0.05) 100%
+                    )
+                  `,
+                  backdropFilter: 'blur(20px)',
+                  borderRadius: '24px',
+                  p: 4,
+                  border: '1px solid rgba(162, 146, 120, 0.2)',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: `
+                      linear-gradient(45deg, 
+                        transparent 30%, 
+                        rgba(162, 146, 120, 0.05) 50%, 
+                        transparent 70%
+                      )
+                    `,
+                    animation: `${holographicShimmer} 6s ease-in-out infinite`,
+                    zIndex: -1
+                  }
+                }}>
+                  {/* Form Title */}
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      mb: 2,
+                      textAlign: 'center',
+                      fontSize: { xs: '1.5rem', md: '1.8rem' }
+                    }}
+                  >
+                    Get Exclusive Access
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      textAlign: 'center',
+                      mb: 3,
+                      fontSize: '0.95rem'
+                    }}
+                  >
+                    Join 10,000+ fashion enthusiasts
+                  </Typography>
+
+                  {/* Email Input */}
+                  <Box sx={{
+                    position: 'relative',
+                    mb: 3
+                  }}>
+                    <Box
+                      component="input"
+                      type="email"
+                      placeholder="Enter your email address"
+                      sx={{
+                        width: '100%',
+                        p: 2.5,
+                        borderRadius: '16px',
+                        border: '2px solid rgba(162, 146, 120, 0.3)',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        backdropFilter: 'blur(10px)',
+                        color: '#ffffff',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        outline: 'none',
+                        transition: 'all 0.3s ease',
+                        '&::placeholder': {
+                          color: 'rgba(255, 255, 255, 0.6)'
+                        },
+                        '&:focus': {
+                          border: '2px solid rgba(162, 146, 120, 0.6)',
+                          background: 'rgba(255, 255, 255, 0.15)',
+                          animation: `${inputGlow} 2s ease-in-out infinite`
+                        }
+                      }}
+                    />
+                  </Box>
+
+                  {/* Subscribe Button */}
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      py: 2.5,
+                      borderRadius: '16px',
+                      background: `
+                        linear-gradient(135deg, 
+                          #a29278 0%, 
+                          #d4c09e 50%,
+                          #a29278 100%
+                        )
+                      `,
+                      backgroundSize: '200% 200%',
+                      color: '#ffffff',
+                      fontSize: '1rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      border: 'none',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.4s ease',
+                      animation: `${buttonPulse} 3s ease-in-out infinite`,
+                      '&:hover': {
+                        backgroundPosition: 'right center',
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 20px 40px rgba(162, 146, 120, 0.4)'
+                      },
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: '-100%',
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
+                        transition: 'left 0.5s ease'
+                      },
+                      '&:hover::before': {
+                        left: '100%'
+                      }
+                    }}
+                  >
+                    Subscribe Now
+                  </Button>
+
+                  {/* Privacy Notice */}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      textAlign: 'center',
+                      color: 'rgba(255, 255, 255, 0.5)',
+                      mt: 2,
+                      fontSize: '0.8rem'
+                    }}
+                  >
+                    We respect your privacy. Unsubscribe at any time.
+                  </Typography>
+                </Box>
+
+                {/* Floating Particles */}
+                {[...Array(6)].map((_, i) => (
+                  <Box
+                    key={i}
+                    sx={{
+                      position: 'absolute',
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: 'linear-gradient(45deg, #a29278, #d4c09e)',
+                      top: `${20 + i * 15}%`,
+                      right: `${10 + i * 5}%`,
+                      animation: `${particleFloat} ${8 + i * 2}s ease-in-out infinite ${i * 0.5}s`,
+                      opacity: 0.6
+                    }}
+                  />
+                ))}
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+
+        {/* Bottom Decorative Line */}
+        <Box sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: `
+            linear-gradient(90deg, 
+              transparent 0%, 
+              rgba(162, 146, 120, 0.5) 25%,
+              rgba(212, 192, 158, 0.8) 50%,
+              rgba(162, 146, 120, 0.5) 75%,
+              transparent 100%
+            )
+          `,
+          animation: `${holographicShimmer} 4s ease-in-out infinite`
+        }} />
       </Box>
       
      

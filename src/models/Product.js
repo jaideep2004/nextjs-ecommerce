@@ -27,6 +27,17 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// Performance indexes for common filters and sorts
+productSchema.index({ slug: 1 }, { unique: true });
+productSchema.index({ category: 1, subcategory: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ isFeatured: 1 });
+productSchema.index({ discount: -1 });
+productSchema.index({ createdAt: -1 });
+// Text index to speed up search on name/description
+productSchema.index({ name: 'text', description: 'text' });
+
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export default Product;

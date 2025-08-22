@@ -38,24 +38,69 @@ import {
 
 // Styled components
 const FooterSection = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'light' ? theme.palette.primary.dark : '#1A1A1A',
+  backgroundColor: '#000000',
   color: theme.palette.common.white,
   paddingTop: theme.spacing(8),
-  paddingBottom: theme.spacing(3),
+  paddingBottom: 0,
   position: 'relative',
   overflow: 'hidden',
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
+    left: 0,
     right: 0,
-    width: '300px',
-    height: '300px',
-    borderRadius: '50%',
-    background: theme.palette.mode === 'light' 
-      ? 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%)'
-      : 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 70%)',
+    bottom: 0,
+    background: `
+      radial-gradient(circle at 20% 20%, rgba(162, 146, 120, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(212, 192, 158, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, rgba(162, 146, 120, 0.04) 0%, transparent 50%)
+    `,
     zIndex: 1,
+  },
+}));
+
+const ContactInfo = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: theme.spacing(1.5),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    color: '#d4c09e',
+    transform: 'translateX(5px)',
+  },
+}));
+
+const CopyrightSection = styled(Box)(({ theme }) => ({
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  borderTop: '1px solid rgba(162, 146, 120, 0.2)',
+  padding: theme.spacing(3, 0),
+  marginTop: theme.spacing(6),
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent, rgba(162, 146, 120, 0.5), transparent)',
+  },
+}));
+
+const PaymentIconBox = styled(Box)(({ theme }) => ({
+  width: 45,
+  height: 30,
+  backgroundColor: 'rgba(255, 255, 255, 1)',
+  borderRadius: theme.spacing(0.5),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  margin: theme.spacing(0, 0.5),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-3px)',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
   },
 }));
 
@@ -87,7 +132,7 @@ const FooterLink = styled(ListItem)(({ theme }) => ({
 
 const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   minWidth: 30,
-  color: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.5)',
+  color: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.5)',
 }));
 
 const NewsletterBox = styled(Paper)(({ theme }) => ({
@@ -185,277 +230,342 @@ export default function Footer() {
 
   return (
     <FooterSection>
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-        <Grid container spacing={4}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
+        <Grid container spacing={4} justifyContent="center">
           {/* Company Info */}
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
-                Punjabi Attire
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 3, opacity: 0.8, lineHeight: 1.7 }}>
-                Punjabi Attire is an exciting UK-based brand that offers high-quality traditional Punjabi suits and turbans with authentic designs.
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <StyledListItemIcon>
-                  <Email fontSize="small" />
-                </StyledListItemIcon>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' , minWidth: '250px'}}>
+            <FooterTitle variant="h6">
+              Punjabi Attire
+            </FooterTitle>
+            <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.8, color: 'rgba(255, 255, 255, 1)' }}>
+              Discover authentic traditional Punjabi suits and turbans with<br/> premium quality and timeless designs from the UK.
+            </Typography>
+            
+            <Box sx={{ mb: 4 }}>
+              <ContactInfo>
+                <Email sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
                   info@punjabiattire.com
                 </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <StyledListItemIcon>
-                  <Phone fontSize="small" />
-                </StyledListItemIcon>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              </ContactInfo>
+              <ContactInfo>
+                <Phone sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
                   +44 123 456 7890
                 </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <StyledListItemIcon>
-                  <LocationOn fontSize="small" />
-                </StyledListItemIcon>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              </ContactInfo>
+              <ContactInfo>
+                <LocationOn sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
                   123 High Street, London, UK
                 </Typography>
-              </Box>
+              </ContactInfo>
             </Box>
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>
-                Find Us:
+            
+            <Box>
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 700, color: '#ffffff' }}>
+                Follow Us
               </Typography>
-              <Box sx={{ display: 'flex' }}>
-                <SocialIconButton size="small" aria-label="facebook">
-                  <Facebook fontSize="small" />
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                <SocialIconButton aria-label="facebook">
+                  <Facebook />
                 </SocialIconButton>
-                <SocialIconButton size="small" aria-label="twitter">
-                  <Twitter fontSize="small" />
+                <SocialIconButton aria-label="twitter">
+                  <Twitter />
                 </SocialIconButton>
-                <SocialIconButton size="small" aria-label="instagram">
-                  <Instagram fontSize="small" />
+                <SocialIconButton aria-label="instagram">
+                  <Instagram />
                 </SocialIconButton>
-                <SocialIconButton size="small" aria-label="youtube">
-                  <YouTube fontSize="small" />
+                <SocialIconButton aria-label="youtube">
+                  <YouTube />
                 </SocialIconButton>
-                <SocialIconButton size="small" aria-label="linkedin">
-                  <LinkedIn fontSize="small" />
+                <SocialIconButton aria-label="linkedin">
+                  <LinkedIn />
                 </SocialIconButton>
               </Box>
             </Box>
           </Grid>
 
           {/* Customer Services */}
-          <Grid item xs={12} sm={6} md={3} lg={3}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
             <FooterTitle variant="h6">
               Customer Services
             </FooterTitle>
             <List dense disablePadding>
               <FooterLink disableGutters component={Link} href="/customer/orders" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="My Orders" />
+                <ListItemText 
+                  primary="My Orders" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/customer/wishlist" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Wishlist" />
+                <ListItemText 
+                  primary="Wishlist" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/terms" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Terms & Conditions" />
+                <ListItemText 
+                  primary="Terms & Conditions" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/privacy" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Privacy Policy" />
+                <ListItemText 
+                  primary="Privacy Policy" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/shipping" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Shipping Information" />
+                <ListItemText 
+                  primary="Shipping Information" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/returns" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Returns & Refunds" />
+                <ListItemText 
+                  primary="Returns & Refunds" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
             </List>
           </Grid>
 
           {/* Quick Links */}
-          <Grid item xs={12} sm={6} md={2} lg={2}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
             <FooterTitle variant="h6">
               Quick Links
             </FooterTitle>
             <List dense disablePadding>
               <FooterLink disableGutters component={Link} href="/" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Home" />
+                <ListItemText 
+                  primary="Home" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/products" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Shop" />
+                <ListItemText 
+                  primary="Shop" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/about" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="About Us" />
+                <ListItemText 
+                  primary="About Us" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/contact" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Contact" />
+                <ListItemText 
+                  primary="Contact" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
               <FooterLink disableGutters component={Link} href="/faq" sx={{ color: 'inherit', textDecoration: 'none' }}>
-                <ListItemIcon sx={{ minWidth: 30, color: 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="FAQ" />
+                <ListItemText 
+                  primary="FAQ" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
               </FooterLink>
             </List>
           </Grid>
 
-          {/* Newsletter & Blog Posts */}
-          <Grid item xs={12} sm={6} md={3} lg={4}>
+          {/* Categories */}
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
             <FooterTitle variant="h6">
-              Newsletter
+              Categories
             </FooterTitle>
-            <NewsletterBox>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Subscribe to receive updates, access to exclusive deals, and more.
-              </Typography>
-              <Box component="form" onSubmit={handleSubscribe}>
-                <TextField
-                  fullWidth
-                  placeholder="Your email address"
-                  variant="outlined"
-                  size="small"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  sx={{
-                    mb: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: 1,
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: theme.palette.secondary.main,
-                      },
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
-                    },
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          disableElevation
-                          type="submit"
-                          disabled={!email || !email.includes('@')}
-                          sx={{
-                            borderRadius: '50px',
-                            minWidth: 'unset',
-                            width: 35,
-                            height: 35,
-                            p: 0,
-                          }}
-                        >
-                          <Send fontSize="small" />
-                        </Button>
-                      </InputAdornment>
-                    ),
-                  }}
+            <List dense disablePadding>
+              <FooterLink disableGutters component={Link} href="/products?category=suits" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
+                  <KeyboardArrowRight fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Punjabi Suits" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
                 />
-                {subscribed && (
-                  <Typography variant="caption" color="success.light">
-                    Thank you for subscribing!
-                  </Typography>
-                )}
-              </Box>
-            </NewsletterBox>
-
-            <FooterTitle variant="h6">
-              Recent Posts
-            </FooterTitle>
-            {recentPosts.map((post) => (
-              <BlogPost key={post.id} component={Link} href={`/blog/${post.slug}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
-                <BlogImage>
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
-                </BlogImage>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, opacity: 0.9 }}>
-                    {post.title}
-                  </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                    {post.date}
-                  </Typography>
-                </Box>
-              </BlogPost>
-            ))}
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              endIcon={<ArrowForward />}
-              component={Link}
-              href="/blog"
-              sx={{ mt: 1, borderRadius: '50px' }}
-            >
-              View All Posts
-            </Button>
+              </FooterLink>
+              <FooterLink disableGutters component={Link} href="/products?category=turbans" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
+                  <KeyboardArrowRight fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Turbans" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
+              </FooterLink>
+              <FooterLink disableGutters component={Link} href="/products?category=dupattas" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
+                  <KeyboardArrowRight fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Dupattas" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
+              </FooterLink>
+              <FooterLink disableGutters component={Link} href="/products?category=kurtas" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
+                  <KeyboardArrowRight fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Kurtas" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
+              </FooterLink>
+              <FooterLink disableGutters component={Link} href="/products?category=accessories" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
+                  <KeyboardArrowRight fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Accessories" 
+                  primaryTypographyProps={{ 
+                    sx: { color: 'rgba(255, 255, 255, 1)', fontSize: '0.95rem', fontWeight: 500 } 
+                  }} 
+                />
+              </FooterLink>
+            </List>
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-
-        {/* Bottom Footer */}
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
-              © {currentYear} Punjabi Attire. All rights reserved.
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, alignItems: 'center' }}>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.7)" sx={{ mr: 2 }}>
-              We Accept:
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <PaymentIcon src="/images/payment/visa.svg" alt="Visa" width={40} height={25} />
-              <PaymentIcon src="/images/payment/mastercard.svg" alt="Mastercard" width={40} height={25} />
-              <PaymentIcon src="/images/payment/amex.svg" alt="American Express" width={40} height={25} />
-              <PaymentIcon src="/images/payment/paypal.svg" alt="PayPal" width={40} height={25} />
-              <PaymentIcon src="/images/payment/apple-pay.svg" alt="Apple Pay" width={40} height={25} />
-            </Box>
-          </Grid>
-        </Grid>
       </Container>
+      
+      {/* Copyright Section */}
+      <CopyrightSection>
+        <Container maxWidth="xl">
+          <Grid container spacing={6} alignItems="center" justifyContent="space-around">
+            <Grid item xs={12} md={6}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 1)',
+                  fontSize: '0.95rem',
+                  fontWeight: 500
+                }}
+              >
+                © {currentYear} Punjabi Attire. All rights reserved.
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 1)',
+                  display: 'block',
+                  mt: 0.5
+                }}
+              >
+                Crafted with ❤️ for authentic fashion
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ 
+              display: 'flex', 
+              justifyContent: { xs: 'flex-start', md: 'flex-end' }, 
+              alignItems: 'center',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 2
+            }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 1)',
+                  fontWeight: 600,
+                  mr: { xs: 0, sm: 2 }
+                }}
+              >
+                Secure Payments:
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <PaymentIconBox>
+                  <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 'bold', fontSize: '10px' }}>
+                    VISA
+                  </Typography>
+                </PaymentIconBox>
+                <PaymentIconBox>
+                  <Typography variant="caption" sx={{ color: '#eb001b', fontWeight: 'bold', fontSize: '9px' }}>
+                    MC
+                  </Typography>
+                </PaymentIconBox>
+                <PaymentIconBox>
+                  <Typography variant="caption" sx={{ color: '#0070ba', fontWeight: 'bold', fontSize: '8px' }}>
+                    PayPal
+                  </Typography>
+                </PaymentIconBox>
+                <PaymentIconBox>
+                  <Typography variant="caption" sx={{ color: '#000', fontWeight: 'bold', fontSize: '8px' }}>
+                    AMEX
+                  </Typography>
+                </PaymentIconBox>
+                <PaymentIconBox>
+                  <Typography variant="caption" sx={{ color: '#000', fontWeight: 'bold', fontSize: '7px' }}>
+                    Apple Pay
+                  </Typography>
+                </PaymentIconBox>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </CopyrightSection>
     </FooterSection>
   );
 }
