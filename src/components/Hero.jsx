@@ -444,7 +444,7 @@ const Hero = () => {
                   variant="contained" 
                   className="primary"
                   component={Link}
-                  href="/shop"
+                  href="/products"
                 >
                   Shop Now
                 </PrimaryButton>
@@ -452,7 +452,7 @@ const Hero = () => {
                   variant="outlined" 
                   className="secondary"
                   component={Link}
-                  href="/collections"
+                  href="/products"
                 >
                   View Collection
                 </PrimaryButton>

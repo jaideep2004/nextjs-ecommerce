@@ -1,5 +1,6 @@
 import connectToDatabase from '@/lib/mongodb';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 import { apiResponse, handleApiRequest, validateMethod } from '@/utils/api';
 
 // Get all products with filtering, sorting, and pagination
@@ -79,6 +80,7 @@ export async function GET(req) {
     const projection = 'name slug image price rating numReviews discount isFeatured category brand countInStock createdAt';
     const products = await Product.find(filter)
       .select(projection)
+      .populate('category', 'name slug')
       .sort({ [sortField]: sortDir })
       .skip(skip)
       .limit(limit)

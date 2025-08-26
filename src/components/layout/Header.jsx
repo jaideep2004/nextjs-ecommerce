@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useThemeContext } from '@/theme';
+import CategoriesDropdown from './CategoriesDropdown';
 import {
   AppBar,
   Box,
@@ -379,13 +380,36 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 
 
-// Hide on scroll
-function HideOnScroll(props) {
+// Hide on scroll up, show on scroll down
+function HideOnScrollUp(props) {
   const { children } = props;
-  const trigger = useScrollTrigger();
+  const [prevScrollY, setPrevScrollY] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header when at top of page
+      if (currentScrollY < 10) {
+        setVisible(true);
+      }
+      // Hide when scrolling up, show when scrolling down
+      else if (prevScrollY > currentScrollY && currentScrollY > 100) {
+        setVisible(false);
+      } else if (prevScrollY < currentScrollY) {
+        setVisible(true);
+      }
+      
+      setPrevScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prevScrollY]);
 
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
+    <Slide appear={false} direction="down" in={visible}>
       {children}
     </Slide>
   );
@@ -457,11 +481,11 @@ export default function Header() {
     handleCloseUserMenu();
   };
 
-  // Navigation items (removed New Arrivals as requested)
+  // Navigation items (Categories now handled by dropdown)
   const pages = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/products' },
-    { name: 'Categories', path: '/categories' },
+    { name: 'Categories', isDropdown: true },
     { name: 'Sale', path: '/products/sale' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
@@ -509,25 +533,41 @@ export default function Header() {
       </Box>
       <Divider />
       <List>
-        {pages.map((page) => (
-          <ListItem key={page.name} disablePadding>
-            <ListItemButton 
-              component={Link} 
-              href={page.path}
-              selected={pathname === page.path}
-            >
-              <ListItemText primary={page.name} />
-              {page.name === 'Sale' && (
-                <Chip 
-                  label="Hot" 
-                  size="small" 
-                  color="error" 
-                  sx={{ ml: 1 }}
-                />
-              )}
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {pages.map((page) => {
+          if (page.isDropdown && page.name === 'Categories') {
+            return (
+              <ListItem key={page.name} disablePadding>
+                <ListItemButton 
+                  component={Link} 
+                  href="/products"
+                  selected={pathname.startsWith('/products') && pathname.includes('category')}
+                >
+                  <ListItemText primary={page.name} />
+                </ListItemButton>
+              </ListItem>
+            );
+          }
+          
+          return (
+            <ListItem key={page.name} disablePadding>
+              <ListItemButton 
+                component={Link} 
+                href={page.path}
+                selected={pathname === page.path}
+              >
+                <ListItemText primary={page.name} />
+                {page.name === 'Sale' && (
+                  <Chip 
+                    label="Hot" 
+                    size="small" 
+                    color="error" 
+                    sx={{ ml: 1 }}
+                  />
+                )}
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
       <Divider />
       <List>
@@ -590,7 +630,7 @@ export default function Header() {
 
   return (
     <>
-      <HideOnScroll>
+      <HideOnScrollUp>
         <StyledAppBar>
           <Container maxWidth="xl">
             <Toolbar 
@@ -706,33 +746,51 @@ export default function Header() {
                 justifyContent: 'center',
                 gap: 1,
               }}>
-                {pages.map((page) => (
-                  <StyledNavButton
-                    key={page.name}
-                    component={Link}
-                    href={page.path}
-                    className={pathname === page.path ? 'active' : ''}
-                    sx={{ position: 'relative' }}
-                  >
-                    {page.name}
-                    {page.name === 'Sale' && (
-                      <Chip 
-                        label="Hot" 
-                        size="small" 
-                        sx={{ 
-                          ml: 1, 
-                          height: 18,
-                          fontSize: '0.65rem',
-                          fontWeight: 700,
-                          background: 'linear-gradient(135deg, #ff4444, #ff6666)',
-                          color: 'white',
-                          border: 'none',
-                          animation: `${iconPulse} 2s ease-in-out infinite`,
-                        }}
+                {pages.map((page) => {
+                  if (page.isDropdown && page.name === 'Categories') {
+                    return (
+                      <CategoriesDropdown
+                        key={page.name}
+                        trigger={
+                          <StyledNavButton
+                            className={pathname.startsWith('/products') && pathname.includes('category') ? 'active' : ''}
+                            sx={{ position: 'relative' }}
+                          >
+                            {page.name}
+                          </StyledNavButton>
+                        }
                       />
-                    )}
-                  </StyledNavButton>
-                ))}
+                    );
+                  }
+                  
+                  return (
+                    <StyledNavButton
+                      key={page.name}
+                      component={Link}
+                      href={page.path}
+                      className={pathname === page.path ? 'active' : ''}
+                      sx={{ position: 'relative' }}
+                    >
+                      {page.name}
+                      {page.name === 'Sale' && (
+                        <Chip 
+                          label="Hot" 
+                          size="small" 
+                          sx={{ 
+                            ml: 1, 
+                            height: 18,
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            background: 'linear-gradient(135deg, #ff4444, #ff6666)',
+                            color: 'white',
+                            border: 'none',
+                            animation: `${iconPulse} 2s ease-in-out infinite`,
+                          }}
+                        />
+                      )}
+                    </StyledNavButton>
+                  );
+                })}
               </Box>
 
               {/* Right Side Actions */}
@@ -936,7 +994,7 @@ export default function Header() {
             </Toolbar>
           </Container>
         </StyledAppBar>
-      </HideOnScroll>
+      </HideOnScrollUp>
 
       {/* Search Dialog */}
       <SearchDialog

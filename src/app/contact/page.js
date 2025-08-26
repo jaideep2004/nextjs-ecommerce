@@ -22,6 +22,10 @@ import {
   Phone as PhoneIcon,
   LocationOn as LocationIcon,
   Send as SendIcon,
+  AccessTime as TimeIcon,
+  Business as BusinessIcon,
+  Support as SupportIcon,
+  ContactSupport as ContactIcon,
 } from '@mui/icons-material';
 
 export default function ContactPage() {
@@ -92,19 +96,6 @@ export default function ContactPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // In a real application, you would send the form data to your API
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Failed to send message');
-      // }
-      
       // Reset form after successful submission
       setFormData({
         name: '',
@@ -136,120 +127,320 @@ export default function ContactPage() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-        <Link href="/" passHref>
-          <MuiLink underline="hover" color="inherit">
-            Home
-          </MuiLink>
-        </Link>
-        <Typography color="text.primary">Contact Us</Typography>
-      </Breadcrumbs>
+    <Box>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #5D4037 0%, #3E2723 100%)',
+          color: 'white',
+          py: { xs: 6, md: 8 },
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            opacity: 0.3,
+          },
+        }}
+      >
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <Breadcrumbs 
+            aria-label="breadcrumb" 
+            sx={{ 
+              mb: 3,
+              '& .MuiBreadcrumbs-separator': { color: 'rgba(255,255,255,0.7)' },
+            }}
+          >
+            <Link href="/" passHref>
+              <MuiLink underline="hover" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                Home
+              </MuiLink>
+            </Link>
+            <Typography sx={{ color: 'white' }}>Contact Us</Typography>
+          </Breadcrumbs>
 
-      <Typography variant="h4" component="h1" gutterBottom>
-        Contact Us
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Have questions or feedback? We'd love to hear from you. Fill out the form below or use our contact information to get in touch.
-      </Typography>
+          <Box sx={{ textAlign: 'center', maxWidth: '800px', mx: 'auto' }}>
+            <Typography 
+              variant="h2" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 700,
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                mb: 2,
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              }}
+            >
+              Get In Touch
+            </Typography>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
+                fontWeight: 400,
+                lineHeight: 1.6,
+                maxWidth: '600px',
+                mx: 'auto',
+              }}
+            >
+              Have questions about our products or need support? We're here to help you every step of the way.
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
 
-      <Grid container spacing={4}>
-        {/* Contact Information */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>
-              Contact Information
-            </Typography>
-            <Divider sx={{ mb: 3 }} />
-            
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3 }}>
-              <LocationIcon sx={{ mr: 2, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Address
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  123 Commerce Street<br />
-                  Suite 456<br />
-                  New York, NY 10001<br />
-                  United States
-                </Typography>
+      {/* Contact Section */}
+      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
+
+        <Grid container spacing={4}>
+          {/* Contact Information */}
+          <Grid item xs={12} md={5}>
+            <Box sx={{ pr: { md: 2 } }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  mb: 2,
+                  fontSize: { xs: '1.75rem', md: '2.125rem' },
+                }}
+              >
+                Contact Information
+              </Typography>
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ mb: 4, lineHeight: 1.7 }}
+              >
+                Ready to start your shopping journey? Reach out to us through any of these channels.
+              </Typography>
+
+              {/* Contact Cards */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Email Card */}
+                <Paper 
+                  elevation={0}
+                  sx={{ 
+                    p: 3,
+                    border: '2px solid',
+                    borderColor: 'grey.100',
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #FFA000 0%, #FF8F00 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <EmailIcon sx={{ color: 'white', fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Email Us
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <MuiLink 
+                          href="mailto:info@ecommerce.com" 
+                          underline="hover"
+                          sx={{ color: 'primary.main', fontWeight: 500 }}
+                        >
+                          info@ecommerce.com
+                        </MuiLink>
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <MuiLink 
+                          href="mailto:support@ecommerce.com" 
+                          underline="hover"
+                          sx={{ color: 'primary.main', fontWeight: 500 }}
+                        >
+                          support@ecommerce.com
+                        </MuiLink>
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+
+                {/* Phone Card */}
+                <Paper 
+                  elevation={0}
+                  sx={{ 
+                    p: 3,
+                    border: '2px solid',
+                    borderColor: 'grey.100',
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #5D4037 0%, #3E2723 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <PhoneIcon sx={{ color: 'white', fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Call Us
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <MuiLink 
+                          href="tel:+1-800-123-4567" 
+                          underline="hover"
+                          sx={{ color: 'primary.main', fontWeight: 500 }}
+                        >
+                          +1 (800) 123-4567
+                        </MuiLink>
+                        <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>
+                          Sales
+                        </Typography>
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <MuiLink 
+                          href="tel:+1-800-765-4321" 
+                          underline="hover"
+                          sx={{ color: 'primary.main', fontWeight: 500 }}
+                        >
+                          +1 (800) 765-4321
+                        </MuiLink>
+                        <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>
+                          Support
+                        </Typography>
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+
+                {/* Business Hours Card */}
+                <Paper 
+                  elevation={0}
+                  sx={{ 
+                    p: 3,
+                    border: '2px solid',
+                    borderColor: 'grey.100',
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #388E3C 0%, #2E7D32 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <TimeIcon sx={{ color: 'white', fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        Business Hours
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Monday - Friday:</span>
+                          <span style={{ fontWeight: 500, color: '#5D4037' }}>9:00 AM - 6:00 PM</span>
+                        </Typography>
+                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Saturday:</span>
+                          <span style={{ fontWeight: 500, color: '#5D4037' }}>10:00 AM - 4:00 PM</span>
+                        </Typography>
+                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Sunday:</span>
+                          <span style={{ fontWeight: 500, color: '#757575' }}>Closed</span>
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Paper>
               </Box>
             </Box>
-            
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3 }}>
-              <EmailIcon sx={{ mr: 2, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Email
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <MuiLink href="mailto:info@yourecommerce.com" underline="hover">
-                    info@yourecommerce.com
-                  </MuiLink>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <MuiLink href="mailto:support@yourecommerce.com" underline="hover">
-                    support@yourecommerce.com
-                  </MuiLink>
-                </Typography>
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3 }}>
-              <PhoneIcon sx={{ mr: 2, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Phone
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <MuiLink href="tel:+1-800-123-4567" underline="hover">
-                    +1 (800) 123-4567
-                  </MuiLink> (Sales)
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <MuiLink href="tel:+1-800-765-4321" underline="hover">
-                    +1 (800) 765-4321
-                  </MuiLink> (Support)
-                </Typography>
-              </Box>
-            </Box>
-            
-            <Typography variant="subtitle2" gutterBottom>
-              Business Hours
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Monday - Friday: 9:00 AM - 6:00 PM EST<br />
-              Saturday: 10:00 AM - 4:00 PM EST<br />
-              Sunday: Closed
-            </Typography>
-          </Paper>
-        </Grid>
-        
-        {/* Contact Form */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Send Us a Message
-            </Typography>
-            <Divider sx={{ mb: 3 }} />
-            
-            <form onSubmit={handleSubmit}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Your Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    error={!!errors.name}
-                    helperText={errors.name}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
+          </Grid>
+
+          {/* Contact Form */}
+          <Grid item xs={12} md={7}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 3,
+                border: '2px solid',
+                borderColor: 'grey.100',
+                borderRadius: 3,
+              }}
+            >
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  mb: 2,
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                }}
+              >
+                Send us a message
+              </Typography>
+              <Divider sx={{ mb: 3 }} />
+
+              <form onSubmit={handleSubmit} noValidate>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Your Name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      error={!!errors.name}
+                      helperText={errors.name}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
                     fullWidth
                     label="Your Email"
                     name="email"
@@ -340,5 +531,6 @@ export default function ContactPage() {
         </Alert>
       </Snackbar>
     </Container>
+  </Box>
   );
 }

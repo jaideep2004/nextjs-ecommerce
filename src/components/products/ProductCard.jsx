@@ -140,19 +140,32 @@ const StyledCard = styled(Card)(({ theme }) => ({
   overflow: 'hidden',
   borderRadius: '20px',
   transformStyle: 'preserve-3d',
-  background: `linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.98) 0%, 
-    rgba(250, 250, 250, 0.95) 25%,
-    rgba(245, 245, 245, 0.92) 50%,
-    rgba(250, 250, 250, 0.95) 75%,
-    rgba(255, 255, 255, 0.98) 100%
-  )`,
+  background: theme.palette.mode === 'light' 
+    ? `linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.98) 0%, 
+        rgba(250, 250, 250, 0.95) 25%,
+        rgba(245, 245, 245, 0.92) 50%,
+        rgba(250, 250, 250, 0.95) 75%,
+        rgba(255, 255, 255, 0.98) 100%
+      )`
+    : `linear-gradient(145deg, 
+        rgba(30, 30, 30, 0.98) 0%, 
+        rgba(35, 35, 35, 0.95) 25%,
+        rgba(40, 40, 40, 0.92) 50%,
+        rgba(35, 35, 35, 0.95) 75%,
+        rgba(30, 30, 30, 0.98) 100%
+      )`,
   border: '2px solid transparent',
   backgroundClip: 'padding-box',
-  boxShadow: `0 10px 30px rgba(0, 0, 0, 0.1), 
-     0 0 20px rgba(162, 146, 120, 0.12),
-     0 0 0 2px rgba(162, 146, 120, 0.08),
-     inset 0 1px 0 rgba(255, 255, 255, 0.15)`,
+  boxShadow: theme.palette.mode === 'light'
+    ? `0 10px 30px rgba(0, 0, 0, 0.1), 
+       0 0 20px rgba(162, 146, 120, 0.12),
+       0 0 0 2px rgba(162, 146, 120, 0.08),
+       inset 0 1px 0 rgba(255, 255, 255, 0.15)`
+    : `0 10px 30px rgba(0, 0, 0, 0.3), 
+       0 0 20px rgba(162, 146, 120, 0.15),
+       0 0 0 2px rgba(162, 146, 120, 0.12),
+       inset 0 1px 0 rgba(255, 255, 255, 0.05)`,
   transition: 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   '&::before': {
     content: '""',
@@ -192,14 +205,19 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
   '&:hover': {
     transform: 'perspective(1500px) translateY(-15px) rotateX(8deg) rotateY(3deg) scale(1.05)',
-    boxShadow: `
-      0 25px 50px rgba(0, 0, 0, 0.15),
-      0 0 40px rgba(162, 146, 120, 0.3),
-      0 0 80px rgba(212, 192, 158, 0.2),
-      0 0 120px rgba(255, 215, 0, 0.1),
-      0 0 0 3px rgba(162, 146, 120, 0.4),
-      inset 0 2px 0 rgba(255, 255, 255, 0.25)
-    `,
+    boxShadow: theme.palette.mode === 'light'
+      ? `0 25px 50px rgba(0, 0, 0, 0.15),
+         0 0 40px rgba(162, 146, 120, 0.3),
+         0 0 80px rgba(212, 192, 158, 0.2),
+         0 0 120px rgba(255, 215, 0, 0.1),
+         0 0 0 3px rgba(162, 146, 120, 0.4),
+         inset 0 2px 0 rgba(255, 255, 255, 0.25)`
+      : `0 25px 50px rgba(0, 0, 0, 0.4),
+         0 0 40px rgba(162, 146, 120, 0.4),
+         0 0 80px rgba(212, 192, 158, 0.3),
+         0 0 120px rgba(255, 215, 0, 0.15),
+         0 0 0 3px rgba(162, 146, 120, 0.5),
+         inset 0 2px 0 rgba(255, 255, 255, 0.1)`,
     animation: `${hyperdimensionalFloat} 4s ease-in-out infinite`,
     '&::before': {
       transform: 'translate(-50%, -50%) scale(1.1) rotate(180deg)',
@@ -223,7 +241,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const ProductImageContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   height: '250px',
-  backgroundColor: theme.palette.mode === 'light' ? '#F5F5F5' : '#333333',
+  backgroundColor: theme.palette.mode === 'light' ? '#F5F5F5' : '#2a2a2a',
   overflow: 'hidden',
   borderRadius: '18px 18px 0 0',
   transformStyle: 'preserve-3d',
@@ -334,7 +352,9 @@ const StyledCardActions = styled(CardActions)(({ theme }) => ({
   bottom: 0,
   left: 0,
   right: 0,
-  background: 'linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))',
+  background: theme.palette.mode === 'light'
+    ? 'linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))'
+    : 'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))',
   padding: theme.spacing(1.5),
   opacity: 0,
   transform: 'translateY(20px)',
@@ -533,16 +553,22 @@ export default function ProductCard({
           )}
         </ProductImageContainer>
 
-        <CardContent sx={{ 
+        <CardContent sx={(theme) => ({ 
           flexGrow: 1, 
           pt: 2.5,
           px: 2.5,
           pb: 2,
-          background: `linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.95) 0%, 
-            rgba(250, 250, 250, 0.9) 50%,
-            rgba(245, 245, 245, 0.85) 100%
-          )`,
+          background: theme.palette.mode === 'light'
+            ? `linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(250, 250, 250, 0.9) 50%,
+                rgba(245, 245, 245, 0.85) 100%
+              )`
+            : `linear-gradient(135deg, 
+                rgba(45, 45, 45, 0.95) 0%, 
+                rgba(40, 40, 40, 0.9) 50%,
+                rgba(35, 35, 35, 0.85) 100%
+              )`,
           borderRadius: '0 0 18px 18px',
           position: 'relative',
           transformStyle: 'preserve-3d',
@@ -570,20 +596,26 @@ export default function ProductCard({
             opacity: 1,
           },
           '&:hover': {
-            background: `linear-gradient(135deg, 
-              rgba(162, 146, 120, 0.06) 0%, 
-              rgba(212, 192, 158, 0.08) 50%,
-              rgba(255, 215, 0, 0.04) 100%
-            )`,
+            background: theme.palette.mode === 'light'
+              ? `linear-gradient(135deg, 
+                  rgba(162, 146, 120, 0.06) 0%, 
+                  rgba(212, 192, 158, 0.08) 50%,
+                  rgba(255, 215, 0, 0.04) 100%
+                )`
+              : `linear-gradient(135deg, 
+                  rgba(162, 146, 120, 0.08) 0%, 
+                  rgba(212, 192, 158, 0.1) 50%,
+                  rgba(255, 215, 0, 0.06) 100%
+                )`,
             transform: 'translateZ(10px)',
           }
-        }}>
+        })}>
           <Typography 
             variant="subtitle1" 
             component="h2" 
             fontWeight={600}
             gutterBottom 
-            sx={{
+            sx={(theme) => ({
               fontSize: '1.1rem',
               letterSpacing: '0.3px',
               lineHeight: 1.3,
@@ -593,12 +625,13 @@ export default function ProductCard({
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               transition: 'all 0.3s ease',
+              color: theme.palette.text.primary,
               '&:hover': {
                 color: '#8b7355',
                 textShadow: '0 2px 4px rgba(139, 115, 85, 0.2)',
                 transform: 'translateZ(5px)',
               }
-            }}
+            })}
           >
             {product.name}
           </Typography>
@@ -617,17 +650,18 @@ export default function ProductCard({
                   variant="h6" 
                   component="span" 
                   fontWeight="bold"
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: '1.3rem',
                     background: 'linear-gradient(135deg, #8b7355, #c4a876, #d4c09e)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       transform: 'translateZ(8px) scale(1.03)',
                       filter: 'drop-shadow(0 1px 3px rgba(139, 115, 85, 0.2))',
                     }
-                  }}
+                  })}
                 >
                   {formatPrice(product.price * (1 - product.discount / 100))}
                 </Typography>
@@ -648,7 +682,7 @@ export default function ProductCard({
                 variant="h6" 
                 component="span" 
                 fontWeight="bold"
-                sx={{
+                sx={(theme) => ({
                   fontSize: '1.3rem',
                   color: '#8b7355',
                   transition: 'all 0.3s ease',
@@ -656,10 +690,11 @@ export default function ProductCard({
                     background: 'linear-gradient(135deg, #8b7355, #c4a876, #d4c09e)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
                     transform: 'translateZ(8px) scale(1.03)',
                     filter: 'drop-shadow(0 1px 3px rgba(139, 115, 85, 0.2))',
                   }
-                }}
+                })}
               >
                 {formatPrice(product.price)}
               </Typography>

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Punjabi Attire - Traditional Punjabi Suits & Turbans",
+  title: "India Inspired - Traditional Punjabi Suits & Turbans",
   description: "Shop authentic Punjabi suits and turbans crafted with premium fabrics and traditional designs. Free shipping on orders over $50.",
 };
 
