@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,24 +20,23 @@ import {
   Paper,
   Tabs,
   Tab,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
   CircularProgress,
   Alert,
-  Breadcrumbs,
+  IconButton,
+  Stack,
+  Tooltip,
 } from '@mui/material';
 import {
   ShoppingCart,
   Favorite,
+  FavoriteBorder,
   LocalShipping,
   Security,
   Refresh,
-  NavigateNext,
+  Add as AddIcon,
+  Remove as RemoveIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
-
 
 export default function ProductPage() {
   const params = useParams();
@@ -52,6 +50,10 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [tabValue, setTabValue] = useState(0);
+  const [activeImage, setActiveImage] = useState('');
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+  
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
   
@@ -71,6 +73,13 @@ export default function ProductPage() {
       if (productData.sizes && productData.sizes.length > 0) {
         setSelectedSize(productData.sizes[0]);
       }
+
+      // Set gallery active image
+      const imgs = [
+        productData.image,
+        ...(Array.isArray(productData.images) ? productData.images : []),
+      ].filter(Boolean);
+      setActiveImage(imgs[0] || '/images/placeholder.png');
     } catch (err) {
       console.error('Error fetching product:', err);
       setError(err.response?.data?.message || 'Failed to load product');
@@ -215,59 +224,83 @@ export default function ProductPage() {
   const discountedPrice = product.discount
     ? product.price - (product.price * product.discount) / 100
     : product.price;
+
+  // Build gallery images
+  const galleryImages = [
+    product.image,
+    ...(Array.isArray(product.images) ? product.images : []),
+  ].filter(Boolean);
+
+  const isInWishlist = wishlistItems.some((w) => w._id === product._id);
   
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Breadcrumbs */}
-      <Breadcrumbs 
-        separator={<NavigateNext fontSize="small" />} 
-        aria-label="breadcrumb"
-        sx={{ mb: 3 }}
-      >
-        <Link href="/" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            Home
-          </Typography>
-        </Link>
-        <Link href="/products" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            Products
-          </Typography>
-        </Link>
-        <Link href={`/category/${product.category}`} passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            {product.category}
-          </Typography>
-        </Link>
-        <Typography color="text.primary">{product.name}</Typography>
-      </Breadcrumbs>
+     
       
-      <Grid container spacing={4}>
-        {/* Product Image */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={2} sx={{ position: 'relative', height: 500, overflow: 'hidden' }}>
+      <Grid container spacing={8} style={{flexWrap: 'nowrap'}}>
+        {/* Product Gallery */}
+        <Grid item xs={12} md={6} style={{minWidth: '450px'}}>
+          <Paper elevation={2} sx={{ position: 'relative', height: 520, overflow: 'hidden', borderRadius: 2 }}>
             {product.discount > 0 && (
               <Chip 
                 label={`${product.discount}% OFF`} 
                 color="error" 
-                sx={{ 
-                  position: 'absolute', 
-                  top: 16, 
-                  left: 16, 
-                  zIndex: 1,
-                  fontWeight: 'bold',
-                }}
+                sx={{ position: 'absolute', top: 16, left: 16, zIndex: 1, fontWeight: 'bold' }}
               />
             )}
-            <Image 
-              src={product.image || (product.images && product.images.length > 0 ? product.images[0] : '/images/placeholder.png')} 
-              alt={product.name}
-              fill
-              style={{ objectFit: 'contain' }}
-              sizes="(max-width: 600px) 100vw, 600px"
-              priority
-            />
+            <Box
+              sx={{ position: 'absolute', inset: 0 }}
+              onMouseEnter={() => setIsZoomed(true)}
+              onMouseLeave={() => setIsZoomed(false)}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                setZoomOrigin({ x: Math.min(100, Math.max(0, x)), y: Math.min(100, Math.max(0, y)) });
+              }}
+            >
+              <Image 
+                src={activeImage || galleryImages[0] || '/images/placeholder.png'} 
+                alt={product.name}
+                fill
+                style={{ 
+                  objectFit: 'cover',
+                  transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transition: 'transform 120ms ease-out',
+                  willChange: 'transform',
+                  cursor: isZoomed ? 'zoom-out' : 'zoom-in',
+                }}
+                sizes="(max-width: 600px) 100vw, 600px"
+                priority
+              />
+            </Box>
           </Paper>
+
+          {/* Thumbnails */}
+          {galleryImages.length > 1 && (
+            <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, overflowX: 'auto', pb: 1 }}>
+              {galleryImages.map((img) => (
+                <Box
+                  key={img}
+                  onClick={() => setActiveImage(img)}
+                  sx={{
+                    position: 'relative',
+                    width: 88,
+                    height: 88,
+                    flex: '0 0 auto',
+                    borderRadius: 2,
+                    border: (theme) => `2px solid ${activeImage === img ? theme.palette.primary.main : 'transparent'}`,
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    boxShadow: activeImage === img ? 3 : 0,
+                  }}
+                >
+                  <Image src={img} alt={`${product.name} thumb`} fill style={{ objectFit: 'cover' }} />
+                </Box>
+              ))}
+            </Stack>
+          )}
         </Grid>
         
         {/* Product Details */}
@@ -278,152 +311,151 @@ export default function ProductPage() {
           
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <Rating value={product.rating} precision={0.5} readOnly />
-            <Typography variant="body2" sx={{ ml: 1 }}>
+            <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
               ({product.numReviews} reviews)
             </Typography>
           </Box>
-          
-          <Box sx={{ display: 'flex', alignItems: 'baseline', mb: 3 }}>
-            <Typography variant="h5" component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+
+          {/* Price */}
+          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 2 }}>
+            <Typography variant="h4" component="span" sx={{ fontWeight: 800, color: 'primary.main' }}>
               ${discountedPrice.toFixed(2)}
             </Typography>
             {product.discount > 0 && (
-              <Typography 
-                variant="h6" 
-                component="span" 
-                sx={{ ml: 2, textDecoration: 'line-through', color: 'text.secondary' }}
-              >
+              <Typography variant="h6" component="span" sx={{ textDecoration: 'line-through', color: 'text.secondary' }}>
                 ${product.price.toFixed(2)}
               </Typography>
             )}
           </Box>
-          
+
+          {/* Blurb */}
           <Typography variant="body1" sx={{ mb: 3 }}>
             {product.description}
           </Typography>
-          
-          <Divider sx={{ mb: 3 }} />
-          
-          {/* Product Options */}
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            {/* Color Selection */}
-            {product.colors && product.colors.length > 0 && (
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="color-select-label">Color</InputLabel>
-                  <Select
-                    labelId="color-select-label"
-                    value={selectedColor}
-                    label="Color"
-                    onChange={(e) => setSelectedColor(e.target.value)}
-                  >
-                    {product.colors.map((color) => (
-                      <MenuItem key={color} value={color}>
-                        {color}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Product Options (swatches, chips, quantity) */}
+          <Stack spacing={2.5} sx={{ mb: 3 }}>
+            {product.colors?.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>Color</Typography>
+                <Stack direction="row" spacing={1.25}>
+                  {product.colors.map((c) => (
+                    <Tooltip key={c} title={c} arrow>
+                      <IconButton
+                        onClick={() => setSelectedColor(c)}
+                        size="small"
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          border: (theme) => `2px solid ${selectedColor === c ? theme.palette.primary.main : theme.palette.divider}`,
+                          bgcolor: '#fff',
+                          p: 0.2,
+                        }}
+                        aria-label={`select color ${c}`}
+                      >
+                        <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: c }} />
+                      </IconButton>
+                    </Tooltip>
+                  ))}
+                </Stack>
+              </Box>
             )}
-            
-            {/* Size Selection */}
-            {product.sizes && product.sizes.length > 0 && (
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="size-select-label">Size</InputLabel>
-                  <Select
-                    labelId="size-select-label"
-                    value={selectedSize}
-                    label="Size"
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                  >
-                    {product.sizes.map((size) => (
-                      <MenuItem key={size} value={size}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+
+            {product.sizes?.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>Size</Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                  {product.sizes.map((s) => (
+                    <Chip
+                      key={s}
+                      label={s}
+                      clickable
+                      color={selectedSize === s ? 'primary' : 'default'}
+                      variant={selectedSize === s ? 'filled' : 'outlined'}
+                      onClick={() => setSelectedSize(s)}
+                      sx={{ borderRadius: 1 }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
             )}
-            
-            {/* Quantity */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                type="number"
-                label="Quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                InputProps={{ inputProps: { min: 1, max: product.countInStock } }}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          
-          {/* Add to Cart Button */}
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<ShoppingCart />}
-            onClick={handleAddToCart}
-            disabled={product.countInStock === 0}
-            fullWidth
-            sx={{ 
-              mb: 2, 
-              py: 1.5,
-              bgcolor: '#8D6E63',
-              '&:hover': { bgcolor: '#6D4C41' },
-            }}
-          >
-            {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
-          </Button>
-          
-          {/* Wishlist Button */}
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={<Favorite />}
-            fullWidth
-            sx={{ mb: 3, py: 1.5 }}
-          >
-            Add to Wishlist
-          </Button>
-          
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>Quantity</Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <IconButton size="small" onClick={() => setQuantity((q) => Math.max(1, q - 1))} aria-label="decrease">
+                  <RemoveIcon />
+                </IconButton>
+                <Box sx={{ px: 2, py: 0.75, border: 1, borderColor: 'divider', borderRadius: 1, minWidth: 44, textAlign: 'center' }}>{quantity}</Box>
+                <IconButton size="small" onClick={() => setQuantity((q) => Math.min(q + 1, product.countInStock || q + 1))} aria-label="increase">
+                  <AddIcon />
+                </IconButton>
+              </Stack>
+            </Box>
+          </Stack>
+
+          {/* CTA Row */}
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }}>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<ShoppingCart />}
+              onClick={handleAddToCart}
+              disabled={product.countInStock === 0}
+              sx={{
+                flex: 1,
+                py: 1.25,
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                boxShadow: 2,
+                '&:hover': { filter: 'brightness(0.95)' },
+              }}
+            >
+              {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={isInWishlist ? <Favorite /> : <FavoriteBorder />}
+              onClick={() => (isInWishlist ? handleRemoveFromWishlist(product._id) : handleAddToWishlist(product))}
+              sx={{ flexShrink: 0, py: 1.25 }}
+            >
+              {isInWishlist ? 'Wishlisted' : 'Add to Wishlist'}
+            </Button>
+            <IconButton aria-label="share" sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}>
+              <ShareIcon />
+            </IconButton>
+          </Stack>
+
           {/* Product Meta */}
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" sx={{ mb: 0.5 }}>
               <strong>SKU:</strong> {product._id}
             </Typography>
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              <strong>Category:</strong> {product.category}
-            </Typography>
-            {product.subcategory && (
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Subcategory:</strong> {product.subcategory}
-              </Typography>
-            )}
             {product.brand && (
               <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Brand:</strong> {product.brand}
               </Typography>
             )}
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              <strong>Availability:</strong> {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
-            </Typography>
+            {product.category && (
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <strong>Category:</strong> {String(product.category.name || product.category)}
+              </Typography>
+            )}
           </Box>
-          
-          {/* Shipping Info */}
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 2 }}>
+
+          {/* Perks */}
+          <Stack direction="row" spacing={1.5} sx={{ mt: 1 }} flexWrap="wrap">
             <Chip icon={<LocalShipping />} label="Free Shipping" variant="outlined" />
             <Chip icon={<Security />} label="Secure Payment" variant="outlined" />
             <Chip icon={<Refresh />} label="30-Day Returns" variant="outlined" />
-          </Box>
+          </Stack>
         </Grid>
       </Grid>
-      
+
       {/* Product Tabs */}
-      <Paper sx={{ mt: 6 }}>
+      <Paper sx={{ mt: 6, borderRadius: 2 }}>
         <Tabs 
           value={tabValue} 
           onChange={handleTabChange} 
@@ -450,34 +482,24 @@ export default function ProductPage() {
           
           {tabValue === 1 && (
             <Grid container spacing={2}>
-              {product.fabric && (
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Fabric</Typography>
-                  <Typography variant="body2">{product.fabric}</Typography>
+              {[{ label: 'Fabric', value: product.fabric },
+                { label: 'Occasion', value: product.occasion },
+                { label: 'Style', value: product.style },
+                { label: 'Brand', value: product.brand },
+                { label: 'Category', value: product.category?.name || product.category },
+              ].filter((row) => row.value).map((row) => (
+                <Grid key={row.label} item xs={12} sm={6}>
+                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{row.label}</Typography>
+                    <Typography variant="body2" color="text.secondary">{row.value}</Typography>
+                  </Paper>
                 </Grid>
-              )}
-              {product.occasion && (
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Occasion</Typography>
-                  <Typography variant="body2">{product.occasion}</Typography>
-                </Grid>
-              )}
-              {product.style && (
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Style</Typography>
-                  <Typography variant="body2">{product.style}</Typography>
-                </Grid>
-              )}
-              {/* Add more product attributes as needed */}
+              ))}
             </Grid>
           )}
           
           {tabValue === 2 && (
             <Box>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Customer Reviews
-              </Typography>
-              
               {product.numReviews > 0 ? (
                 <Typography variant="body2">
                   Reviews will be displayed here. This would typically fetch reviews from the API.
@@ -487,7 +509,6 @@ export default function ProductPage() {
                   No reviews yet. Be the first to review this product.
                 </Typography>
               )}
-              
               <Button 
                 variant="contained" 
                 sx={{ 
@@ -502,7 +523,7 @@ export default function ProductPage() {
           )}
         </Box>
       </Paper>
-      
+
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <Box sx={{ mt: 8 }}>

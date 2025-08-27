@@ -1,7 +1,17 @@
 import connectToDatabase from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import mongoose from 'mongoose';
 import { apiResponse, handleApiRequest, validateMethod } from '@/utils/api';
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function brandPatternExactInsensitive(val) {
+  // Match value with optional leading/trailing whitespace in stored data
+  return new RegExp(`^\\s*${escapeRegExp(val)}\\s*$`, 'i');
+}
 
 // Get all products with filtering, sorting, and pagination
 export async function GET(req) {
@@ -11,7 +21,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     
     // Filtering
-    const category = searchParams.get('category');
+    const categoryParam = searchParams.get('category');
     const subcategory = searchParams.get('subcategory');
     const brand = searchParams.get('brand');
     const minPrice = searchParams.get('minPrice');
@@ -49,30 +59,52 @@ export async function GET(req) {
     // Build filter object
     const filter = {};
     
-    // Handle category filtering - lookup by slug or name, then use ObjectId
-    if (category) {
-      try {
-        // First try to find category by slug or name
-        const categoryDoc = await Category.findOne({
+    // Category filter: accept ObjectId, slug, or name (and match both ObjectId and legacy string values)
+    if (categoryParam) {
+      let categoryId = null;
+      if (mongoose.Types.ObjectId.isValid(categoryParam)) {
+        categoryId = new mongoose.Types.ObjectId(categoryParam);
+      } else {
+        // Try find by slug or name (case-insensitive)
+        const catDoc = await Category.findOne({
           $or: [
-            { slug: category.toLowerCase().replace(/\s+/g, '-') },
-            { name: { $regex: new RegExp(`^${category}$`, 'i') } }
-          ]
-        });
-        
-        if (categoryDoc) {
-          filter.category = categoryDoc._id;
-        } else {
-          // If no category found, return empty results
-          filter.category = null;
-        }
-      } catch (err) {
-        console.error('Category lookup error:', err);
-        filter.category = null;
+            { slug: categoryParam },
+            { name: { $regex: `^${categoryParam}$`, $options: 'i' } },
+          ],
+        }).select('_id');
+        if (catDoc) categoryId = catDoc._id;
+      }
+      if (categoryId) {
+        // Match documents where category is stored as ObjectId or as legacy string
+        const idStr = categoryId.toString();
+        filter.$expr = { $in: ['$category', [categoryId, idStr]] };
+      } else if (mongoose.Types.ObjectId.isValid(categoryParam)) {
+        // No category doc found but param looks like an ObjectId; still match both types
+        const oid = new mongoose.Types.ObjectId(categoryParam);
+        filter.$expr = { $in: ['$category', [oid, categoryParam]] };
+      } else {
+        // If no match, set to impossible id to return empty result instead of throwing cast error
+        filter.category = new mongoose.Types.ObjectId();
       }
     }
     if (subcategory) filter.subcategory = subcategory;
-    if (brand) filter.brand = brand;
+    // Robust brand filtering: supports repeated brand params and comma-separated lists
+    const brandParams = [
+      ...searchParams.getAll('brand'),
+      ...(brand ? [brand] : []),
+    ];
+    if (brandParams.length > 0) {
+      const brandValues = brandParams
+        .flatMap((b) => String(b).split(','))
+        .map((b) => b.trim())
+        .filter(Boolean);
+      if (brandValues.length === 1) {
+        filter.brand = brandPatternExactInsensitive(brandValues[0]);
+      } else if (brandValues.length > 1) {
+        const patterns = brandValues.map((b) => brandPatternExactInsensitive(b));
+        filter.brand = { $in: patterns };
+      }
+    }
     if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice) };
     if (maxPrice) filter.price = { ...filter.price, $lte: parseFloat(maxPrice) };
     if (featured === 'true') filter.isFeatured = true;
@@ -99,6 +131,10 @@ export async function GET(req) {
     
     // Execute query with pagination and sorting
     const projection = 'name slug image price rating numReviews discount isFeatured category brand countInStock createdAt';
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[GET /api/products] filter:', JSON.stringify(filter));
+    }
+
     const products = await Product.find(filter)
       .select(projection)
       .populate('category', 'name slug')
