@@ -571,6 +571,40 @@ export default function Header() {
       </List>
       <Divider />
       <List>
+        {/* Mobile-only actions */}
+        <ListItem>
+          <Box sx={{ display: 'flex', justifyContent: 'space-around', width: '100%', py: 1 }}>
+            <StyledIconButton
+              onClick={toggleTheme}
+              aria-label="toggle theme"
+              size="medium"
+              className="dark-mode-toggle"
+            >
+              {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+            </StyledIconButton>
+            <StyledIconButton
+              onClick={() => {
+                setMobileDrawerOpen(false);
+                handleSearchIconClick();
+              }}
+              aria-label="search"
+              size="medium"
+            >
+              <SearchIcon />
+            </StyledIconButton>
+            <StyledIconButton 
+              component={Link}
+              href="/customer/wishlist"
+              aria-label="wishlist"
+              size="medium"
+            >
+              <StyledBadge badgeContent={wishlistItemCount} color="error">
+                <Favorite />
+              </StyledBadge>
+            </StyledIconButton>
+          </Box>
+        </ListItem>
+        <Divider />
         {user ? (
           <>
             <ListItem>
@@ -712,31 +746,48 @@ export default function Header() {
                   display: { xs: 'flex', md: 'none' },
                   flexGrow: 1,
                   textDecoration: 'none',
+                  justifyContent: 'center',
                 }}
               >
                 <img 
-                  src="/images/l2.png" 
+                  src="/images/lp3.png" 
                   alt="Punjabi Attire Logo" 
                   style={{
-                    width: '45px',
-                    height: '45px',
+                    width: '50px',
+                    height: '50px',
                     objectFit: 'cover',
                   }}
                 />
-                <Typography
-                  variant="h6"
-                  sx={{
-                    ml: 1.5,
-                    fontWeight: 800,
-                    fontSize: '1.1rem',
-                    letterSpacing: '0.5px',
-                    background: 'linear-gradient(135deg, #8b7355, #c4a876)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  PUNJABI ATTIRE
-                </Typography>
+                <Box sx={{ ml: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: '0.95rem',
+                      letterSpacing: '0.5px',
+                      background: 'linear-gradient(135deg, #8b7355, #c4a876)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    INDIA
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '0.65rem',
+                      letterSpacing: '1px',
+                      color: '#8b7355',
+                      opacity: 0.8,
+                      textTransform: 'uppercase',
+                      lineHeight: 1,
+                    }}
+                  >
+                    INSPIRED
+                  </Typography>
+                </Box>
               </LogoContainer>
 
               {/* Desktop Navigation */}
@@ -794,13 +845,19 @@ export default function Header() {
               </Box>
 
               {/* Right Side Actions */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: { xs: 0.5, sm: 1 },
+                flexShrink: 0,
+              }}>
                 {/* Theme Toggle */}
                 <StyledIconButton
                   onClick={toggleTheme}
                   aria-label="toggle theme"
                   size="medium"
                   className="dark-mode-toggle"
+                  sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
                 >
                   {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
                 </StyledIconButton>
@@ -810,6 +867,7 @@ export default function Header() {
                   onClick={handleSearchIconClick}
                   aria-label="search"
                   size="medium"
+                  sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
                 >
                   <SearchIcon />
                 </StyledIconButton>
@@ -820,6 +878,7 @@ export default function Header() {
                   href="/customer/wishlist"
                   aria-label="wishlist"
                   size="medium"
+                  sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
                 >
                   <StyledBadge badgeContent={wishlistItemCount} color="error">
                     <Favorite />
@@ -841,14 +900,23 @@ export default function Header() {
                 {/* User Menu */}
                 <Box sx={{ flexGrow: 0 }}>
                   <Tooltip title="Account settings">
-                    <StyledIconButton onClick={handleOpenUserMenu} sx={{ p: 0.5 }}>
+                    <StyledIconButton 
+                      onClick={handleOpenUserMenu} 
+                      sx={{ 
+                        p: { xs: 0.25, sm: 0.5 },
+                        '& .MuiAvatar-root': {
+                          width: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 },
+                        }
+                      }}
+                    >
                       {user ? (
                         <Avatar 
                           alt="User" 
                           src="/images/avatar/1.jpg" 
                           sx={{ 
-                            width: 36, 
-                            height: 36,
+                            width: { xs: 32, sm: 36 }, 
+                            height: { xs: 32, sm: 36 },
                             border: '2px solid rgba(162, 146, 120, 0.2)',
                             transition: 'all 0.3s ease',
                             '&:hover': {
@@ -858,7 +926,7 @@ export default function Header() {
                           }}
                         />
                       ) : (
-                        <AccountCircle sx={{ fontSize: 32 }} />
+                        <AccountCircle sx={{ fontSize: { xs: 28, sm: 32 } }} />
                       )}
                     </StyledIconButton>
                   </Tooltip>

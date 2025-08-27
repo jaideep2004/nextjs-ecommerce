@@ -111,6 +111,13 @@ const HeroSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'stretch',
   padding: 0,
+  [theme.breakpoints.down('md')]: {
+    minHeight: '70vh',
+    alignItems: 'center',
+  },
+  [theme.breakpoints.down('sm')]: {
+    minHeight: '60vh',
+  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -156,6 +163,10 @@ const TextContent = styled(Box)(({ theme }) => ({
   fontFamily: '"Cinzel", "Playfair Display", "Times New Roman", serif',
   [theme.breakpoints.down('md')]: {
     flex: '1 1 100%',
+    padding: theme.spacing(6, 3),
+    textAlign: 'center',
+  },
+  [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(4, 2),
   },
 }));
@@ -168,7 +179,28 @@ const ImageContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   transformStyle: 'preserve-3d',
   [theme.breakpoints.down('md')]: {
-    display: 'none',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 0,
+    opacity: 0.15,
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: theme.palette.mode === 'dark' 
+        ? 'linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%)'
+        : 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%)',
+      zIndex: 1,
+    },
+  },
+  [theme.breakpoints.down('sm')]: {
+    opacity: 0.1,
   },
   '& img': {
     width: '100%',
@@ -238,19 +270,23 @@ const ButtonGroup = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
   marginTop: theme.spacing(4),
+  justifyContent: { xs: 'center', md: 'flex-start' },
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
+    gap: theme.spacing(1.5),
+    marginTop: theme.spacing(3),
   },
 }));
 
 const PrimaryButton = styled(Button)(({ theme }) => ({
-  padding: '12px 32px',
+  padding: { xs: '10px 24px', md: '12px 32px' },
   borderRadius: 0,
   textTransform: 'uppercase',
   fontWeight: 500,
   letterSpacing: '1px',
-  fontSize: '0.9rem',
+  fontSize: { xs: '0.8rem', md: '0.9rem' },
   transition: 'all 0.3s ease',
+  minWidth: { xs: '140px', sm: 'auto' },
   '&.primary': {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
@@ -387,13 +423,13 @@ const Hero = () => {
                 variant="overline"
                 sx={{
                   color: '#a29278',
-                  letterSpacing: 3,
+                  letterSpacing: { xs: 2, md: 3 },
                   fontWeight: 600,
                   display: 'block',
-                  mb: 2,
+                  mb: { xs: 1.5, md: 2 },
                   fontFamily: '"Cinzel", "Playfair Display", serif',
                   textTransform: 'uppercase',
-                  fontSize: '0.9rem',
+                  fontSize: { xs: '0.8rem', md: '0.9rem' },
                   textShadow: '0 2px 4px rgba(162, 146, 120, 0.3)',
                 }}
               >
@@ -406,15 +442,15 @@ const Hero = () => {
                 variant="h1"
                 component="h1"
                 sx={{
-                  fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5rem' },
                   fontWeight: 900,
                   mb: 2,
-                  lineHeight: 1.1,
+                  lineHeight: { xs: 1.2, md: 1.1 },
                   textTransform: 'uppercase',
-                  letterSpacing: '2px',
+                  letterSpacing: { xs: '1px', md: '2px' },
                   color: theme => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a',
                   fontFamily: '"Cinzel", "Playfair Display", serif',
-                  whiteSpace: 'nowrap',
+                  whiteSpace: { xs: 'normal', md: 'nowrap' },
                   textShadow: '3px 3px 12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(162, 146, 120, 0.3)',
                   // filter: 'drop-shadow(0 6px 12px rgba(162, 146, 120, 0.4))',
                 }}
@@ -426,10 +462,10 @@ const Hero = () => {
                 component="h2"
                 sx={{
                   fontWeight: 400,
-                  fontSize: { xs: '1.3rem', md: '1.8rem' },
+                  fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.8rem' },
                   color: 'text.secondary',
-                  mb: 4,
-                  maxWidth: '90%',
+                  mb: { xs: 3, md: 4 },
+                  maxWidth: { xs: '100%', md: '90%' },
                   lineHeight: 1.6,
                   fontFamily: '"Playfair Display", "Georgia", serif',
                   fontStyle: 'italic',
