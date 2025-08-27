@@ -49,7 +49,28 @@ export async function GET(req) {
     // Build filter object
     const filter = {};
     
-    if (category) filter.category = category;
+    // Handle category filtering - lookup by slug or name, then use ObjectId
+    if (category) {
+      try {
+        // First try to find category by slug or name
+        const categoryDoc = await Category.findOne({
+          $or: [
+            { slug: category.toLowerCase().replace(/\s+/g, '-') },
+            { name: { $regex: new RegExp(`^${category}$`, 'i') } }
+          ]
+        });
+        
+        if (categoryDoc) {
+          filter.category = categoryDoc._id;
+        } else {
+          // If no category found, return empty results
+          filter.category = null;
+        }
+      } catch (err) {
+        console.error('Category lookup error:', err);
+        filter.category = null;
+      }
+    }
     if (subcategory) filter.subcategory = subcategory;
     if (brand) filter.brand = brand;
     if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice) };
