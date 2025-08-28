@@ -103,8 +103,20 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const CategoryHero = styled(Box)(({ theme }) => ({
   position: 'relative',
-  height: '60vh',
-  minHeight: '400px',
+  height: { xs: '50vh', md: '60vh' },
+  minHeight: { xs: '350px', md: '400px' },
+  display: 'flex',
+  alignItems: 'center',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    zIndex: 1,
+  },
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -332,7 +344,13 @@ export default function CategoryPage() {
           </Box>
         )}
         
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, textAlign: 'center' }}>
+        <Container maxWidth="lg" sx={{ 
+          position: 'relative', 
+          zIndex: 2, 
+          textAlign: 'center',
+          px: { xs: 2, sm: 3 },
+          py: { xs: 4, md: 6 }
+        }}>
           <Box data-aos="fade-up" data-aos-delay="100">
             <Typography
               variant="overline"
@@ -353,7 +371,7 @@ export default function CategoryPage() {
               component="h1"
               sx={{
                 fontSize: { xs: '3rem', md: '4.5rem' },
-                fontWeight: 300,
+                fontWeight: 600,
                 mb: 3,
                 lineHeight: 1.2,
               }}
@@ -364,11 +382,13 @@ export default function CategoryPage() {
             <Typography
               variant="h6"
               sx={{
-                color: 'rgba(255,255,255,0.9)',
-                maxWidth: '600px',
+                color: 'rgba(255,255,255,0.95)',
+                maxWidth: '800px',
                 mx: 'auto',
                 mb: 4,
-                lineHeight: 1.6,
+                lineHeight: 1.7,
+                fontSize: { xs: '1rem', md: '1.25rem' },
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}
             >
               {category?.description || `Explore our exclusive collection of premium quality ${category?.name?.toLowerCase()}. Each piece is crafted with attention to detail and authentic designs.`}
@@ -392,7 +412,7 @@ export default function CategoryPage() {
         </Container>
       </CategoryHero>
       
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
+      <Container maxWidth="lg" sx={{ pb: 8, px: { xs: 2, sm: 3 } }}>
         {/* Breadcrumbs */}
         <Breadcrumbs 
           separator={<NavigateNext fontSize="small" />} 
@@ -452,15 +472,24 @@ export default function CategoryPage() {
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
                 >
-                  <StyledCard>
+                  <StyledCard sx={{ '&:hover': { transform: 'translateY(-8px)' } }}>
                     {/* Product Image */}
-                    <Box sx={{ position: 'relative', paddingTop: '75%' }}>
+                    <Box sx={{ 
+                      position: 'relative', 
+                      paddingTop: '100%',
+                      overflow: 'hidden',
+                      '&:hover img': {
+                        transform: 'scale(1.05)'
+                      }
+                    }}>
                       <Image
                         src={product.image}
                         alt={product.name}
                         fill
-                        style={{ objectFit: 'cover' }}
-                        className="product-image"
+                        style={{ 
+                          objectFit: 'cover',
+                          transition: 'transform 0.4s ease-in-out'
+                        }}
                       />
                       
                       {/* Discount Badge */}

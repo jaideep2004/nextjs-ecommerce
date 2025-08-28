@@ -1667,7 +1667,7 @@ export default function Home() {
                   >
                     <StyledCategoryCard 
                       component={Link}
-                      href={`/category/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      href={`/products?category=${encodeURIComponent(category.name)}`}
                       featured={isFeatured}
                     >
                       {/* Category Image */}

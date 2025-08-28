@@ -538,7 +538,7 @@ export default function ProductsPage() {
 								webkitTextFillColor: "transparent",
 								backgroundClip: "text",
 								mb: 1,
-								fontSize: "2.5rem",
+								fontSize: { xs: '2.4rem', md: '2.5rem' },
 							}}>
 							Discover Amazing Products
 						</Typography>
@@ -580,13 +580,14 @@ export default function ProductsPage() {
 					container
 					spacing={4}
 					sx={{ flexWrap: { xs: "wrap", md: "nowrap" } }}>
-					{/* Enhanced Filters Sidebar */}
-					<Grid
-						item
-						xs={12}
-						md={2.5}
-						sx={{ minWidth: { md: "280px" }, maxWidth: { md: "320px" } }}>
-						<FilterSidebar sx={{ p: 3 }}>
+					{/* Enhanced Filters Sidebar (desktop only) */}
+					{!isMobile && (
+						<Grid
+							item
+							xs={12}
+							md={2.5}
+							sx={{ minWidth: { md: "280px" }, maxWidth: { md: "320px" } }}>
+							<FilterSidebar sx={{ p: 3 }}>
 							{/* Filter Header */}
 							<Box
 								sx={{
@@ -786,7 +787,8 @@ export default function ProductsPage() {
 								</Box>
 							</Box>
 						</FilterSidebar>
-					</Grid>
+						</Grid>
+					)}
 
 					{/* Enhanced Products Grid */}
 					<Grid item xs={12} md={9.5}>
@@ -861,6 +863,8 @@ export default function ProductsPage() {
 							onAddToCart={handleAddToCart}
 							onAddToWishlist={handleAddToWishlist}
 							onRemoveFromWishlist={handleRemoveFromWishlist}
+							gridProps={{ justifyContent: { xs: 'center', md: 'flex-start' } }}
+							itemProps={{ xs: 'auto', sm: 6, md: 4, sx: { display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } } }}
 						/>
 
 						{/* Enhanced Pagination */}
@@ -1029,7 +1033,207 @@ export default function ProductsPage() {
 								<Close />
 							</IconButton>
 						</Box>
-						{/* Mobile filter content would go here - same as desktop sidebar */}
+		 				{/* Mobile filter content - reuse desktop sidebar markup */}
+						<FilterSidebar sx={{ p: 2 }}>
+							{/* Filter Header */}
+							<Box
+								sx={{
+									display: "flex",
+									justifyContent: "space-between",
+									alignItems: "center",
+									mb: 3,
+								}}>
+								<Typography
+									variant='h5'
+									sx={{
+										fontWeight: 700,
+										display: "flex",
+										alignItems: "center",
+										gap: 1,
+									}}>
+									<Tune color='primary' />
+									Product Categories
+								</Typography>
+								<Button
+									size='small'
+									onClick={clearFilters}
+									startIcon={<Clear />}
+									sx={{
+										borderRadius: "20px",
+										textTransform: "none",
+										fontWeight: 600,
+									}}>
+									Clear All
+								</Button>
+							</Box>
+
+							{/* Product Categories */}
+							<Box sx={{ mb: 4 }}>
+								<Typography
+									variant='h6'
+									sx={{
+										mb: 2,
+										fontWeight: 600,
+										display: "flex",
+										alignItems: "center",
+										gap: 1,
+									}}>
+									<Category fontSize='small' />
+									Categories
+								</Typography>
+								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+									{dynamicFilters.categories.map((category) => (
+										<CategoryChip
+											key={category.name}
+											label={`${category.name} (${category.count})`}
+											selected={filters.category === category.name}
+											onClick={() =>
+											handleFilterChange(
+												"category",
+												filters.category === category.name
+													? ""
+													: category.name
+											)
+										}
+											size='small'
+											variant={
+												filters.category === category.name
+													? "filled"
+													: "outlined"
+											}
+										/>
+									))}
+								</Box>
+							</Box>
+
+							{/* Brands */}
+							<Box sx={{ mb: 4 }}>
+								<Typography
+									variant='h6'
+									sx={{
+										mb: 2,
+										fontWeight: 600,
+										display: "flex",
+										alignItems: "center",
+										gap: 1,
+									}}>
+									<BrandingWatermark fontSize='small' />
+									Brands
+								</Typography>
+								<FormGroup>
+									{dynamicFilters.brands.map((brand) => (
+										<FormControlLabel
+											key={brand.name}
+											control={<Checkbox size='small' />}
+											label={
+												<Box
+													sx={{
+														display: "flex",
+														justifyContent: "space-between",
+														width: "100%",
+													}}>
+													<Typography variant='body2'>{brand.name}</Typography>
+													<Typography variant='body2' color='text.secondary'>
+														({brand.count})
+													</Typography>
+												</Box>
+											}
+											sx={{ m: 0, mb: 0.5, width: "100%" }}
+										/>
+									))}
+								</FormGroup>
+							</Box>
+
+							{/* Color Filter */}
+							<Box sx={{ mb: 4 }}>
+								<Typography
+									variant='h6'
+									sx={{
+										mb: 2,
+										fontWeight: 600,
+										display: "flex",
+										alignItems: "center",
+										gap: 1,
+									}}>
+									<ColorLens fontSize='small' />
+									Color
+								</Typography>
+								{dynamicFilters.colors.length > 0 && (
+									<Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+										{dynamicFilters.colors.map((color) => (
+											<Chip
+												key={color.name}
+												label={color.name}
+												size='small'
+												variant='outlined'
+												sx={{
+													borderRadius: "16px",
+													transition: "all 0.2s ease",
+													"&:hover": {
+														transform: "scale(1.05)",
+														borderColor: theme.palette.primary.main,
+													},
+													mb: 1,
+												}}
+											/>
+										))}
+									</Stack>
+								)}
+							</Box>
+
+							{/* Price Range Filter */}
+							<Box sx={{ mb: 3 }}>
+								<Typography
+									variant='h6'
+									sx={{
+										mb: 2,
+										fontWeight: 600,
+										display: "flex",
+										alignItems: "center",
+										gap: 1,
+									}}>
+									<AttachMoney fontSize='small' />
+									Price Filter
+								</Typography>
+								<Slider
+									value={[filters.minPrice, filters.maxPrice]}
+									onChange={handlePriceChange}
+									valueLabelDisplay='auto'
+									min={0}
+									max={1000}
+									sx={{
+										color: theme.palette.primary.main,
+										height: 8,
+										"& .MuiSlider-track": {
+											border: "none",
+											background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+										},
+										"& .MuiSlider-thumb": {
+											height: 20,
+											width: 20,
+											backgroundColor: "#fff",
+											border: `2px solid ${theme.palette.primary.main}`,
+											"&:hover, &.Mui-focusVisible": {
+												boxShadow: `0px 0px 0px 8px ${theme.palette.primary.main}16`,
+											},
+										},
+									}}
+								/>
+								<Box
+									sx={{
+										display: "flex",
+										justifyContent: "space-between",
+										mt: 1,
+									}}>
+									<Typography variant='body2' sx={{ fontWeight: 600 }}>
+										${filters.minPrice}
+									</Typography>
+									<Typography variant='body2' sx={{ fontWeight: 600 }}>
+										${filters.maxPrice}
+									</Typography>
+								</Box>
+							</Box>
+						</FilterSidebar>
 					</Box>
 				</Drawer>
 			</Container>

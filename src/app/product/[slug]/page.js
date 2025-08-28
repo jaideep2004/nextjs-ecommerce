@@ -235,12 +235,10 @@ export default function ProductPage() {
   
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-     
-      
-      <Grid container spacing={8} style={{flexWrap: 'nowrap'}}>
+      <Grid container spacing={8} sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
         {/* Product Gallery */}
-        <Grid item xs={12} md={6} style={{minWidth: '450px'}}>
-          <Paper elevation={2} sx={{ position: 'relative', height: 520, overflow: 'hidden', borderRadius: 2 }}>
+        <Grid item xs={12} md={6} sx={{ minWidth: { xs: 'auto', md: '450px' }, width: '100%' }}>
+          <Paper elevation={2} sx={{ position: 'relative', height: { xs: 360, md: 520 }, overflow: 'hidden', borderRadius: 2 }}>
             {product.discount > 0 && (
               <Chip 
                 label={`${product.discount}% OFF`} 
@@ -279,15 +277,15 @@ export default function ProductPage() {
 
           {/* Thumbnails */}
           {galleryImages.length > 1 && (
-            <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, overflowX: 'auto', pb: 1 }}>
+      <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, overflowX: 'auto', pb: 1 }}>
               {galleryImages.map((img) => (
                 <Box
                   key={img}
                   onClick={() => setActiveImage(img)}
                   sx={{
                     position: 'relative',
-                    width: 88,
-                    height: 88,
+        width: { xs: 64, md: 88 },
+        height: { xs: 64, md: 88 },
                     flex: '0 0 auto',
                     borderRadius: 2,
                     border: (theme) => `2px solid ${activeImage === img ? theme.palette.primary.main : 'transparent'}`,
