@@ -1407,7 +1407,17 @@ export default function Home() {
             >
               Most Popular
             </Typography>
-            <ShimmerText variant="h3" component="h2" fontWeight="bold" sx={{ mb: 2 }} data-aos="fade-up" data-aos-delay="200">
+            <ShimmerText 
+              variant="h3" 
+              component="h2" 
+              fontWeight="bold" 
+              sx={{ 
+                mb: 2,
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+              }} 
+              data-aos="fade-up" 
+              data-aos-delay="200"
+            >
               Trending Products
             </ShimmerText>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }} data-aos="fade-up" data-aos-delay="300">
@@ -1641,7 +1651,7 @@ export default function Home() {
               </Button>
             </Box>
           ) : (
-            <Grid container spacing={4}>
+            <Grid container spacing={4} sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}>
               {categories?.map((category, index) => {
                 const isFeatured = index === 0;
                 const hasImage = category?.image;
@@ -1766,7 +1776,17 @@ export default function Home() {
             <Typography variant="subtitle1" color="primary" fontWeight="bold" sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 1 }} data-aos="fade-up" data-aos-delay="100">
               Our Products
             </Typography>
-            <ShimmerText variant="h3" component="h2" fontWeight="bold" sx={{ mb: 2 }} data-aos="fade-up" data-aos-delay="200">
+            <ShimmerText 
+              variant="h3" 
+              component="h2" 
+              fontWeight="bold" 
+              sx={{ 
+                mb: 2,
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+              }} 
+              data-aos="fade-up" 
+              data-aos-delay="200"
+            >
               Featured Collections
             </ShimmerText>
             
@@ -1810,6 +1830,9 @@ export default function Home() {
               onAddToWishlist={handleAddToWishlist}
               onRemoveFromWishlist={handleRemoveFromWishlist}
               enhanced={true}
+              gridProps={{
+                justifyContent: { xs: 'center', md: 'flex-start' }
+              }}
             />
           </Box>
           
@@ -1986,9 +2009,9 @@ export default function Home() {
           );
         })}
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={6} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+          <Grid container spacing={{ xs: 3, md: 6 }} alignItems="center" justifyContent="center" sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
             {/* Left Side - Animated Content */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 1 } }}>
               <Box sx={{ 
                 textAlign: { xs: 'center', md: 'left' },
                 position: 'relative',
@@ -1996,7 +2019,7 @@ export default function Home() {
                   content: '""',
                   position: 'absolute',
                   top: '-20px',
-                  left: { xs: '10px !important', md: '-20px' },
+                  left: { xs: '50%', md: '-20px' },
                   transform: { xs: 'translateX(-50%)', md: 'none' },
                   width: '60px',
                   height: '4px',
@@ -2059,7 +2082,7 @@ export default function Home() {
                   component="h2" 
                   sx={{ 
                     fontWeight: 800,
-                    fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.2rem' },
+                    fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3.2rem' },
                     lineHeight: 1.1,
                     mb: 2,
                     background: `
@@ -2099,7 +2122,7 @@ export default function Home() {
                   variant="h2"
                   sx={{ 
                     fontWeight: 900,
-                    fontSize: { xs: '2.2rem', md: '2.8rem' },
+                    fontSize: { xs: '1.6rem', sm: '2rem', md: '2.8rem' },
                     mb: 3,
                     background: '#b98844',
                     WebkitBackgroundClip: 'text',
@@ -2129,10 +2152,10 @@ export default function Home() {
                 {/* Animated Countdown Timer */}
                 <Box sx={{ 
                   display: 'flex',
-                  gap: 1.5,
+                  gap: { xs: 1, md: 1.5 },
                   mb: 4,
                   justifyContent: { xs: 'center', md: 'flex-start' },
-                  flexWrap: 'nowrap'
+                  flexWrap: { xs: 'wrap', sm: 'nowrap' }
                 }}>
                   {[
                     { value: useCountdown().days, label: 'Days' },
@@ -2144,8 +2167,8 @@ export default function Home() {
                       key={item.label}
                       sx={{ 
                         textAlign: 'center',
-                        minWidth: '65px',
-                        p: 1.5,
+                        minWidth: { xs: '55px', md: '65px' },
+                        p: { xs: 1, md: 1.5 },
                         borderRadius: '12px',
                         background: `
                           linear-gradient(145deg, 
@@ -2192,7 +2215,7 @@ export default function Home() {
                         sx={{ 
                           fontWeight: 800,
                           color: '#2c2c2c',
-                          fontSize: '1.5rem',
+                          fontSize: { xs: '1.2rem', md: '1.5rem' },
                           lineHeight: 1,
                           mb: 0.5,
                           background: 'linear-gradient(135deg, #2c2c2c 0%, #8b7355 100%)',
@@ -2207,7 +2230,7 @@ export default function Home() {
                         variant="caption" 
                         sx={{ 
                           color: '#8b7355',
-                          fontSize: '0.7rem',
+                          fontSize: { xs: '0.6rem', md: '0.7rem' },
                           fontWeight: 600,
                           textTransform: 'uppercase',
                           letterSpacing: '0.8px'
@@ -2265,11 +2288,12 @@ export default function Home() {
             </Grid>
 
             {/* Right Side - Animated Image */}
-            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', order: { xs: 2, md: 2 }, mt: { xs: 2, md: 0 } }}>
               <Box sx={{ 
                 position: 'relative',
                 textAlign: 'center',
-                height: '500px',
+                height: { xs: '500px', sm: '500px', md: '500px' },
+                width: { xs: '500px', sm: '500px', md: '600px' },
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -2362,21 +2386,22 @@ export default function Home() {
       
        {/* About Us Section */}
        <Box sx={{ 
-        py: 12, 
+        py: { xs: 6, md: 12 }, 
         bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
         position: 'relative',
         overflow: 'hidden'
       }}>
         <Container maxWidth="lg">
-          <Grid container spacing={6} alignItems="center" sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+          <Grid container spacing={{ xs: 3, md: 6 }} alignItems="center" sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
             {/* Left Side - Images Grid */}
             <Grid item xs={12} md={6} sx={{ 
               minWidth: { xs: '100%', sm: '360px', md: '440px' },
-              maxWidth: { xs: '100%', md: '50%' }
+              maxWidth: { xs: '100%', md: '50%' },
+              order: { xs: 2, md: 1 }
             }}>
               <Box sx={{ 
                 position: 'relative',
-                height: { xs: 400, sm: 500, md: 600 },
+                height: { xs: 300, sm: 400, md: 600 },
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,
@@ -2491,12 +2516,13 @@ export default function Home() {
             </Grid>
 
             {/* Right Side - Content */}
-            <Grid item xs={12} md={6}>
-              <Box sx={{ pl: { md: 4 } }} >
+            <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }}>
+              <Box sx={{ pl: { md: 4 }, textAlign: { xs: 'center', md: 'left' } }} >
                 {/* Section Tag */}
                 <Box sx={{ 
                   display: 'flex', 
                   alignItems: 'center', 
+                 justifyContent: { xs: 'center', md: 'left' },
                   mb: 3,
                   transform: 'translateX(0)',
                   animation: 'slideInRight 1s ease-out'
@@ -2529,7 +2555,7 @@ export default function Home() {
                     fontWeight: 700,
                     color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#2c2c2c',
                     mb: 4,
-                    fontSize: { xs: '2rem', md: '2.75rem' },
+                    fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.75rem' },
                     lineHeight: 1.3,
                     transform: 'translateY(0)',
                     animation: 'slideInUp 1s ease-out 0.2s both'
@@ -2543,7 +2569,7 @@ export default function Home() {
                   variant="body1" 
                   sx={{ 
                     color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#666',
-                    fontSize: '1rem',
+                    fontSize: { xs: '0.95rem', md: '1rem' },
                     lineHeight: 1.6,
                     mb: 4,
                     transform: 'translateY(0)',
@@ -2693,7 +2719,7 @@ export default function Home() {
       
       {/* 4th Dimensional Premium Testimonials Section */}
       <Box sx={{ 
-        py: 15,
+        py: { xs: 8, md: 15 },
         pt: '0px !important',
         position: 'relative',
         overflow: 'hidden',
@@ -2701,12 +2727,13 @@ export default function Home() {
       }}>
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={0} alignItems="center" justifyContent="center" sx={{ minHeight: '600px' }}>
+          <Grid container spacing={{ xs: 4, md: 0 }} alignItems="center" justifyContent="center" sx={{ minHeight: { xs: 'auto', md: '600px' } }}>
             
             {/* Left Side - Heading Container (45%) */}
-            <Grid item xs={12} md={5.4}>
+            <Grid item xs={12} md={5.4} sx={{ order: { xs: 1, md: 1 } }}>
               <Box sx={{ 
                 pr: { xs: 0, md: 6 },
+                mb: { xs: 4, md: 0 },
                 textAlign: { xs: 'center', md: 'left' },
                 position: 'relative',
                 '&::before': {
@@ -2734,8 +2761,9 @@ export default function Home() {
                   alignItems: 'center',
                   gap: 1,
                   mb: 4,
-                  px: 4,
-                  py: 2,
+                  mt: 4,
+                  px: { xs: 3, md: 4 },
+                  py: { xs: 1.5, md: 2 },
                   borderRadius: '60px',
                   background: `
                     linear-gradient(135deg, 
@@ -2781,7 +2809,7 @@ export default function Home() {
                   component="h2" 
                   sx={{ 
                     fontWeight: 800,
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
                     lineHeight: 1.2,
                     mb: 3,
                     background: `
@@ -2822,7 +2850,7 @@ export default function Home() {
                 <Typography 
                   variant="body1" 
                   sx={{ 
-                    fontSize: '1.2rem',
+                    fontSize: { xs: '1rem', md: '1.2rem' },
                     lineHeight: 1.8,
                     color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#666',
                     mb: 5,
@@ -2842,8 +2870,8 @@ export default function Home() {
                   <IconButton 
                     onClick={handlePrevTestimonial}
                     sx={{ 
-                      width: 60, 
-                      height: 60,
+                      width: { xs: 50, md: 60 }, 
+                      height: { xs: 50, md: 60 },
                       background: `
                         linear-gradient(135deg, 
                           rgba(162, 146, 120, 0.1) 0%, 
@@ -2871,8 +2899,8 @@ export default function Home() {
                   <IconButton 
                     onClick={handleNextTestimonial}
                     sx={{ 
-                      width: 60, 
-                      height: 60,
+                      width: { xs: 50, md: 60 }, 
+                      height: { xs: 50, md: 60 },
                       background: `
                         linear-gradient(135deg, 
                           rgba(162, 146, 120, 0.1) 0%, 
@@ -2901,10 +2929,10 @@ export default function Home() {
             </Grid>
 
             {/* Right Side - Testimonial Slider (55%) */}
-            <Grid item xs={12} md={6.6}>
+            <Grid item xs={12} md={6.6} sx={{ order: { xs: 2, md: 2 } }}>
               <Box sx={{ 
                 position: 'relative',
-                height: '500px',
+                height: { xs: '400px', md: '500px' },
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -2916,11 +2944,11 @@ export default function Home() {
                   sx={{
                     position: 'relative',
                     width: '100%',
-                    maxWidth: '600px',
-                    height: '400px',
+                    maxWidth: { xs: '100%', md: '600px' },
+                    height: { xs: '350px', md: '400px' },
                     background: (theme) => theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
                     borderRadius: '30px',
-                    padding: '50px 40px',
+                    padding: { xs: '30px 20px', md: '50px 40px' },
                     boxShadow: (theme) => theme.palette.mode === 'dark' 
                       ? '0 20px 60px rgba(0, 0, 0, 0.4)' 
                       : '0 20px 60px rgba(162, 146, 120, 0.15)',
@@ -2971,7 +2999,7 @@ export default function Home() {
                   <Typography 
                     variant="body1" 
                     sx={{ 
-                      fontSize: '1.3rem',
+                      fontSize: { xs: '1rem', md: '1.3rem' },
                       lineHeight: 1.8,
                       fontStyle: 'italic',
                       color: (theme) => theme.palette.mode === 'dark' ? '#e0e0e0' : '#444',

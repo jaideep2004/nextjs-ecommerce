@@ -40,10 +40,13 @@ import {
 const FooterSection = styled(Box)(({ theme }) => ({
   backgroundColor: '#000000',
   color: theme.palette.common.white,
-  paddingTop: theme.spacing(8),
+  paddingTop: theme.spacing(6),
   paddingBottom: 0,
   position: 'relative',
   overflow: 'hidden',
+  [theme.breakpoints.up('md')]: {
+    paddingTop: theme.spacing(8),
+  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -89,15 +92,20 @@ const CopyrightSection = styled(Box)(({ theme }) => ({
 }));
 
 const PaymentIconBox = styled(Box)(({ theme }) => ({
-  width: 45,
-  height: 30,
+  width: 40,
+  height: 26,
   backgroundColor: 'rgba(255, 255, 255, 1)',
   borderRadius: theme.spacing(0.5),
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  margin: theme.spacing(0, 0.5),
+  margin: theme.spacing(0, 0.25),
   transition: 'all 0.3s ease',
+  [theme.breakpoints.up('md')]: {
+    width: 45,
+    height: 30,
+    margin: theme.spacing(0, 0.5),
+  },
   '&:hover': {
     transform: 'translateY(-3px)',
     boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
@@ -105,11 +113,15 @@ const PaymentIconBox = styled(Box)(({ theme }) => ({
 }));
 
 const FooterTitle = styled(Typography)(({ theme }) => ({
-  fontSize: '1.25rem',
+  fontSize: '1.1rem',
   fontWeight: 'bold',
-  marginBottom: theme.spacing(3),
+  marginBottom: theme.spacing(2),
   position: 'relative',
   display: 'inline-block',
+  [theme.breakpoints.up('md')]: {
+    fontSize: '1.25rem',
+    marginBottom: theme.spacing(3),
+  },
   '&::after': {
     content: '""',
     position: 'absolute',
@@ -231,13 +243,13 @@ export default function Footer() {
   return (
     <FooterSection>
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="center">
           {/* Company Info */}
-          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' , minWidth: '250px'}}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'start' }, minWidth: { xs: 'auto', md: '250px' }, textAlign: { xs: 'center', md: 'left' } }}>
             <FooterTitle variant="h6">
               Punjabi Attire
             </FooterTitle>
-            <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.8, color: 'rgba(255, 255, 255, 1)' }}>
+            <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.8, color: 'rgba(255, 255, 255, 1)', fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
               Discover authentic traditional Punjabi suits and turbans with<br/> premium quality and timeless designs from the UK.
             </Typography>
             
@@ -287,7 +299,7 @@ export default function Footer() {
           </Grid>
 
           {/* Customer Services */}
-          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'center' }, minWidth: { xs: 'auto', md: '250px' } }}>
             <FooterTitle variant="h6">
               Customer Services
             </FooterTitle>
@@ -362,7 +374,7 @@ export default function Footer() {
           </Grid>
 
           {/* Quick Links */}
-          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'center' }, minWidth: { xs: 'auto', md: '250px' } }}>
             <FooterTitle variant="h6">
               Quick Links
             </FooterTitle>
@@ -426,11 +438,18 @@ export default function Footer() {
           </Grid>
 
           {/* Categories */}
-          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '250px' }}>
+          <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'center' }, minWidth: { xs: 'auto', md: '250px' } }}>
             <FooterTitle variant="h6">
               Categories
             </FooterTitle>
-            <List dense disablePadding>
+            <Box sx={{ 
+              display: { xs: 'grid', md: 'block' },
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
+              gap: { xs: 1, sm: 2 },
+              width: '100%',
+              justifyItems: 'center'
+            }}>
+            <List dense disablePadding sx={{ display: 'contents' }}>
               <FooterLink disableGutters component={Link} href="/products?category=suits" sx={{ color: 'inherit', textDecoration: 'none' }}>
                 <ListItemIcon sx={{ minWidth: 30, color: 'rgba(255, 255, 255, 1)' }}>
                   <KeyboardArrowRight fontSize="small" />
@@ -487,6 +506,7 @@ export default function Footer() {
                 />
               </FooterLink>
             </List>
+            </Box>
           </Grid>
         </Grid>
 
@@ -495,13 +515,13 @@ export default function Footer() {
       {/* Copyright Section */}
       <CopyrightSection>
         <Container maxWidth="xl">
-          <Grid container spacing={6} alignItems="center" justifyContent="space-around">
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={{ xs: 3, md: 6 }} alignItems="center" justifyContent="space-around">
+            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               <Typography 
                 variant="body2" 
                 sx={{ 
                   color: 'rgba(255, 255, 255, 1)',
-                  fontSize: '0.95rem',
+                  fontSize: { xs: '0.875rem', md: '0.95rem' },
                   fontWeight: 500
                 }}
               >
@@ -512,7 +532,8 @@ export default function Footer() {
                 sx={{ 
                   color: 'rgba(255, 255, 255, 1)',
                   display: 'block',
-                  mt: 0.5
+                  mt: 0.5,
+                  fontSize: { xs: '0.75rem', md: '0.75rem' }
                 }}
               >
                 Crafted with ❤️ for authentic fashion
@@ -530,12 +551,14 @@ export default function Footer() {
                 sx={{ 
                   color: 'rgba(255, 255, 255, 1)',
                   fontWeight: 600,
-                  mr: { xs: 0, sm: 2 }
+                  mr: { xs: 0, sm: 2 },
+                  fontSize: { xs: '0.875rem', md: '0.875rem' },
+                  mb: { xs: 1, sm: 0 }
                 }}
               >
                 Secure Payments:
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', gap: { xs: 0.5, md: 1 }, flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-start' } }}>
                 <PaymentIconBox>
                   <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 'bold', fontSize: '10px' }}>
                     VISA

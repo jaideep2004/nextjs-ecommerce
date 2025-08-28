@@ -149,6 +149,9 @@ const HeroContent = styled(Box)(({ theme }) => ({
   maxWidth: '100%',
   margin: 0,
   padding: 0,
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+  },
 }));
 
 const TextContent = styled(Box)(({ theme }) => ({
@@ -162,7 +165,7 @@ const TextContent = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8),
   fontFamily: '"Cinzel", "Playfair Display", "Times New Roman", serif',
   [theme.breakpoints.down('md')]: {
-    flex: '1 1 100%',
+    flex: '1 1 auto',
     padding: theme.spacing(6, 3),
     textAlign: 'center',
   },
@@ -179,28 +182,17 @@ const ImageContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   transformStyle: 'preserve-3d',
   [theme.breakpoints.down('md')]: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: 0,
-    opacity: 0.15,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: theme.palette.mode === 'dark' 
-        ? 'linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%)'
-        : 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%)',
-      zIndex: 1,
-    },
+    flex: '1 1 auto',
+    minHeight: '300px',
+    height: '300px',
+    marginTop: theme.spacing(2),
+    borderRadius: '12px',
+    overflow: 'hidden',
+    opacity: 1,
   },
   [theme.breakpoints.down('sm')]: {
-    opacity: 0.1,
+    minHeight: '250px',
+    height: '250px',
   },
   '& img': {
     width: '100%',
@@ -686,6 +678,43 @@ const Hero = () => {
               }}
             />
           </motion.div>
+          
+          {/* Mobile Image Navigation Dots */}
+          <Box 
+            sx={{ 
+              display: { xs: 'flex', md: 'none' },
+              justifyContent: 'center',
+              gap: 1,
+              mt: 2,
+              position: 'absolute',
+              bottom: 16,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+            }}
+          >
+            {productImages.map((_, index) => (
+              <Box
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: currentImageIndex === index 
+                    ? 'rgba(162, 146, 120, 0.9)' 
+                    : 'rgba(255, 255, 255, 0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid rgba(162, 146, 120, 0.3)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(162, 146, 120, 0.7)',
+                    transform: 'scale(1.2)',
+                  },
+                }}
+              />
+            ))}
+          </Box>
         </ImageContainer>
       </HeroContent>
     </HeroSection>
