@@ -184,10 +184,16 @@ export default function ContactPage() {
       {/* Contact Section */}
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
 
-        <Grid container spacing={4} sx={{ alignItems: 'stretch', minHeight: '600px', flexWrap: 'nowrap' }}>
+        <Grid container spacing={{ xs: 3, md: 4 }} sx={{ alignItems: 'stretch', minHeight: { xs: 'auto', md: '600px' }, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
           {/* Contact Information */}
-          <Grid item xs={12} md={6} style={{ flex: 1 }}>
-            <Box sx={{ pr: { md: 2 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }}>
+            <Box sx={{ 
+              pr: { md: 2 }, 
+              pt: { xs: 2, md: 0 },
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column' 
+            }}>
               <Typography 
                 variant="h4" 
                 sx={{ 
@@ -202,53 +208,73 @@ export default function ContactPage() {
               <Typography 
                 variant="body1" 
                 color="text.secondary" 
-                sx={{ mb: 4, lineHeight: 1.7 }}
+                sx={{ 
+                  mb: { xs: 3, md: 4 }, 
+                  lineHeight: 1.7,
+                  fontSize: { xs: '0.95rem', md: '1rem' },
+                  textAlign: { xs: 'center', md: 'left' },
+                  px: { xs: 1, md: 0 }
+                }}
               >
                 Ready to start your shopping journey? Reach out to us through any of these channels.
               </Typography>
 
               {/* Contact Cards */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, justifyContent: 'space-between' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: { xs: 2, md: 3 }, 
+                flex: 1, 
+                justifyContent: { xs: 'flex-start', md: 'space-between' },
+                px: { xs: 1, md: 0 }
+              }}>
                 {/* Email Card */}
                 <Paper 
                   elevation={0}
                   sx={{ 
-                    p: 3,
+                    p: { xs: 2.5, md: 3 },
                     border: '2px solid',
                     borderColor: 'grey.100',
-                    borderRadius: 3,
+                    borderRadius: { xs: 2, md: 3 },
                     transition: 'all 0.3s ease',
-                    flex: 1,
+                    flex: { xs: 'none', md: 1 },
                     display: 'flex',
                     alignItems: 'center',
                     '&:hover': {
                       borderColor: 'primary.main',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                      transform: { xs: 'translateY(-1px)', md: 'translateY(-2px)' },
+                      boxShadow: { xs: '0 4px 15px rgba(93, 64, 55, 0.12)', md: '0 8px 25px rgba(93, 64, 55, 0.15)' },
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <Box sx={{ display: 'flex', alignItems: { xs: 'center', md: 'flex-start' }, width: '100%' }}>
                     <Box
                       sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '12px',
+                        width: { xs: 44, md: 48 },
+                        height: { xs: 44, md: 48 },
+                        borderRadius: { xs: '10px', md: '12px' },
                         background: 'linear-gradient(135deg, #FFA000 0%, #FF8F00 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        mr: 2,
+                        mr: { xs: 1.5, md: 2 },
                         flexShrink: 0,
                       }}
                     >
-                      <EmailIcon sx={{ color: 'white', fontSize: 24 }} />
+                      <EmailIcon sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
                     </Box>
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 600, 
+                        mb: { xs: 0.5, md: 1 },
+                        fontSize: { xs: '1rem', md: '1.25rem' }
+                      }}>
                         Email Us
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ 
+                        mb: { xs: 0.5, md: 1 },
+                        fontSize: { xs: '0.875rem', md: '0.875rem' }
+                      }}>
                         <MuiLink 
                           href="mailto:info@ecommerce.com" 
                           underline="hover"
@@ -257,7 +283,9 @@ export default function ContactPage() {
                           info@ecommerce.com
                         </MuiLink>
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{
+                        fontSize: { xs: '0.875rem', md: '0.875rem' }
+                      }}>
                         <MuiLink 
                           href="mailto:support@ecommerce.com" 
                           underline="hover"
@@ -274,42 +302,53 @@ export default function ContactPage() {
                 <Paper 
                   elevation={0}
                   sx={{ 
-                    p: 3,
+                    p: { xs: 2.5, md: 3 },
                     border: '2px solid',
                     borderColor: 'grey.100',
-                    borderRadius: 3,
+                    borderRadius: { xs: 2, md: 3 },
                     transition: 'all 0.3s ease',
-                    flex: 1,
+                    flex: { xs: 'none', md: 1 },
                     display: 'flex',
                     alignItems: 'center',
                     '&:hover': {
                       borderColor: 'primary.main',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                      transform: { xs: 'translateY(-1px)', md: 'translateY(-2px)' },
+                      boxShadow: { xs: '0 4px 15px rgba(93, 64, 55, 0.12)', md: '0 8px 25px rgba(93, 64, 55, 0.15)' },
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <Box sx={{ display: 'flex', alignItems: { xs: 'center', md: 'flex-start' }, width: '100%' }}>
                     <Box
                       sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '12px',
+                        width: { xs: 44, md: 48 },
+                        height: { xs: 44, md: 48 },
+                        borderRadius: { xs: '10px', md: '12px' },
                         background: 'linear-gradient(135deg, #5D4037 0%, #3E2723 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        mr: 2,
+                        mr: { xs: 1.5, md: 2 },
                         flexShrink: 0,
                       }}
                     >
-                      <PhoneIcon sx={{ color: 'white', fontSize: 24 }} />
+                      <PhoneIcon sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
                     </Box>
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 600, 
+                        mb: { xs: 0.5, md: 1 },
+                        fontSize: { xs: '1rem', md: '1.25rem' }
+                      }}>
                         Call Us
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ 
+                        mb: { xs: 0.5, md: 1 },
+                        fontSize: { xs: '0.875rem', md: '0.875rem' },
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        gap: { xs: 0, sm: 1 }
+                      }}>
                         <MuiLink 
                           href="tel:+1-800-123-4567" 
                           underline="hover"
@@ -317,11 +356,21 @@ export default function ContactPage() {
                         >
                           +1 (800) 123-4567
                         </MuiLink>
-                        <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>
+                        <Typography component="span" sx={{ 
+                          color: 'text.secondary',
+                          fontSize: { xs: '0.75rem', md: '0.875rem' },
+                          fontStyle: 'italic'
+                        }}>
                           Sales
                         </Typography>
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{
+                        fontSize: { xs: '0.875rem', md: '0.875rem' },
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        gap: { xs: 0, sm: 1 }
+                      }}>
                         <MuiLink 
                           href="tel:+1-800-765-4321" 
                           underline="hover"
@@ -329,7 +378,11 @@ export default function ContactPage() {
                         >
                           +1 (800) 765-4321
                         </MuiLink>
-                        <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>
+                        <Typography component="span" sx={{ 
+                          color: 'text.secondary',
+                          fontSize: { xs: '0.75rem', md: '0.875rem' },
+                          fontStyle: 'italic'
+                        }}>
                           Support
                         </Typography>
                       </Typography>
@@ -341,51 +394,72 @@ export default function ContactPage() {
                 <Paper 
                   elevation={0}
                   sx={{ 
-                    p: 3,
+                    p: { xs: 2.5, md: 3 },
                     border: '2px solid',
                     borderColor: 'grey.100',
-                    borderRadius: 3,
+                    borderRadius: { xs: 2, md: 3 },
                     transition: 'all 0.3s ease',
-                    flex: 1,
+                    flex: { xs: 'none', md: 1 },
                     display: 'flex',
                     alignItems: 'center',
                     '&:hover': {
                       borderColor: 'primary.main',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(93, 64, 55, 0.15)',
+                      transform: { xs: 'translateY(-1px)', md: 'translateY(-2px)' },
+                      boxShadow: { xs: '0 4px 15px rgba(93, 64, 55, 0.12)', md: '0 8px 25px rgba(93, 64, 55, 0.15)' },
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <Box sx={{ display: 'flex', alignItems: { xs: 'center', md: 'flex-start' }, width: '100%' }}>
                     <Box
                       sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '12px',
+                        width: { xs: 44, md: 48 },
+                        height: { xs: 44, md: 48 },
+                        borderRadius: { xs: '10px', md: '12px' },
                         background: 'linear-gradient(135deg, #388E3C 0%, #2E7D32 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        mr: 2,
+                        mr: { xs: 1.5, md: 2 },
                         flexShrink: 0,
                       }}
                     >
-                      <TimeIcon sx={{ color: 'white', fontSize: 24 }} />
+                      <TimeIcon sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
                     </Box>
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 600, 
+                        mb: { xs: 0.5, md: 1 },
+                        fontSize: { xs: '1rem', md: '1.25rem' }
+                      }}>
                         Business Hours
                       </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: { xs: 0.3, md: 0.5 }
+                      }}>
+                        <Typography variant="body2" sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          fontSize: { xs: '0.8rem', md: '0.875rem' },
+                          flexDirection: { xs: 'row', sm: 'row' }
+                        }}>
                           <span>Monday - Friday:</span>
                           <span style={{ fontWeight: 500, color: '#5D4037' }}>9:00 AM - 6:00 PM</span>
                         </Typography>
-                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          fontSize: { xs: '0.8rem', md: '0.875rem' }
+                        }}>
                           <span>Saturday:</span>
                           <span style={{ fontWeight: 500, color: '#5D4037' }}>10:00 AM - 4:00 PM</span>
                         </Typography>
-                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          fontSize: { xs: '0.8rem', md: '0.875rem' }
+                        }}>
                           <span>Sunday:</span>
                           <span style={{ fontWeight: 500, color: '#757575' }}>Closed</span>
                         </Typography>
@@ -398,7 +472,7 @@ export default function ContactPage() {
           </Grid>
 
           {/* Contact Form */}
-          <Grid item xs={12} md={6} style={{ flex: 1 }}>
+          <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }}>
             <Paper 
               elevation={0}
               sx={{ 

@@ -906,9 +906,16 @@ export default function ProductsPage() {
 								container
 								spacing={4}
 								alignItems='center'
-								style={{ flexWrap: "nowrap" }}>
+								sx={{ 
+									flexWrap: { xs: 'wrap', md: 'nowrap' },
+									textAlign: { xs: 'center', md: 'left' }
+								}}>
 								<Grid item xs={12} md={6}>
-									<Typography variant='h4' sx={{ fontWeight: 700, mb: 2 }}>
+									<Typography variant='h4' sx={{ 
+										fontWeight: 700, 
+										mb: 2,
+										fontSize: { xs: '1.8rem', md: '2.125rem' }
+									}}>
 										Get Weekly Update. Sign Up And Get Up To{" "}
 										<Typography
 											component='span'
@@ -930,7 +937,11 @@ export default function ProductsPage() {
 									<Box
 										component='form'
 										onSubmit={handleNewsletterSubmit}
-										sx={{ display: "flex", gap: 2 }}>
+										sx={{ 
+											display: "flex", 
+											gap: 2,
+											flexDirection: { xs: 'column', sm: 'row' }
+										}}>
 										<TextField
 											fullWidth
 											placeholder='Write your Email Address'
@@ -950,6 +961,7 @@ export default function ProductsPage() {
 											sx={{
 												borderRadius: "25px",
 												px: 4,
+												mt: { xs: 2, sm: 0 },
 												fontWeight: 600,
 												textTransform: "none",
 												background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
@@ -962,11 +974,15 @@ export default function ProductsPage() {
 										</Button>
 									</Box>
 								</Grid>
-								<Grid item xs={12} md={6} sx={{ textAlign: "center" }} style={{minWidth: '400px'}}>
+								<Grid item xs={12} md={6} sx={{ 
+									textAlign: "center", 
+									mt: { xs: 4, md: 0 },
+									minWidth: { xs: 'auto', md: '390px' }
+								}}>
 									<Box
 										sx={{
-											width: 350,
-											height: 350,
+											width: { xs: 280, sm: 350 },
+											height: { xs: 280, sm: 350 },
 											borderRadius: "50%",
 											background: `linear-gradient(135deg, ${theme.palette.primary.main}20, ${theme.palette.secondary.main}20)`,
 											display: "flex",

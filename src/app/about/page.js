@@ -134,9 +134,13 @@ export default function AboutPage() {
 		setIsTransitioning(true);
 		setTimeout(() => {
 			if (direction === "next") {
-				setCurrentTestimonial((prev) => (prev < 1 ? prev + 1 : 0));
+				// Mobile: Navigate through 4 individual cards (0, 1, 2, 3)
+				// Desktop: Navigate through 2 slides (0, 1)
+				const maxSlides = window.innerWidth < 960 ? 3 : 1; // md breakpoint is 960px
+				setCurrentTestimonial((prev) => (prev < maxSlides ? prev + 1 : 0));
 			} else {
-				setCurrentTestimonial((prev) => (prev > 0 ? prev - 1 : 1));
+				const maxSlides = window.innerWidth < 960 ? 3 : 1;
+				setCurrentTestimonial((prev) => (prev > 0 ? prev - 1 : maxSlides));
 			}
 			setIsTransitioning(false);
 		}, 150);
@@ -230,33 +234,41 @@ export default function AboutPage() {
 
 	return (
 		<Container sx={{ py: 4 }} style={{ maxWidth: "1300px" }}>
-			{/* Hero Section - Exact Carbon Copy */}
+			{/* Hero Section - Mobile Responsive */}
 			<Box sx={{ mb: 10, overflow: "hidden" }}>
 				<Grid
 					container
-					spacing={4}
+					spacing={{ xs: 2, md: 4 }}
 					alignItems='center'
-          sx={{ flexWrap: { xs: "wrap", md: "nowrap" } }}
-        style={{padding:"30px 0px"}}
-        >
+					sx={{
+						flexWrap: { xs: "wrap", md: "nowrap" },
+						flexDirection: { xs: "column-reverse", md: "row" },
+					}}
+					style={{ padding: { xs: "20px 0px", md: "30px 0px" } }}>
 					{/* Left Side - Images Section */}
 					<Grid item xs={12} md={6} sx={{ minWidth: { md: "550px" } }}>
 						<Box
 							sx={{
 								position: "relative",
-								height: { xs: "500px", md: "600px" },
+								height: { xs: "400px", sm: "450px", md: "600px" },
+								mx: { xs: "auto", md: 0 },
+								maxWidth: { xs: "350px", sm: "400px", md: "none" },
 							}}>
 							{/* Main Large Image - Left */}
 							<Box
 								sx={{
 									position: "absolute",
-									left: 0,
+									left: { xs: "5%", md: 0 },
 									top: 0,
-									width: "80%",
-									height: "85%",
-									borderRadius: 3,
+									width: { xs: "75%", md: "80%" },
+									height: { xs: "80%", md: "85%" },
+									minWidth: { xs: "200px", md: "auto" },
+									borderRadius: { xs: 2, md: 3 },
 									overflow: "hidden",
-									boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+									boxShadow: {
+										xs: "0 10px 20px rgba(0,0,0,0.1)",
+										md: "0 20px 40px rgba(0,0,0,0.15)",
+									},
 									zIndex: 1,
 								}}>
 								<Image
@@ -271,15 +283,19 @@ export default function AboutPage() {
 							<Box
 								sx={{
 									position: "absolute",
-									right: "0%",
-									top: "34%",
-									width: "52%",
-									height: "60%",
-									borderRadius: 3,
+									right: { xs: "5%", md: "0%" },
+									top: { xs: "30%", md: "34%" },
+									width: { xs: "48%", md: "52%" },
+									height: { xs: "55%", md: "60%" },
+									minWidth: { xs: "230px", md: "auto" },
+									borderRadius: { xs: 2, md: 3 },
 									overflow: "hidden",
-									boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+									boxShadow: {
+										xs: "0 10px 20px rgba(0,0,0,0.1)",
+										md: "0 20px 40px rgba(0,0,0,0.15)",
+									},
 									zIndex: 2,
-									border: "4px solid white",
+									border: { xs: "3px solid white", md: "4px solid white" },
 								}}>
 								<Image
 									src='/images/abt2.png'
@@ -293,22 +309,27 @@ export default function AboutPage() {
 							<Box
 								sx={{
 									position: "absolute",
-									left: "39%",
-									bottom: "5%",
-									width: 80,
-									height: 80,
+									left: { xs: "35%", md: "39%" },
+									bottom: { xs: "8%", md: "5%" },
+									width: { xs: 60, sm: 70, md: 80 },
+									height: { xs: 60, sm: 70, md: 80 },
+									minWidth: { xs: "50px", md: "auto" },
+									minHeight: { xs: "50px", md: "auto" },
 									bgcolor: "warning.main",
-									borderRadius: "20px",
+									borderRadius: { xs: "15px", md: "20px" },
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "center",
 									transform: "rotate(15deg)",
-									boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+									boxShadow: {
+										xs: "0 5px 15px rgba(0,0,0,0.15)",
+										md: "0 10px 30px rgba(0,0,0,0.2)",
+									},
 									zIndex: 3,
 								}}>
 								<Typography
 									sx={{
-										fontSize: "2.5rem",
+										fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" },
 										color: "white",
 										transform: "rotate(-15deg)",
 									}}>
@@ -320,17 +341,20 @@ export default function AboutPage() {
 							<Paper
 								sx={{
 									position: "absolute",
-									bottom: 0,
-									right: 0,
-									p: 2.5,
-									borderRadius: 3,
-									boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+									bottom: { xs: -5, md: 0 },
+									right: { xs: 5, md: 0 },
+									p: { xs: 1.5, sm: 2, md: 2.5 },
+									borderRadius: { xs: 2, md: 3 },
+									boxShadow: {
+										xs: "0 10px 20px rgba(0,0,0,0.1)",
+										md: "0 20px 40px rgba(0,0,0,0.15)",
+									},
 									bgcolor: "background.paper",
 									display: "flex",
 									alignItems: "center",
-									gap: 2,
+									gap: { xs: 1, md: 2 },
 									zIndex: 3,
-									minWidth: 140,
+									minWidth: { xs: "100px", sm: 200, md: 140 },
 								}}>
 								<Typography
 									variant='h2'
@@ -338,6 +362,7 @@ export default function AboutPage() {
 										fontWeight: 800,
 										color: "primary.main",
 										lineHeight: 1,
+										fontSize: { xs: "1.8rem", sm: "2.2rem", md: "3rem" },
 									}}>
 									25
 								</Typography>
@@ -348,6 +373,7 @@ export default function AboutPage() {
 											fontWeight: 600,
 											color: "text.primary",
 											lineHeight: 1.2,
+											fontSize: { xs: "0.75rem", sm: "0.875rem" },
 										}}>
 										Year's
 										<br />
@@ -360,7 +386,12 @@ export default function AboutPage() {
 
 					{/* Right Side - Content Section */}
 					<Grid item xs={12} md={6}>
-						<Box sx={{ pl: { md: 3 } }}>
+						<Box
+							sx={{
+								pl: { md: 3 },
+								mt: { xs: 3, md: 0 },
+								textAlign: { xs: "center", md: "left" },
+							}}>
 							<Chip
 								label='About us'
 								sx={{
@@ -368,7 +399,7 @@ export default function AboutPage() {
 									bgcolor: alpha(theme.palette.primary.main, 0.1),
 									color: "primary.main",
 									fontWeight: 500,
-									fontSize: "0.9rem",
+									fontSize: { xs: "0.8rem", md: "0.9rem" },
 									"&::before": {
 										content: '"★"',
 										marginRight: 1,
@@ -381,10 +412,16 @@ export default function AboutPage() {
 								component='h1'
 								sx={{
 									fontWeight: 700,
-									fontSize: { xs: "2rem", md: "2.5rem", lg: "3rem" },
-									lineHeight: 1.2,
+									fontSize: {
+										xs: "1.8rem",
+										sm: "2.2rem",
+										md: "2.5rem",
+										lg: "3rem",
+									},
+									lineHeight: { xs: 1.3, md: 1.2 },
 									mb: 3,
 									color: "text.primary",
+									px: { xs: 1, md: 0 },
 								}}>
 								Online Shopping Is Buying Things From Stores On The Internet.
 							</Typography>
@@ -392,11 +429,12 @@ export default function AboutPage() {
 							<Typography
 								variant='body1'
 								sx={{
-									fontSize: "1rem",
+									fontSize: { xs: "0.95rem", md: "1rem" },
 									color: "text.secondary",
 									mb: 4,
 									lineHeight: 1.7,
-									maxWidth: "90%",
+									maxWidth: { xs: "100%", md: "90%" },
+									px: { xs: 1, md: 0 },
 								}}>
 								There are many variations of passages of Lorem Ipsum available,
 								but the our majority have suffered alteration in some form, by
@@ -408,12 +446,13 @@ export default function AboutPage() {
 							<Box
 								sx={{
 									display: "flex",
-									gap: 4,
+									flexDirection: { xs: "column", md: "row" },
+									gap: { xs: 3, md: 4 },
 									mb: 4,
-									alignItems: "flex-start",
+									alignItems: { xs: "center", md: "flex-start" },
 								}}>
 								{/* Key Points */}
-								<Box sx={{ flex: 1 }}>
+								<Box sx={{ flex: 1, textAlign: { xs: "center", md: "left" } }}>
 									{companyValues.map((value, index) => (
 										<Box
 											key={index}
@@ -428,11 +467,17 @@ export default function AboutPage() {
 								</Box>
 
 								{/* Right Side Images */}
-								<Box sx={{ display: "flex", gap: 2, flexShrink: 0 }}>
+								<Box
+									sx={{
+										display: { xs: "none", sm: "flex" },
+										gap: 2,
+										flexShrink: 0,
+										justifyContent: "center",
+									}}>
 									<Box
 										sx={{
-											width: 120,
-											height: 115,
+											width: { xs: 100, sm: 110, md: 120 },
+											height: { xs: 95, sm: 105, md: 115 },
 											borderRadius: 2,
 											overflow: "hidden",
 											boxShadow: 2,
@@ -451,8 +496,8 @@ export default function AboutPage() {
 									</Box>
 									<Box
 										sx={{
-											width: 120,
-											height: 115,
+											width: { xs: 100, sm: 110, md: 120 },
+											height: { xs: 95, sm: 105, md: 115 },
 											borderRadius: 2,
 											overflow: "hidden",
 											boxShadow: 2,
@@ -476,18 +521,25 @@ export default function AboutPage() {
 							<Paper
 								sx={{
 									mt: 4,
-									p: 3,
+									p: { xs: 2, md: 3 },
 									borderRadius: 3,
 									boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
 									border: "1px solid",
 									borderColor: "divider",
-									maxWidth: 500,
+									maxWidth: { xs: "100%", md: 500 },
+									mx: { xs: "auto", md: 0 },
 								}}>
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+								<Box
+									sx={{
+										display: "flex",
+										alignItems: "center",
+										gap: { xs: 1.5, md: 2 },
+										flexWrap: { xs: "wrap", sm: "nowrap" },
+									}}>
 									<Avatar
 										sx={{
-											width: 50,
-											height: 50,
+											width: { xs: 40, md: 50 },
+											height: { xs: 40, md: 50 },
 											bgcolor: "primary.main",
 										}}>
 										T
@@ -495,20 +547,32 @@ export default function AboutPage() {
 									<Box sx={{ flex: 1 }}>
 										<Typography
 											variant='h6'
-											sx={{ fontWeight: 600, color: "text.primary" }}>
+											sx={{
+												fontWeight: 600,
+												color: "text.primary",
+												fontSize: { xs: "1rem", md: "1.25rem" },
+											}}>
 											India Inspired
 										</Typography>
-										<Typography variant='body2' color='text.secondary'>
+										<Typography
+											variant='body2'
+											color='text.secondary'
+											sx={{ fontSize: { xs: "0.8rem", md: "0.875rem" } }}>
 											CEO
 										</Typography>
 									</Box>
-									<Box sx={{ textAlign: "right" }}>
+									<Box
+										sx={{
+											textAlign: "right",
+											display: { xs: "none", sm: "block" },
+										}}>
 										<Typography
 											variant='h4'
 											sx={{
 												fontWeight: 300,
 												fontStyle: "italic",
 												color: "text.secondary",
+												fontSize: { xs: "1.5rem", md: "2.125rem" },
 											}}>
 											India Inspired
 										</Typography>
@@ -564,12 +628,12 @@ export default function AboutPage() {
 
 					<Grid
 						container
-						spacing={4}
+						spacing={{ xs: 2, md: 4 }}
 						sx={{
 							position: "relative",
 							zIndex: 1,
 							justifyContent: "center",
-							gap: "60px !important",
+							gap: { xs: "20px !important", md: "60px !important" },
 						}}>
 						{stats.map((stat, index) => {
 							const count = useCounter(stat.value);
@@ -578,7 +642,7 @@ export default function AboutPage() {
 									<Box
 										sx={{
 											textAlign: "center",
-											p: 3,
+											p: { xs: 2, md: 3 },
 											borderRadius: 3,
 											transition: "all 0.3s ease",
 											"&:hover": {
@@ -589,18 +653,18 @@ export default function AboutPage() {
 										{/* Icon Container */}
 										<Box
 											sx={{
-												width: 80,
-												height: 80,
+												width: { xs: 60, md: 80 },
+												height: { xs: 60, md: 80 },
 												borderRadius: "50%",
 												bgcolor: alpha(theme.palette.primary.main, 0.1),
 												display: "flex",
 												alignItems: "center",
 												justifyContent: "center",
 												mx: "auto",
-												mb: 3,
+												mb: { xs: 2, md: 3 },
 												color: "primary.main",
 											}}>
-											{React.cloneElement(stat.icon, { sx: { fontSize: 36 } })}
+											{React.cloneElement(stat.icon, { sx: { fontSize: { xs: 28, md: 36 } } })}
 										</Box>
 
 										{/* Count */}
@@ -608,9 +672,9 @@ export default function AboutPage() {
 											variant='h3'
 											sx={{
 												fontWeight: 800,
-												mb: 1,
+												mb: { xs: 0.5, md: 1 },
 												color: "primary.main",
-												fontSize: { xs: "2rem", md: "2.5rem" },
+												fontSize: { xs: "1.75rem", md: "2.5rem" },
 											}}>
 											{count.toLocaleString()}
 											{stat.suffix}
@@ -622,7 +686,7 @@ export default function AboutPage() {
 											sx={{
 												color: "text.secondary",
 												fontWeight: 500,
-												fontSize: "1rem",
+												fontSize: { xs: "0.9rem", md: "1rem" },
 											}}>
 											{stat.label}
 										</Typography>
@@ -640,9 +704,12 @@ export default function AboutPage() {
 				<Box
 					sx={{
 						display: "flex",
-						alignItems: "center",
-						justifyContent: "space-between",
-						mb: 6,
+						flexDirection: { xs: "column", md: "row" },
+						alignItems: { xs: "center", md: "center" },
+						justifyContent: { xs: "center", md: "space-between" },
+						mb: { xs: 4, md: 6 },
+						textAlign: { xs: "center", md: "left" },
+						gap: { xs: 2, md: 0 },
 					}}>
 					<Typography
 						variant='h4'
@@ -655,7 +722,7 @@ export default function AboutPage() {
 					</Typography>
 
 					{/* Navigation Controls */}
-					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+					<Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
 						<IconButton
 							onClick={() => handleTestimonialChange("prev")}
 							disabled={isTransitioning}
@@ -704,34 +771,36 @@ export default function AboutPage() {
 					sx={{
 						position: "relative",
 						overflow: "hidden",
-						height: 280,
-            borderRadius: 3,
-            padding:"20px 0px"
+						height: { xs: "auto", md: 280 },
+						borderRadius: 3,
+						padding: { xs: "10px 0px", md: "20px 0px" },
 					}}>
 					{/* Testimonials Slider */}
 					<Box
 						sx={{
-							display: "flex",
-							transform: `translateX(-${currentTestimonial * 50}%)`,
+							display: { xs: "block", md: "flex" },
+							transform: { xs: "none", md: `translateX(-${currentTestimonial * 50}%)` },
 							transition: isTransitioning
 								? "none"
 								: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-							width: "200%",
+							width: { xs: "100%", md: "200%" },
 							height: "100%",
 						}}>
 						{/* Slide 1: Testimonials 0 & 1 */}
 						<Box
 							sx={{
-								width: "50%",
+								width: { xs: "100%", md: "50%" },
 								px: 1,
-								display: "flex",
-								gap: 3,
+								display: { xs: "block", md: "flex" },
+								flexDirection: { xs: "column", md: "row" },
+								gap: { xs: 2, md: 3 },
 							}}>
 							{/* First Card */}
 							<Paper
 								sx={{
 									flex: 1,
-									p: 4,
+									display: { xs: currentTestimonial === 0 ? "block" : "none", md: "block" },
+									p: { xs: 3, md: 4 },
 									borderRadius: 3,
 									position: "relative",
 									border: "1px solid",
@@ -748,10 +817,10 @@ export default function AboutPage() {
 								<Box
 									sx={{
 										position: "absolute",
-										top: 20,
-										right: 20,
-										width: 40,
-										height: 40,
+										top: { xs: 15, md: 20 },
+										right: { xs: 15, md: 20 },
+										width: { xs: 35, md: 40 },
+										height: { xs: 35, md: 40 },
 										borderRadius: "50%",
 										bgcolor: alpha(theme.palette.warning.main, 0.1),
 										display: "flex",
@@ -760,7 +829,7 @@ export default function AboutPage() {
 									}}>
 									<FormatQuoteIcon
 										sx={{
-											fontSize: 20,
+											fontSize: { xs: 16, md: 20 },
 											color: "warning.main",
 											transform: "rotate(180deg)",
 										}}
@@ -771,23 +840,23 @@ export default function AboutPage() {
 								<Typography
 									variant='body1'
 									sx={{
-										mb: 4,
+										mb: { xs: 3, md: 4 },
 										lineHeight: 1.7,
 										color: "text.primary",
-										fontSize: "0.95rem",
-										pr: 6,
+										fontSize: { xs: "0.9rem", md: "0.95rem" },
+										pr: { xs: 4, md: 6 },
 									}}>
 									{testimonials[0].text}
 								</Typography>
 
 								{/* User Info */}
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[0].image}
 										alt={testimonials[0].name}
 										sx={{
-											width: 50,
-											height: 50,
+											width: { xs: 45, md: 50 },
+											height: { xs: 45, md: 50 },
 											bgcolor: "primary.main",
 											border: "2px solid white",
 											boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -800,7 +869,7 @@ export default function AboutPage() {
 											sx={{
 												fontWeight: 600,
 												color: "text.primary",
-												fontSize: "1rem",
+												fontSize: { xs: "0.9rem", md: "1rem" },
 												mb: 0.5,
 											}}>
 											{testimonials[0].name}
@@ -823,7 +892,8 @@ export default function AboutPage() {
 							<Paper
 								sx={{
 									flex: 1,
-									p: 4,
+									display: { xs: currentTestimonial === 1 ? "block" : "none", md: "block" },
+									p: { xs: 3, md: 4 },
 									borderRadius: 3,
 									position: "relative",
 									border: "1px solid",
@@ -840,10 +910,10 @@ export default function AboutPage() {
 								<Box
 									sx={{
 										position: "absolute",
-										top: 20,
-										right: 20,
-										width: 40,
-										height: 40,
+										top: { xs: 15, md: 20 },
+										right: { xs: 15, md: 20 },
+										width: { xs: 35, md: 40 },
+										height: { xs: 35, md: 40 },
 										borderRadius: "50%",
 										bgcolor: alpha(theme.palette.warning.main, 0.1),
 										display: "flex",
@@ -852,7 +922,7 @@ export default function AboutPage() {
 									}}>
 									<FormatQuoteIcon
 										sx={{
-											fontSize: 20,
+											fontSize: { xs: 16, md: 20 },
 											color: "warning.main",
 											transform: "rotate(180deg)",
 										}}
@@ -863,23 +933,23 @@ export default function AboutPage() {
 								<Typography
 									variant='body1'
 									sx={{
-										mb: 4,
+										mb: { xs: 3, md: 4 },
 										lineHeight: 1.7,
 										color: "text.primary",
-										fontSize: "0.95rem",
-										pr: 6,
+										fontSize: { xs: "0.9rem", md: "0.95rem" },
+										pr: { xs: 4, md: 6 },
 									}}>
 									{testimonials[1].text}
 								</Typography>
 
 								{/* User Info */}
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[1].image}
 										alt={testimonials[1].name}
 										sx={{
-											width: 50,
-											height: 50,
+											width: { xs: 45, md: 50 },
+											height: { xs: 45, md: 50 },
 											bgcolor: "primary.main",
 											border: "2px solid white",
 											boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -892,7 +962,7 @@ export default function AboutPage() {
 											sx={{
 												fontWeight: 600,
 												color: "text.primary",
-												fontSize: "1rem",
+												fontSize: { xs: "0.9rem", md: "1rem" },
 												mb: 0.5,
 											}}>
 											{testimonials[1].name}
@@ -915,16 +985,17 @@ export default function AboutPage() {
 						{/* Slide 2: Testimonial 2 centered */}
 						<Box
 							sx={{
-								width: "50%",
+								width: { xs: "100%", md: "50%" },
 								px: 1,
-								display: "flex",
+								display: { xs: currentTestimonial === 1 ? "flex" : "none", md: "flex" },
 								justifyContent: "center",
-								gap: 3,
+								gap: { xs: 2, md: 3 },
 							}}>
 							<Paper
 								sx={{
-									width: "50%",
-									p: 4,
+									width: { xs: "100%", md: "50%" },
+									display: { xs: currentTestimonial === 2 ? "block" : "none", md: "block" },
+									p: { xs: 3, md: 4 },
 									borderRadius: 3,
 									position: "relative",
 									border: "1px solid",
@@ -941,10 +1012,10 @@ export default function AboutPage() {
 								<Box
 									sx={{
 										position: "absolute",
-										top: 20,
-										right: 20,
-										width: 40,
-										height: 40,
+										top: { xs: 15, md: 20 },
+										right: { xs: 15, md: 20 },
+										width: { xs: 35, md: 40 },
+										height: { xs: 35, md: 40 },
 										borderRadius: "50%",
 										bgcolor: alpha(theme.palette.warning.main, 0.1),
 										display: "flex",
@@ -953,7 +1024,7 @@ export default function AboutPage() {
 									}}>
 									<FormatQuoteIcon
 										sx={{
-											fontSize: 20,
+											fontSize: { xs: 16, md: 20 },
 											color: "warning.main",
 											transform: "rotate(180deg)",
 										}}
@@ -964,23 +1035,23 @@ export default function AboutPage() {
 								<Typography
 									variant='body1'
 									sx={{
-										mb: 4,
+										mb: { xs: 3, md: 4 },
 										lineHeight: 1.7,
 										color: "text.primary",
-										fontSize: "0.95rem",
-										pr: 6,
+										fontSize: { xs: "0.9rem", md: "0.95rem" },
+										pr: { xs: 4, md: 6 },
 									}}>
 									{testimonials[2].text}
 								</Typography>
 
 								{/* User Info */}
-								<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[2].image}
 										alt={testimonials[2].name}
 										sx={{
-											width: 50,
-											height: 50,
+											width: { xs: 45, md: 50 },
+											height: { xs: 45, md: 50 },
 											bgcolor: "primary.main",
 											border: "2px solid white",
 											boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -993,7 +1064,7 @@ export default function AboutPage() {
 											sx={{
 												fontWeight: 600,
 												color: "text.primary",
-												fontSize: "1rem",
+												fontSize: { xs: "0.9rem", md: "1rem" },
 												mb: 0.5,
 											}}>
 											{testimonials[2].name}
@@ -1012,42 +1083,178 @@ export default function AboutPage() {
 								</Box>
 							</Paper>
 						</Box>
+					
+						{/* Mobile-only: Fourth testimonial card */}
+						<Box
+							sx={{
+								display: { xs: currentTestimonial === 3 ? "block" : "none", md: "none" },
+								width: "100%",
+								px: 1,
+							}}>
+							<Paper
+								sx={{
+									p: 3,
+									borderRadius: 3,
+									position: "relative",
+									border: "1px solid",
+									borderColor: "divider",
+									bgcolor: "background.paper",
+									boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+									transition: "all 0.3s ease",
+									"&:hover": {
+										transform: "translateY(-2px)",
+										boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+									},
+								}}>
+								{/* Quote Icon */}
+								<Box
+									sx={{
+										position: "absolute",
+										top: 15,
+										right: 15,
+										width: 35,
+										height: 35,
+										borderRadius: "50%",
+										bgcolor: alpha(theme.palette.warning.main, 0.1),
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+									}}>
+									<FormatQuoteIcon
+										sx={{
+											fontSize: 16,
+											color: "warning.main",
+											transform: "rotate(180deg)",
+										}}
+									/>
+								</Box>
+					
+								{/* Content */}
+								<Typography
+									variant='body1'
+									sx={{
+										mb: 3,
+										lineHeight: 1.7,
+										color: "text.primary",
+										fontSize: "0.9rem",
+										pr: 4,
+									}}>
+									{testimonials[3].text}
+								</Typography>
+					
+								{/* User Info */}
+								<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+									<Avatar
+										src={testimonials[3].image}
+										alt={testimonials[3].name}
+										sx={{
+											width: 45,
+											height: 45,
+											bgcolor: "primary.main",
+											border: "2px solid white",
+											boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+										}}>
+										{testimonials[3].name.charAt(0)}
+									</Avatar>
+									<Box sx={{ flex: 1 }}>
+										<Typography
+											variant='h6'
+											sx={{
+												fontWeight: 600,
+												color: "text.primary",
+												fontSize: "0.9rem",
+												mb: 0.5,
+											}}>
+											{testimonials[3].name}
+										</Typography>
+										<Rating
+											value={testimonials[3].rating}
+											readOnly
+											size='small'
+											sx={{
+												"& .MuiRating-iconFilled": {
+													color: "warning.main",
+												},
+											}}
+										/>
+									</Box>
+								</Box>
+							</Paper>
+						</Box>
 					</Box>
 				</Box>
 
 				{/* Dots Indicator */}
-				<Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 1 }}>
-					{[0, 1].map((slideIndex) => (
-						<Box
-							key={slideIndex}
-							onClick={() => {
-								if (!isTransitioning) {
-									setIsTransitioning(true);
-									setTimeout(() => {
-										setCurrentTestimonial(slideIndex);
-										setIsTransitioning(false);
-									}, 150);
-								}
-							}}
-							sx={{
-								width: currentTestimonial === slideIndex ? 24 : 8,
-								height: 8,
-								borderRadius: 4,
-								bgcolor:
-									currentTestimonial === slideIndex
-										? "primary.main"
-										: "divider",
-								cursor: "pointer",
-								transition: "all 0.3s ease",
-								"&:hover": {
+				<Box sx={{ display: "flex", justifyContent: "center", mt: { xs: 3, md: 4 }, gap: 1 }}>
+					{/* Mobile: Show 4 dots for individual cards */}
+					<Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
+						{[0, 1, 2, 3].map((slideIndex) => (
+							<Box
+								key={slideIndex}
+								onClick={() => {
+									if (!isTransitioning) {
+										setIsTransitioning(true);
+										setTimeout(() => {
+											setCurrentTestimonial(slideIndex);
+											setIsTransitioning(false);
+										}, 150);
+									}
+								}}
+								sx={{
+									width: currentTestimonial === slideIndex ? 24 : 8,
+									height: 8,
+									borderRadius: 4,
 									bgcolor:
 										currentTestimonial === slideIndex
 											? "primary.main"
-											: "text.secondary",
-								},
-							}}
-						/>
-					))}
+											: "divider",
+									cursor: "pointer",
+									transition: "all 0.3s ease",
+									"&:hover": {
+										bgcolor:
+											currentTestimonial === slideIndex
+												? "primary.main"
+												: "text.secondary",
+									},
+								}}
+							/>
+						))}
+					</Box>
+					
+					{/* Desktop: Show 2 dots for slide pairs */}
+					<Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
+						{[0, 1].map((slideIndex) => (
+							<Box
+								key={slideIndex}
+								onClick={() => {
+									if (!isTransitioning) {
+										setIsTransitioning(true);
+										setTimeout(() => {
+											setCurrentTestimonial(slideIndex);
+											setIsTransitioning(false);
+										}, 150);
+									}
+								}}
+								sx={{
+									width: currentTestimonial === slideIndex ? 24 : 8,
+									height: 8,
+									borderRadius: 4,
+									bgcolor:
+										currentTestimonial === slideIndex
+											? "primary.main"
+											: "divider",
+									cursor: "pointer",
+									transition: "all 0.3s ease",
+									"&:hover": {
+										bgcolor:
+											currentTestimonial === slideIndex
+												? "primary.main"
+												: "text.secondary",
+									},
+								}}
+							/>
+						))}
+					</Box>
 				</Box>
 			</Box>
 
@@ -1061,7 +1268,7 @@ export default function AboutPage() {
 							bgcolor: alpha(theme.palette.primary.main, 0.1),
 							color: "primary.main",
 							fontWeight: 500,
-							fontSize: "0.9rem",
+							fontSize: { xs: "0.8rem", md: "0.9rem" },
 							px: 2,
 							py: 0.5,
 							"&::before": {
@@ -1094,7 +1301,7 @@ export default function AboutPage() {
 				</Box>
 
 				{/* Process Steps Container */}
-				<Box sx={{ position: "relative", maxWidth: 1200, mx: "auto" }}>
+				<Box sx={{ position: "relative", maxWidth: 1200, mx: "auto", px: { xs: 2, md: 0 } }}>
 					{/* Connecting Line */}
 					<Box
 						sx={{
@@ -1138,19 +1345,19 @@ export default function AboutPage() {
 						}}
 					/>
 
-					<Grid container spacing={4} style={{ flexWrap: "nowrap" }}>
+					<Grid container spacing={{ xs: 3, md: 4 }} sx={{ flexWrap: { xs: "wrap", lg: "nowrap" } }}>
 						{processSteps.map((step, index) => (
-							<Grid item xs={12} sm={6} md={3} key={index}>
+							<Grid item xs={12} sm={6} lg={3} key={index}>
 								<Box
 									sx={{
 										zIndex: 2,
 										textAlign: "center",
 										position: "relative",
-										p: 3,
+										p: { xs: 2, md: 3 },
 										height: "100%",
 										transition: "all 0.3s ease",
 										"&:hover": {
-											transform: "translateY(-8px)",
+											transform: { xs: "none", md: "translateY(-8px)" },
 											"& .step-card": {
 												boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
 												bgcolor: "primary.main",
@@ -1171,7 +1378,7 @@ export default function AboutPage() {
 									<Paper
 										className='step-card'
 										sx={{
-											p: 4,
+											p: { xs: 3, md: 4 },
 											borderRadius: 4,
 											height: "100%",
 											display: "flex",
@@ -1205,10 +1412,10 @@ export default function AboutPage() {
 											className='step-number'
 											sx={{
 												position: "absolute",
-												top: 15,
-												left: 20,
-												width: 40,
-												height: 30,
+												top: { xs: 10, md: 15 },
+												left: { xs: 15, md: 20 },
+												width: { xs: 35, md: 40 },
+												height: { xs: 25, md: 30 },
 												bgcolor: "primary.main",
 												color: "white",
 												borderRadius: 2,
@@ -1216,7 +1423,7 @@ export default function AboutPage() {
 												alignItems: "center",
 												justifyContent: "center",
 												fontWeight: 700,
-												fontSize: "0.9rem",
+												fontSize: { xs: "0.8rem", md: "0.9rem" },
 												boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 												transition: "all 0.3s ease",
 												zIndex: 2,
@@ -1228,10 +1435,10 @@ export default function AboutPage() {
 										<Box
 											className='step-icon'
 											sx={{
-												mb: 3,
+												mb: { xs: 2, md: 3 },
 												mt: 2,
-												width: 80,
-												height: 80,
+												width: { xs: 70, md: 80 },
+												height: { xs: 70, md: 80 },
 												borderRadius: "50%",
 												bgcolor: alpha(theme.palette.primary.main, 0.1),
 												display: "flex",
@@ -1256,7 +1463,7 @@ export default function AboutPage() {
 												},
 											}}>
 											{React.cloneElement(step.icon, {
-												sx: { fontSize: 36, zIndex: 1, position: "relative" },
+												sx: { fontSize: { xs: 30, md: 36 }, zIndex: 1, position: "relative" },
 											})}
 										</Box>
 
@@ -1271,10 +1478,10 @@ export default function AboutPage() {
 											<Typography
 												variant='h6'
 												sx={{
-													mb: 2,
+													mb: { xs: 1.5, md: 2 },
 													fontWeight: 700,
 													color: "inherit",
-													fontSize: "1.1rem",
+													fontSize: { xs: "1rem", md: "1.1rem" },
 												}}>
 												{step.title}
 											</Typography>
@@ -1284,7 +1491,7 @@ export default function AboutPage() {
 													lineHeight: 1.6,
 													color: "inherit",
 													opacity: 0.8,
-													fontSize: "0.95rem",
+													fontSize: { xs: "0.85rem", md: "0.95rem" },
 												}}>
 												{step.description}
 											</Typography>
@@ -1347,7 +1554,7 @@ export default function AboutPage() {
 			{/* Our Achievements */}
 			<Box sx={{ mb: 10, position: "relative" }}>
 				{/* Section Header */}
-				<Box sx={{ textAlign: "center", mb: 8 }}>
+				<Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
 					<Chip
 						label='Our Team'
 						sx={{
@@ -1355,7 +1562,7 @@ export default function AboutPage() {
 							bgcolor: alpha(theme.palette.primary.main, 0.1),
 							color: "primary.main",
 							fontWeight: 500,
-							fontSize: "0.9rem",
+							fontSize: { xs: "0.8rem", md: "0.9rem" },
 							px: 2,
 							py: 0.5,
 							"&::before": {
@@ -1380,21 +1587,29 @@ export default function AboutPage() {
 							color: "text.secondary",
 							maxWidth: 600,
 							mx: "auto",
-							fontSize: "1.1rem",
+							fontSize: { xs: "1rem", md: "1.1rem" },
 							lineHeight: 1.6,
+							px: { xs: 2, md: 0 },
 						}}>
 						The passionate individuals behind our success
 					</Typography>
 				</Box>
 
 				{/* Team Members */}
-				<Grid container spacing={6} justifyContent='center' style={{flexWrap: "nowrap"}}>
+				<Grid
+					container
+					spacing={{ xs: 3, sm: 4, md: 6 }}
+					justifyContent='center'
+					sx={{ 
+						flexWrap: { xs: "wrap", lg: "nowrap" },
+						px: { xs: 2, md: 0 }
+					}}>
 					{teamMembers.slice(0, 3).map((member, index) => (
-						<Grid item xs={12} sm={6} md={4} key={index} >
+						<Grid item xs={12} sm={6} md={4} key={index}>
 							<Paper
 								sx={{
-									p: 4,
-									borderRadius: 4,
+									p: { xs: 3, md: 4 },
+									borderRadius: { xs: 3, md: 4 },
 									height: "100%",
 									display: "flex",
 									flexDirection: "column",
@@ -1403,16 +1618,16 @@ export default function AboutPage() {
 									border: "1px solid",
 									borderColor: "divider",
 									bgcolor: "background.paper",
-									boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+									boxShadow: { xs: "0 4px 16px rgba(0,0,0,0.08)", md: "0 8px 32px rgba(0,0,0,0.08)" },
 									position: "relative",
 									overflow: "hidden",
 									transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
 									"&:hover": {
-										transform: "translateY(-8px)",
-										boxShadow: "0 20px 48px rgba(0,0,0,0.15)",
+										transform: { xs: "translateY(-4px)", md: "translateY(-8px)" },
+										boxShadow: { xs: "0 8px 24px rgba(0,0,0,0.12)", md: "0 20px 48px rgba(0,0,0,0.15)" },
 										"& .team-avatar": {
-											transform: "scale(1.1)",
-											boxShadow: "0 12px 32px rgba(0,0,0,0.2)",
+											transform: { xs: "scale(1.05)", md: "scale(1.1)" },
+											boxShadow: { xs: "0 8px 20px rgba(0,0,0,0.15)", md: "0 12px 32px rgba(0,0,0,0.2)" },
 										},
 										"& .team-name": {
 											color: "primary.main",
@@ -1442,10 +1657,10 @@ export default function AboutPage() {
 								<Box
 									sx={{
 										position: "absolute",
-										top: -20,
-										right: -20,
-										width: 80,
-										height: 80,
+										top: { xs: -10, md: -20 },
+										right: { xs: -10, md: -20 },
+										width: { xs: 60, md: 80 },
+										height: { xs: 60, md: 80 },
 										borderRadius: "50%",
 										bgcolor: alpha(theme.palette.primary.main, 0.03),
 										zIndex: 0,
@@ -1456,14 +1671,14 @@ export default function AboutPage() {
 								<Avatar
 									className='team-avatar'
 									sx={{
-										width: 120,
-										height: 120,
-										mb: 3,
+										width: { xs: 100, sm: 110, md: 120 },
+										height: { xs: 100, sm: 110, md: 120 },
+										mb: { xs: 2, md: 3 },
 										bgcolor: "primary.main",
-										fontSize: "2.5rem",
+										fontSize: { xs: "2rem", sm: "2.2rem", md: "2.5rem" },
 										fontWeight: 600,
-										border: "4px solid white",
-										boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+										border: { xs: "3px solid white", md: "4px solid white" },
+										boxShadow: { xs: "0 4px 16px rgba(0,0,0,0.15)", md: "0 8px 24px rgba(0,0,0,0.15)" },
 										transition: "all 0.4s ease",
 										zIndex: 1,
 									}}
@@ -1481,7 +1696,7 @@ export default function AboutPage() {
 											fontWeight: 700,
 											color: "text.primary",
 											mb: 1,
-											fontSize: "1.25rem",
+											fontSize: { xs: "1.1rem", sm: "1.2rem", md: "1.25rem" },
 											transition: "color 0.3s ease",
 										}}>
 										{member.name}
@@ -1491,11 +1706,11 @@ export default function AboutPage() {
 										className='team-role'
 										label={member.position}
 										sx={{
-											mb: 3,
+											mb: { xs: 2, md: 3 },
 											bgcolor: alpha(theme.palette.primary.main, 0.1),
 											color: "primary.main",
 											fontWeight: 600,
-											fontSize: "0.85rem",
+											fontSize: { xs: "0.8rem", md: "0.85rem" },
 											transition: "all 0.3s ease",
 											borderRadius: 2,
 										}}
@@ -1506,8 +1721,9 @@ export default function AboutPage() {
 										sx={{
 											color: "text.secondary",
 											lineHeight: 1.7,
-											fontSize: "0.95rem",
-											mb: 3,
+											fontSize: { xs: "0.875rem", md: "0.95rem" },
+											mb: { xs: 2, md: 3 },
+											px: { xs: 1, md: 0 },
 										}}>
 										{member.bio}
 									</Typography>
@@ -1516,7 +1732,7 @@ export default function AboutPage() {
 									<Box
 										sx={{
 											mt: "auto",
-											p: 2,
+											p: { xs: 1.5, md: 2 },
 											borderRadius: 2,
 											bgcolor: alpha(theme.palette.success.main, 0.08),
 											border: "1px solid",
@@ -1528,8 +1744,8 @@ export default function AboutPage() {
 										}}>
 										<Box
 											sx={{
-												width: 8,
-												height: 8,
+												width: { xs: 6, md: 8 },
+												height: { xs: 6, md: 8 },
 												borderRadius: "50%",
 												bgcolor: "success.main",
 											}}
@@ -1539,7 +1755,7 @@ export default function AboutPage() {
 											sx={{
 												color: "success.main",
 												fontWeight: 600,
-												fontSize: "0.9rem",
+												fontSize: { xs: "0.75rem", md: "0.9rem" },
 											}}>
 											{member.experience}
 										</Typography>
@@ -1550,10 +1766,10 @@ export default function AboutPage() {
 								<Box
 									sx={{
 										position: "absolute",
-										bottom: 20,
-										left: 20,
-										width: 12,
-										height: 12,
+										bottom: { xs: 15, md: 20 },
+										left: { xs: 15, md: 20 },
+										width: { xs: 8, md: 12 },
+										height: { xs: 8, md: 12 },
 										borderRadius: "50%",
 										bgcolor: alpha(theme.palette.secondary.main, 0.3),
 										animation: "float 4s ease-in-out infinite",
@@ -1570,9 +1786,7 @@ export default function AboutPage() {
 				</Grid>
 
 				{/* Team Stats */}
-				
 			</Box>
-
 
 			{/* Animated CTA Section */}
 			<Box
@@ -1661,7 +1875,7 @@ export default function AboutPage() {
 								<Chip
 									label='Ready to Start Shopping?'
 									sx={{
-										mb: 4,
+										mb: { xs: 3, md: 4 },
 										bgcolor: alpha(theme.palette.secondary.main, 0.2),
 										color: "white",
 										fontWeight: 600,
@@ -1703,8 +1917,8 @@ export default function AboutPage() {
 										lineHeight: 1.6,
 										fontSize: { xs: "1.1rem", md: "1.25rem" },
 									}}>
-									Discover premium quality products, exceptional service, and unbeatable prices. 
-									Your perfect shopping experience awaits!
+									Discover premium quality products, exceptional service, and
+									unbeatable prices. Your perfect shopping experience awaits!
 								</Typography>
 
 								{/* Action Buttons */}
@@ -1780,7 +1994,7 @@ export default function AboutPage() {
 										fontWeight: 500,
 										textAlign: { xs: "center", md: "center" },
 									}}>
-									Follow us for updates &<br/> exclusive offers
+									Follow us for updates &<br /> exclusive offers
 								</Typography>
 								<Box
 									sx={{
@@ -1807,7 +2021,9 @@ export default function AboutPage() {
 												borderRadius: "50%",
 												p: 0,
 												transition: "all 0.3s ease",
-												animation: `fadeInUp 0.8s ease-out ${index * 0.1}s both`,
+												animation: `fadeInUp 0.8s ease-out ${
+													index * 0.1
+												}s both`,
 												"&:hover": {
 													bgcolor: alpha(theme.palette.secondary.main, 0.2),
 													borderColor: "secondary.main",
