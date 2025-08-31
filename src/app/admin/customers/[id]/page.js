@@ -50,7 +50,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to format date
@@ -237,42 +236,35 @@ export default function CustomerDetailPage() {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink 
-                component={Link} 
-                href="/admin/dashboard" 
-                underline="hover" 
-                color="inherit"
-              >
-                Dashboard
-              </MuiLink>
-              <MuiLink 
-                component={Link} 
-                href="/admin/customers" 
-                underline="hover" 
-                color="inherit"
-              >
-                Customers
-              </MuiLink>
-              <Typography color="text.primary">Customer Details</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Customer Details: {customer.name}
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink 
+            component={Link} 
+            href="/admin/dashboard" 
+            underline="hover" 
+            color="inherit"
+          >
+            Dashboard
+          </MuiLink>
+          <MuiLink 
+            component={Link} 
+            href="/admin/customers" 
+            underline="hover" 
+            color="inherit"
+          >
+            Customers
+          </MuiLink>
+          <Typography color="text.primary">Customer Details</Typography>
+        </Breadcrumbs>
+      </Box>
           
           {/* Customer Header */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Box
@@ -348,7 +340,7 @@ export default function CustomerDetailPage() {
           </Paper>
 
           {/* Customer Information */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
               Customer Information
             </Typography>
@@ -433,7 +425,7 @@ export default function CustomerDetailPage() {
           </Paper>
 
           {/* Orders Section */}
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
               Recent Orders
             </Typography>
@@ -509,8 +501,6 @@ export default function CustomerDetailPage() {
               </Box>
             )}
           </Paper>
-        </Container>
-      </Box>
 
       {/* Confirmation Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
@@ -566,6 +556,6 @@ export default function CustomerDetailPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   );
 }

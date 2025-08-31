@@ -46,7 +46,6 @@ import {
   Print as PrintIcon,
   Email as EmailIcon,
 } from '@mui/icons-material';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to format date
@@ -196,24 +195,26 @@ export default function OrderDetailPage() {
 
   if (authLoading || loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
       </Container>
     );
   }
 
   if (!order) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="warning">Order not found</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="warning" sx={{ mb: 3 }}>Order not found</Alert>
       </Container>
     );
   }
@@ -222,36 +223,29 @@ export default function OrderDetailPage() {
   const customerEmail = order.user?.email || order.shippingAddress?.email || 'No email available';
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <Link href="/admin/dashboard" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Dashboard
-                </MuiLink>
-              </Link>
-              <Link href="/admin/orders" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Orders
-                </MuiLink>
-              </Link>
-              <Typography color="text.primary">Order Details</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Order Details #{order._id ? order._id.toString().substring(order._id.toString().length - 8).toUpperCase() : 'N/A'}
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link href="/admin/dashboard" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Dashboard
+            </MuiLink>
+          </Link>
+          <Link href="/admin/orders" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Orders
+            </MuiLink>
+          </Link>
+          <Typography color="text.primary">Order Details</Typography>
+        </Breadcrumbs>
+      </Box>
 
           {/* Order Header */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Box>
                 <Typography variant="h6" component="h2">
@@ -542,8 +536,6 @@ export default function OrderDetailPage() {
               </Paper>
             </Grid>
           </Grid>
-        </Container>
-      </Box>
 
       {/* Update Status Dialog */}
       <Dialog open={openStatusDialog} onClose={handleCloseStatusDialog} maxWidth="sm" fullWidth>
@@ -623,6 +615,6 @@ export default function OrderDetailPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   );
 }

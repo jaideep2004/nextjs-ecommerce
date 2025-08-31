@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 const CartContext = createContext();
@@ -48,7 +48,7 @@ export function CartProvider({ children }) {
     }
   }, [cartItems, loading]);
 
-  const addToCart = (product, quantity = 1, color = '', size = '', user = null) => {
+  const addToCart = useCallback((product, quantity = 1, color = '', size = '', user = null) => {
     // Check if guest checkout is allowed or user is logged in
     if (!settings.general.allowGuestCheckout && !user) {
       toast.error('Please login to add items to cart');
@@ -95,9 +95,9 @@ export function CartProvider({ children }) {
     });
     
     return true;
-  };
+  }, [settings.general.allowGuestCheckout]);
 
-  const updateCartItemQuantity = (itemId, quantity, color = '', size = '') => {
+  const updateCartItemQuantity = useCallback((itemId, quantity, color = '', size = '') => {
     setCartItems((prevItems) => {
       const updatedItems = prevItems.map((item) => {
         if (item._id === itemId && (color === '' || item.color === color) && (size === '' || item.size === size)) {
@@ -108,9 +108,9 @@ export function CartProvider({ children }) {
       toast.info('Cart updated');
       return updatedItems;
     });
-  };
+  }, []);
 
-  const removeFromCart = (itemId, color = '', size = '') => {
+  const removeFromCart = useCallback((itemId, color = '', size = '') => {
     setCartItems((prevItems) => {
       const filteredItems = prevItems.filter(
         (item) => 
@@ -119,12 +119,12 @@ export function CartProvider({ children }) {
       toast.info('Item removed from cart');
       return filteredItems;
     });
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
     toast.info('Cart cleared');
-  };
+  }, []);
 
   // Calculate cart totals
   const cartTotal = cartItems.reduce(

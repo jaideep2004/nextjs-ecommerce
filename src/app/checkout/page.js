@@ -205,22 +205,10 @@ const ShippingForm = ({ formData, setFormData, user }) => {
   );
 };
 
-const PaymentForm = ({ formData, setFormData, finalTotal, orderId, setPaymentProcessing, setPaymentSuccess, setPaymentError }) => {
+const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, onPayPalSuccess, onPayPalError }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handlePayPalSuccess = (data) => {
-    setPaymentProcessing(false);
-    setPaymentSuccess(true);
-    console.log('PayPal payment successful:', data);
-  };
-  
-  const handlePayPalError = (error) => {
-    setPaymentProcessing(false);
-    setPaymentError('Payment failed. Please try again.');
-    console.error('PayPal payment error:', error);
   };
   
   return (
@@ -251,14 +239,26 @@ const PaymentForm = ({ formData, setFormData, finalTotal, orderId, setPaymentPro
                 </Box>
               } 
             />
-            {formData.paymentMethod === 'paypal' && orderId && (
+            {formData.paymentMethod === 'paypal' && (
               <Box sx={{ mt: 2, ml: 4 }}>
-                <PayPalButton 
-                  amount={finalTotal} 
-                  orderId={orderId}
-                  onSuccess={handlePayPalSuccess}
-                  onError={handlePayPalError}
-                />
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Complete your payment securely with PayPal below:
+                </Typography>
+                {/* Only show PayPal button if we have valid shipping data */}
+                {shippingData.fullName && shippingData.address && shippingData.email ? (
+                  <PayPalButton 
+                    amount={finalTotal} 
+                    cart={cart}
+                    shippingData={shippingData}
+                    formData={formData}
+                    onSuccess={onPayPalSuccess}
+                    onError={onPayPalError}
+                  />
+                ) : (
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    Please complete shipping information first, then return to this step to pay with PayPal.
+                  </Alert>
+                )}
               </Box>
             )}
           </Paper>
@@ -410,10 +410,8 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [orderComplete, setOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState('');
+  const [completedOrderId, setCompletedOrderId] = useState('');
   const [paymentProcessing, setPaymentProcessing] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentError, setPaymentError] = useState('');
   // State for PayPal client ID
   const [paypalClientId, setPaypalClientId] = useState('test');
   
@@ -462,15 +460,28 @@ export default function CheckoutPage() {
     fetchPaypalSettings();
   }, []);
 
-  // Effect to handle payment success
+  // Handle PayPal payment success
+  const handlePayPalSuccess = (data) => {
+    console.log('PayPal payment successful:', data);
+    setCompletedOrderId(data.orderId);
+    setOrderComplete(true);
+    setActiveStep(steps.length);
+    setPaymentProcessing(false);
+  };
+  
+  // Handle PayPal payment error
+  const handlePayPalError = (error) => {
+    console.error('PayPal payment error:', error);
+    setError('Payment failed. Please try again.');
+    setPaymentProcessing(false);
+  };
+
+  // Effect to clear cart when order is complete
   useEffect(() => {
-    if (paymentSuccess && orderId) {
-      // Clear cart and set order complete
+    if (orderComplete && completedOrderId) {
       clearCart();
-      setOrderComplete(true);
-      setActiveStep(steps.length);
     }
-  }, [paymentSuccess, orderId, clearCart, steps]);
+  }, [orderComplete, completedOrderId]); // Removed clearCart from dependencies to prevent infinite loop
   
   // Shipping cost calculation (simplified for demo)
   const shippingCost = cartTotal > 100 ? 0 : 10;
@@ -533,8 +544,13 @@ export default function CheckoutPage() {
     return true;
   };
   
-  // Handle place order
+  // Handle place order (for non-PayPal payments)
   const handlePlaceOrder = async () => {
+    // For PayPal, the order creation and payment is handled directly in PayPal component
+    if (formData.paymentMethod === 'paypal') {
+      setError('Please complete PayPal payment above.');
+      return;
+    }
     
     setLoading(true);
     setError('');
@@ -597,16 +613,10 @@ export default function CheckoutPage() {
         }, { headers });
       }
       
-      // Set order ID for payment processing
-      setOrderId(data.data._id);
-      
-      // If payment method is not PayPal, complete the order
-      if (formData.paymentMethod !== 'paypal') {
-        // Clear cart and set order complete
-        clearCart();
-        setOrderComplete(true);
-        setActiveStep(steps.length);
-      }
+      // For non-PayPal methods, order is complete
+      setCompletedOrderId(data.data._id);
+      setOrderComplete(true);
+      setActiveStep(steps.length);
     } catch (err) {
       console.error('Error placing order:', err);
       setError(err.response?.data?.message || err.message || 'Failed to place order. Please try again.');
@@ -626,10 +636,19 @@ export default function CheckoutPage() {
             formData={formData} 
             setFormData={setFormData} 
             finalTotal={finalTotal}
-            orderId={orderId}
-            setPaymentProcessing={setPaymentProcessing}
-            setPaymentSuccess={setPaymentSuccess}
-            setPaymentError={setPaymentError}
+            cart={cart}
+            shippingData={{
+              fullName: formData.fullName,
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              zipCode: formData.zipCode,
+              country: formData.country,
+              phone: formData.phone,
+              email: formData.email
+            }}
+            onPayPalSuccess={handlePayPalSuccess}
+            onPayPalError={handlePayPalError}
           />
         );
       case 2:
@@ -703,7 +722,7 @@ export default function CheckoutPage() {
               Thank you for your order!
             </Typography>
             <Typography variant="body1" sx={{ mb: 4 }}>
-              Your order number is #{orderId}. We have emailed your order confirmation,
+              Your order number is #{completedOrderId}. We have emailed your order confirmation,
               and will send you an update when your order has shipped.
             </Typography>
             <Button 
@@ -723,7 +742,7 @@ export default function CheckoutPage() {
             <Button 
               variant="outlined" 
               component={Link} 
-              href={`/customer/orders/${orderId}`}
+              href={`/customer/orders/${completedOrderId}`}
               sx={{ px: 4, py: 1.5 }}
             >
               View Order
@@ -747,23 +766,30 @@ export default function CheckoutPage() {
                 </Button>
               )}
               
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={loading}
-                sx={{ 
-                  bgcolor: '#8D6E63',
-                  '&:hover': { bgcolor: '#6D4C41' },
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={24} sx={{ color: 'white' }} />
-                ) : activeStep === steps.length - 1 ? (
-                  'Place Order'
-                ) : (
-                  'Next'
-                )}
-              </Button>
+              {/* Show different button text based on step and payment method */}
+              {activeStep === 1 && formData.paymentMethod === 'paypal' ? (
+                <Typography variant="body1" color="primary" sx={{ py: 1.5, px: 2 }}>
+                  Complete payment with PayPal above to proceed
+                </Typography>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={loading || (activeStep === 1 && formData.paymentMethod === 'paypal')}
+                  sx={{ 
+                    bgcolor: '#8D6E63',
+                    '&:hover': { bgcolor: '#6D4C41' },
+                  }}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: 'white' }} />
+                  ) : activeStep === steps.length - 1 ? (
+                    'Place Order'
+                  ) : (
+                    'Next'
+                  )}
+                </Button>
+              )}
             </Box>
           </Box>
         )}

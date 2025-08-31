@@ -33,6 +33,7 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  Chip,
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -45,8 +46,8 @@ import {
   Email as EmailIcon,
   Notifications as NotificationsIcon,
 } from '@mui/icons-material';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 export default function AdminSettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -142,17 +143,48 @@ export default function AdminSettingsPage() {
       }
       
       const data = await response.json();
+      console.log('Fetched settings data:', data); // Debug log
       
-      // Update state with fetched settings
-      if (data.general) setGeneralSettings(prev => ({ ...prev, ...data.general }));
-      if (data.payment) setPaymentSettings(prev => ({ ...prev, ...data.payment }));
-      if (data.shipping) setShippingSettings(prev => ({ ...prev, ...data.shipping }));
-      if (data.email) setEmailSettings(prev => ({ ...prev, ...data.email }));
-      if (data.notification) setNotificationSettings(prev => ({ ...prev, ...data.notification }));
+      // The API response might be wrapped in apiResponse, so check for data.data
+      const settings = data.data || data;
+      
+      // Update state with fetched settings, preserving existing values if new data is incomplete
+      if (settings.general) {
+        setGeneralSettings(prev => ({ ...prev, ...settings.general }));
+      }
+      if (settings.payment) {
+        // Ensure all payment fields have default values
+        const paymentData = {
+          enableCashOnDelivery: settings.payment.enableCashOnDelivery ?? true,
+          enablePaypal: settings.payment.enablePaypal ?? false,
+          enableStripe: settings.payment.enableStripe ?? false,
+          paypalClientId: settings.payment.paypalClientId || '',
+          stripePublishableKey: settings.payment.stripePublishableKey || '',
+          stripeSecretKey: settings.payment.stripeSecretKey || '',
+          taxRate: settings.payment.taxRate ?? 5,
+        };
+        setPaymentSettings(prev => ({ ...prev, ...paymentData }));
+        console.log('Updated payment settings:', paymentData); // Debug log
+      }
+      if (settings.shipping) {
+        setShippingSettings(prev => ({ 
+          ...prev, 
+          ...settings.shipping,
+          // Preserve newShippingOption as it's UI-only
+          newShippingOption: prev.newShippingOption 
+        }));
+      }
+      if (settings.email) {
+        setEmailSettings(prev => ({ ...prev, ...settings.email }));
+      }
+      if (settings.notification) {
+        setNotificationSettings(prev => ({ ...prev, ...settings.notification }));
+      }
       
     } catch (err) {
       console.error('Error fetching settings:', err);
       setError(err.message || 'Failed to load settings. Please try again.');
+      toast.error('Failed to load settings. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -172,10 +204,19 @@ export default function AdminSettingsPage() {
 
   const handlePaymentChange = (e) => {
     const { name, value, checked } = e.target;
+    console.log('Payment change:', name, value); // Debug log
     setPaymentSettings(prev => ({
       ...prev,
       [name]: e.target.type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleClearPaymentKey = (keyName) => {
+    setPaymentSettings(prev => ({
+      ...prev,
+      [keyName]: ''
+    }));
+    toast.info(`${keyName === 'paypalClientId' ? 'PayPal Client ID' : keyName === 'stripePublishableKey' ? 'Stripe Publishable Key' : 'Stripe Secret Key'} cleared`);
   };
 
   const handleShippingChange = (e) => {
@@ -256,6 +297,8 @@ export default function AdminSettingsPage() {
         notification: notificationSettings
       };
       
+      console.log('Saving settings data:', settingsData); // Debug log
+      
       // Save settings
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
@@ -270,11 +313,17 @@ export default function AdminSettingsPage() {
         throw new Error(errorData.message || 'Failed to save settings');
       }
       
+      const result = await response.json();
+      console.log('Settings saved successfully:', result); // Debug log
+      
       setSnackbar({
         open: true,
         message: 'Settings saved successfully',
         severity: 'success',
       });
+      
+      // Also show toast notification
+      toast.success('Settings saved successfully!');
       
     } catch (err) {
       console.error('Error saving settings:', err);
@@ -283,6 +332,9 @@ export default function AdminSettingsPage() {
         message: err.message || 'Failed to save settings',
         severity: 'error',
       });
+      
+      // Also show toast notification
+      toast.error(err.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -294,48 +346,44 @@ export default function AdminSettingsPage() {
 
   if (authLoading || loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
       </Container>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink 
-                component={Link} 
-                href="/admin/dashboard" 
-                underline="hover" 
-                color="inherit"
-              >
-                Dashboard
-              </MuiLink>
-              <Typography color="text.primary">Settings</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Store Settings
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink 
+            component={Link} 
+            href="/admin/dashboard" 
+            underline="hover" 
+            color="inherit"
+          >
+            Dashboard
+          </MuiLink>
+          <Typography color="text.primary">Settings</Typography>
+        </Breadcrumbs>
+      </Box>
 
-          <Paper sx={{ p: 3, mb: 3 }}>
+          {/* Settings Content */}
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h5" component="h1">
                 Store Settings
@@ -553,64 +601,204 @@ export default function AdminSettingsPage() {
                               label="Cash on Delivery"
                             />
                           </Grid>
+                          
+                          {/* PayPal Settings */}
                           <Grid item xs={12}>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={paymentSettings.enablePaypal}
-                                  onChange={handlePaymentChange}
-                                  name="enablePaypal"
-                                  color="primary"
+                            <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2, mb: 2 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                <FormControlLabel
+                                  control={
+                                    <Switch
+                                      checked={paymentSettings.enablePaypal}
+                                      onChange={handlePaymentChange}
+                                      name="enablePaypal"
+                                      color="primary"
+                                    />
+                                  }
+                                  label="PayPal"
+                                  sx={{ mb: 0 }}
                                 />
-                              }
-                              label="PayPal"
-                            />
-                            {paymentSettings.enablePaypal && (
-                              <TextField
-                                fullWidth
-                                label="PayPal Client ID"
-                                name="paypalClientId"
-                                value={paymentSettings.paypalClientId}
-                                onChange={handlePaymentChange}
-                                margin="normal"
-                                sx={{ mt: 2 }}
-                              />
-                            )}
+                                {paymentSettings.enablePaypal && (
+                                  <Chip 
+                                    size="small" 
+                                    label={paymentSettings.paypalClientId ? "Configured" : "Not Configured"} 
+                                    color={paymentSettings.paypalClientId ? "success" : "warning"}
+                                    variant="outlined"
+                                  />
+                                )}
+                              </Box>
+                              
+                              {paymentSettings.enablePaypal && (
+                                <Box sx={{ mt: 2 }}>
+                                  {/* Current PayPal Client ID Display */}
+                                  {paymentSettings.paypalClientId ? (
+                                    <Box sx={{ mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                                      <Typography variant="subtitle2" color="primary" gutterBottom>
+                                        Current PayPal Client ID:
+                                      </Typography>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography 
+                                          variant="body2" 
+                                          sx={{ 
+                                            fontFamily: 'monospace',
+                                            bgcolor: 'white',
+                                            p: 1,
+                                            borderRadius: 1,
+                                            border: '1px solid #ddd',
+                                            flex: 1,
+                                            wordBreak: 'break-all'
+                                          }}
+                                        >
+                                          {paymentSettings.paypalClientId}
+                                        </Typography>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleClearPaymentKey('paypalClientId')}
+                                          sx={{ color: '#f44336' }}
+                                          title="Clear PayPal Client ID"
+                                        >
+                                          <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                      </Box>
+                                    </Box>
+                                  ) : (
+                                    <TextField
+                                      fullWidth
+                                      label="PayPal Client ID"
+                                      name="paypalClientId"
+                                      value={paymentSettings.paypalClientId || ''}
+                                      onChange={handlePaymentChange}
+                                      placeholder="Enter your PayPal Client ID"
+                                      helperText="Get this from your PayPal Developer Dashboard"
+                                      sx={{ mb: 2 }}
+                                    />
+                                  )}
+                                </Box>
+                              )}
+                            </Box>
                           </Grid>
+                          
+                          {/* Stripe Settings */}
                           <Grid item xs={12}>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={paymentSettings.enableStripe}
-                                  onChange={handlePaymentChange}
-                                  name="enableStripe"
-                                  color="primary"
+                            <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2, mb: 2 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                <FormControlLabel
+                                  control={
+                                    <Switch
+                                      checked={paymentSettings.enableStripe}
+                                      onChange={handlePaymentChange}
+                                      name="enableStripe"
+                                      color="primary"
+                                    />
+                                  }
+                                  label="Stripe"
+                                  sx={{ mb: 0 }}
                                 />
-                              }
-                              label="Stripe"
-                            />
-                            {paymentSettings.enableStripe && (
-                              <>
-                                <TextField
-                                  fullWidth
-                                  label="Stripe Publishable Key"
-                                  name="stripePublishableKey"
-                                  value={paymentSettings.stripePublishableKey}
-                                  onChange={handlePaymentChange}
-                                  margin="normal"
-                                  sx={{ mt: 2 }}
-                                />
-                                <TextField
-                                  fullWidth
-                                  label="Stripe Secret Key"
-                                  name="stripeSecretKey"
-                                  value={paymentSettings.stripeSecretKey}
-                                  onChange={handlePaymentChange}
-                                  margin="normal"
-                                  type="password"
-                                />
-                              </>
-                            )}
+                                {paymentSettings.enableStripe && (
+                                  <Chip 
+                                    size="small" 
+                                    label={(paymentSettings.stripePublishableKey && paymentSettings.stripeSecretKey) ? "Configured" : "Not Configured"} 
+                                    color={(paymentSettings.stripePublishableKey && paymentSettings.stripeSecretKey) ? "success" : "warning"}
+                                    variant="outlined"
+                                  />
+                                )}
+                              </Box>
+                              
+                              {paymentSettings.enableStripe && (
+                                <Box sx={{ mt: 2 }}>
+                                  {/* Current Stripe Publishable Key Display */}
+                                  {paymentSettings.stripePublishableKey ? (
+                                    <Box sx={{ mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                                      <Typography variant="subtitle2" color="primary" gutterBottom>
+                                        Current Stripe Publishable Key:
+                                      </Typography>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography 
+                                          variant="body2" 
+                                          sx={{ 
+                                            fontFamily: 'monospace',
+                                            bgcolor: 'white',
+                                            p: 1,
+                                            borderRadius: 1,
+                                            border: '1px solid #ddd',
+                                            flex: 1,
+                                            wordBreak: 'break-all'
+                                          }}
+                                        >
+                                          {paymentSettings.stripePublishableKey}
+                                        </Typography>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleClearPaymentKey('stripePublishableKey')}
+                                          sx={{ color: '#f44336' }}
+                                          title="Clear Stripe Publishable Key"
+                                        >
+                                          <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                      </Box>
+                                    </Box>
+                                  ) : (
+                                    <TextField
+                                      fullWidth
+                                      label="Stripe Publishable Key"
+                                      name="stripePublishableKey"
+                                      value={paymentSettings.stripePublishableKey || ''}
+                                      onChange={handlePaymentChange}
+                                      placeholder="pk_test_... or pk_live_..."
+                                      helperText="Get this from your Stripe Dashboard"
+                                      sx={{ mb: 2 }}
+                                    />
+                                  )}
+                                  
+                                  {/* Current Stripe Secret Key Display */}
+                                  {paymentSettings.stripeSecretKey ? (
+                                    <Box sx={{ mb: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                                      <Typography variant="subtitle2" color="primary" gutterBottom>
+                                        Current Stripe Secret Key:
+                                      </Typography>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography 
+                                          variant="body2" 
+                                          sx={{ 
+                                            fontFamily: 'monospace',
+                                            bgcolor: 'white',
+                                            p: 1,
+                                            borderRadius: 1,
+                                            border: '1px solid #ddd',
+                                            flex: 1
+                                          }}
+                                        >
+                                          {paymentSettings.stripeSecretKey.length > 10 ? 
+                                            '*'.repeat(Math.max(0, paymentSettings.stripeSecretKey.length - 8)) + paymentSettings.stripeSecretKey.slice(-8) :
+                                            '*'.repeat(paymentSettings.stripeSecretKey.length)
+                                          }
+                                        </Typography>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleClearPaymentKey('stripeSecretKey')}
+                                          sx={{ color: '#f44336' }}
+                                          title="Clear Stripe Secret Key"
+                                        >
+                                          <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                      </Box>
+                                    </Box>
+                                  ) : (
+                                    <TextField
+                                      fullWidth
+                                      label="Stripe Secret Key"
+                                      name="stripeSecretKey"
+                                      value={paymentSettings.stripeSecretKey || ''}
+                                      onChange={handlePaymentChange}
+                                      type="password"
+                                      placeholder="sk_test_... or sk_live_..."
+                                      helperText="Keep this secret! Get it from your Stripe Dashboard"
+                                      sx={{ mb: 2 }}
+                                    />
+                                  )}
+                                </Box>
+                              )}
+                            </Box>
                           </Grid>
                         </Grid>
                       </CardContent>
@@ -975,8 +1163,6 @@ export default function AdminSettingsPage() {
               </Box>
             )}
           </Paper>
-        </Container>
-      </Box>
 
       {/* Snackbar for notifications */}
       <Snackbar
@@ -989,6 +1175,6 @@ export default function AdminSettingsPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   );
 }

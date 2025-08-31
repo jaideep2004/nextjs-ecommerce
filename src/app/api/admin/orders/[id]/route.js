@@ -3,7 +3,7 @@ import Order from '@/models/Order';
 import User from '@/models/User';
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
-import { sendOrderStatusUpdate } from '@/utils/email';
+import { sendOrderStatusUpdate, sendAdminOrderStatusUpdate } from '@/utils/email';
 
 // Get a single order (admin only)
 export async function GET(req, { params }) {
@@ -80,12 +80,16 @@ export async function PUT(req, { params }) {
     // Save the updated order
     await order.save();
     
-    // Send email notification about status update
+    // Send email notifications about status update
     try {
       // Get user information
       const user = await User.findById(order.user);
       
       if (user) {
+        // Store old status for admin notification
+        const oldStatus = orderStatus ? (order.orderStatus === orderStatus ? 'Pending' : order.orderStatus) : order.orderStatus;
+        
+        // Send notification to customer
         await sendOrderStatusUpdate({
           user,
           order: {
@@ -93,6 +97,17 @@ export async function PUT(req, { params }) {
             _id: order._id.toString(),
             createdAt: order.createdAt
           }
+        });
+        
+        // Send notification to admin
+        await sendAdminOrderStatusUpdate({
+          user,
+          order: {
+            ...order.toObject(),
+            _id: order._id.toString(),
+            createdAt: order.createdAt
+          },
+          oldStatus
         });
       }
     } catch (emailError) {

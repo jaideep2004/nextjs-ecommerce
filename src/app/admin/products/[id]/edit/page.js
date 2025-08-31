@@ -85,37 +85,31 @@ export default function EditProductPage({ params }) {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <Link href="/admin/dashboard" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Dashboard
-                </MuiLink>
-              </Link>
-              <Link href="/admin/products" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Products
-                </MuiLink>
-              </Link>
-              <Typography color="text.primary">Edit Product: {product.name}</Typography>
-            </Breadcrumbs>
-          </Paper>
-          
-          <ProductForm product={product} categories={categories} isEdit={true} />
-        </Container>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Edit Product: {product.name}
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link href="/admin/dashboard" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Dashboard
+            </MuiLink>
+          </Link>
+          <Link href="/admin/products" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Products
+            </MuiLink>
+          </Link>
+          <Typography color="text.primary">Edit Product</Typography>
+        </Breadcrumbs>
       </Box>
-    </Box>
+      
+      {/* Product Form */}
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <ProductForm product={product} categories={categories} isEdit={true} />
+      </Paper>
+    </Container>
   );
 }

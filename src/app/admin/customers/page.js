@@ -45,7 +45,6 @@ import {
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to format date
@@ -261,43 +260,36 @@ export default function CustomersPage() {
 
   if (authLoading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink 
-                component={Link} 
-                href="/admin/dashboard" 
-                underline="hover" 
-                color="inherit"
-              >
-                Dashboard
-              </MuiLink>
-              <Typography color="text.primary">Customers</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Customers Management
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink 
+            component={Link} 
+            href="/admin/dashboard" 
+            underline="hover" 
+            color="inherit"
+          >
+            Dashboard
+          </MuiLink>
+          <Typography color="text.primary">Customers</Typography>
+        </Breadcrumbs>
+      </Box>
 
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
-              Customers Management
-            </Typography>
+      {/* Filters and Search Section */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
 
             {/* Filters and Search */}
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
@@ -368,8 +360,10 @@ export default function CustomersPage() {
             </Box>
 
             {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+          </Paper>
 
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          {/* Customers Table Section */}
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
 
               {loading && !error ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
@@ -467,9 +461,6 @@ export default function CustomersPage() {
                 </>
               )}
             </Paper>
-          </Paper>
-        </Container>
-      </Box>
 
       {/* Confirmation Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
@@ -518,6 +509,6 @@ export default function CustomersPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   );
 }

@@ -309,8 +309,10 @@ export default function AdminProducts() {
   
   if (authLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>
-        <CircularProgress sx={{ color: '#8D6E63' }} />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
@@ -320,50 +322,46 @@ export default function AdminProducts() {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Breadcrumbs 
-        separator={<NavigateNext fontSize="small" />} 
-        aria-label="breadcrumb"
-        sx={{ mb: 3 }}
-      >
-        <Typography 
-          component={Link} 
-          href="/" 
-          color="inherit" 
-          sx={{ '&:hover': { textDecoration: 'underline' } }}
-        >
-          Home
-        </Typography>
-        <Typography 
-          component={Link} 
-          href="/admin/dashboard" 
-          color="inherit" 
-          sx={{ '&:hover': { textDecoration: 'underline' } }}
-        >
-          Admin Dashboard
-        </Typography>
-        <Typography color="text.primary">Products</Typography>
-      </Breadcrumbs>
-      
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
           Products Management
         </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<Add />}
-          component={Link}
-          href="/admin/products/new"
-          sx={{ 
-            bgcolor: '#8D6E63',
-            '&:hover': { bgcolor: '#6D4C41' },
-          }}
-        >
-          Add New Product
-        </Button>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Typography 
+            component={Link} 
+            href="/admin/dashboard" 
+            color="inherit" 
+            sx={{ '&:hover': { textDecoration: 'underline' } }}
+          >
+            Dashboard
+          </Typography>
+          <Typography color="text.primary">Products</Typography>
+        </Breadcrumbs>
       </Box>
       
-      <Paper sx={{ p: 3, mb: 4 }}>
+
+      
+      {/* Filters and Actions Section */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            All Products
+          </Typography>
+          <Button 
+            variant="contained" 
+            startIcon={<Add />}
+            component={Link}
+            href="/admin/products/create"
+            sx={{ 
+              bgcolor: '#2196f3',
+              '&:hover': { bgcolor: '#1976d2' },
+            }}
+          >
+            Add New Product
+          </Button>
+        </Box>
         {/* Filters and Search */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} md={4}>
@@ -459,8 +457,10 @@ export default function AdminProducts() {
             </Button>
           </Grid>
         </Grid>
-        
-        {/* Products Table */}
+      </Paper>
+
+      {/* Products Table Section */}
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress sx={{ color: '#8D6E63' }} />

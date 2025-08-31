@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Container, Paper, Typography, Breadcrumbs, Link as MuiLink } from '@mui/material';
+import { Box, Container, Paper, Typography, Breadcrumbs, Link as MuiLink, CircularProgress, Alert } from '@mui/material';
 import NextLink from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import ProductForm from '@/components/admin/ProductForm';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function CreateProductPage() {
@@ -47,48 +46,44 @@ export default function CreateProductPage() {
 
   if (authLoading || loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography>Loading...</Typography>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography color="error">{error}</Typography>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
       </Container>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink component={NextLink} href="/admin/dashboard" underline="hover" color="inherit">
-                Dashboard
-              </MuiLink>
-              <MuiLink component={NextLink} href="/admin/products" underline="hover" color="inherit">
-                Products
-              </MuiLink>
-              <Typography color="text.primary">Create New Product</Typography>
-            </Breadcrumbs>
-          </Paper>
-          
-          <ProductForm categories={categories} isEdit={false} />
-        </Container>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+          Create New Product
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink component={NextLink} href="/admin/dashboard" underline="hover" color="inherit">
+            Dashboard
+          </MuiLink>
+          <MuiLink component={NextLink} href="/admin/products" underline="hover" color="inherit">
+            Products
+          </MuiLink>
+          <Typography color="text.primary">Create New Product</Typography>
+        </Breadcrumbs>
       </Box>
-    </Box>
+      
+      {/* Product Form */}
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <ProductForm categories={categories} isEdit={false} />
+      </Paper>
+    </Container>
   );
 }

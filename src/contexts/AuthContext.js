@@ -96,16 +96,19 @@ export function AuthProvider({ children }) {
           
           console.log('User authenticated via server cookies:', userData.name);
         } catch (serverError) {
-          console.error('Server authentication failed:', serverError);
+          console.log('Server authentication check failed (likely logged out):', serverError.response?.status);
           
-          // If server authentication fails, clear any invalid session
-          setUser(null);
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('user');
-            delete api.defaults.headers.common['Authorization'];
+          // Only clear session if it's actually a 401/403 error, not network issues
+          if (serverError.response?.status === 401 || serverError.response?.status === 403) {
+            setUser(null);
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('user');
+              delete api.defaults.headers.common['Authorization'];
+            }
+          } else {
+            // For network errors or other issues, keep the user logged in locally
+            console.log('Network error during auth check, maintaining local session');
           }
-          
-          // If we're on a protected page, the response interceptor will handle redirect
         }
       } catch (error) {
         console.error('Auth initialization error:', error);

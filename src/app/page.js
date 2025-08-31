@@ -924,27 +924,33 @@ const SectionHeader = styled(Box)(({ theme }) => ({
   },
 }));
 
-const StyledCategoryCard = styled(Card)(({ theme, featured }) => ({
-  position: 'relative',
-  width: '100%',
-  height: featured ? '500px' : '400px',
-  maxHeight: '400px',
-  minWidth: '300px',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  background: '#121212',
-  border: '1px solid rgba(255, 255, 255, 0.04)',
-  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-  display: 'flex',
-  flexDirection: 'column',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)',
-    '& .category-image': {
-      transform: 'scale(1.05)'
-    }
-  },
-}));
+const StyledCategoryCard = styled(Card)(({ theme }) => {
+  // Get the featured state from data attribute via shouldForwardProp
+  return {
+    position: 'relative',
+    width: '100%',
+    height: '400px', // Set a consistent height, will be adjusted via CSS
+    maxHeight: '400px',
+    minWidth: '300px',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    background: '#121212',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+    display: 'flex',
+    flexDirection: 'column',
+    '&[data-featured="true"]': {
+      height: '500px',
+    },
+    '&:hover': {
+      transform: 'translateY(-8px)',
+      boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)',
+      '& .category-image': {
+        transform: 'scale(1.05)'
+      }
+    },
+  };
+});
 
 const CategoryContent = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -1668,7 +1674,7 @@ export default function Home() {
                     <StyledCategoryCard 
                       component={Link}
                       href={`/products?category=${encodeURIComponent(category.name)}`}
-                      featured={isFeatured}
+                      data-featured={isFeatured}
                     >
                       {/* Category Image */}
                       <Box 

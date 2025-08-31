@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import Link from 'next/link';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import {
   Container,
   Typography,

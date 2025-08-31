@@ -1,66 +1,11 @@
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
 import User from '@/models/User';
-import { isAuthenticated, isAdmin } from '@/utils/auth';
+import { isAuthenticated } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 import { sendOrderConfirmation, sendAdminOrderNotification } from '@/utils/email';
 
-// Get all orders (admin) or user orders (customer)
-export async function GET(req) {
-  return handleApiRequest(req, async () => {
-    const decoded = await isAuthenticated(req);
-    await connectToDatabase();
-    
-    const { searchParams } = new URL(req.url);
-    
-    // Pagination
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const skip = (page - 1) * limit;
-    
-    // Sorting
-    const sort = searchParams.get('sort') || 'createdAt';
-    const order = searchParams.get('order') || 'desc';
-    
-    // Filter by status
-    const status = searchParams.get('status');
-    const orderStatus = searchParams.get('orderStatus');
-    const filter = {};
-    
-    if (status) filter.orderStatus = status;
-    if (orderStatus) filter.orderStatus = orderStatus;
-    
-    // If not admin, only show user's orders
-    if (!decoded.isAdmin) {
-      filter.user = decoded._id;
-    }
-    
-    // Execute query with pagination and sorting
-    const orders = await Order.find(filter)
-      .sort({ [sort]: order === 'asc' ? 1 : -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('user', 'name email');
-    
-    // Get total count for pagination
-    const total = await Order.countDocuments(filter);
-    
-    return Response.json(
-      apiResponse(200, {
-        orders,
-        pagination: {
-          total,
-          page,
-          limit,
-          pages: Math.ceil(total / limit),
-        },
-      }),
-      { status: 200 }
-    );
-  });
-}
-
-// Create a new order
+// Create a new order with PayPal payment already completed
 export async function POST(req) {
   return handleApiRequest(req, async () => {
     const decoded = await isAuthenticated(req);
@@ -71,7 +16,7 @@ export async function POST(req) {
     // Validate required fields
     const requiredFields = [
       'orderItems', 'shippingAddress', 'paymentMethod',
-      'itemsPrice', 'taxPrice', 'totalPrice'
+      'itemsPrice', 'taxPrice', 'totalPrice', 'paymentResult'
     ];
     
     for (const field of requiredFields) {
@@ -83,7 +28,7 @@ export async function POST(req) {
       }
     }
     
-    // Ensure shippingPrice is a number (handle PayPal case)
+    // Ensure shippingPrice is a number
     if (typeof orderData.shippingPrice !== 'number') {
       orderData.shippingPrice = parseFloat(orderData.shippingPrice) || 0;
     }
@@ -93,10 +38,21 @@ export async function POST(req) {
       orderData.shippingAddress.postalCode = ''; // Set empty string as default
     }
     
-    // Create new order
+    // Validate PayPal payment
+    if (!orderData.paymentResult || !orderData.paymentResult.id) {
+      return Response.json(
+        apiError(400, 'Invalid PayPal payment result'),
+        { status: 400 }
+      );
+    }
+    
+    // Create new order with payment already completed
     const order = new Order({
       ...orderData,
       user: decoded._id,
+      isPaid: true,
+      paidAt: orderData.paidAt || new Date(),
+      orderStatus: 'Processing', // Set to processing since payment is complete
     });
     
     // Save the order
@@ -134,7 +90,7 @@ export async function POST(req) {
     }
     
     return Response.json(
-      apiResponse(201, order, 'Order created successfully'),
+      apiResponse(201, order, 'PayPal order created successfully'),
       { status: 201 }
     );
   });

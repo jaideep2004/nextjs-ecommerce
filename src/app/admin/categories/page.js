@@ -30,7 +30,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Visibility as ViewIcon,
   CloudUpload as CloudUploadIcon,
   Image as ImageIcon,
 } from '@mui/icons-material';
@@ -334,13 +333,6 @@ export default function CategoriesPage() {
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton
-                          onClick={() => window.open(`/category/${category.slug}`, '_blank')}
-                          size="small"
-                          sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
-                        >
-                          <ViewIcon fontSize="small" />
-                        </IconButton>
                         <IconButton
                           onClick={() => handleOpenDialog(category)}
                           size="small"

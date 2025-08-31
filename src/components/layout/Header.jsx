@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -469,19 +469,9 @@ export default function Header() {
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const { cartItems } = useCart();
-  const [cartItemCount, setCartItemCount] = useState(0);
+  const cartItemCount = useMemo(() => cartItems?.length || 0, [cartItems]);
   const [wishlistItemCount, setWishlistItemCount] = useState(0);
   const { mode, toggleTheme } = useThemeContext();
-
-  // Get real data from contexts
-  useEffect(() => {
-    // Calculate cart count from cartItems
-    if (cartItems && cartItems.length > 0) {
-      setCartItemCount(cartItems.length);
-    } else {
-      setCartItemCount(0);
-    }
-  }, [cartItems]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);

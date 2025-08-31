@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import Image from 'next/image';
 import {
   Box,
@@ -382,13 +383,18 @@ export default function ProductForm({ product, categories = [], isEdit = false }
       
       setSuccess(isEdit ? 'Product updated successfully' : 'Product created successfully');
       
+      // Show toast notification
+      toast.success(isEdit ? 'Product updated successfully!' : 'Product created successfully!');
+      
       // Redirect after a short delay
       setTimeout(() => {
         router.push('/admin/products');
       }, 1500);
     } catch (err) {
       console.error('Error saving product:', err);
-      setError(err.message || 'Failed to save product');
+      const errorMessage = err.message || 'Failed to save product';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
