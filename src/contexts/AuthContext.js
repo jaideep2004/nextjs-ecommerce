@@ -11,28 +11,11 @@ export const api = axios.create({
   withCredentials: true, // Ensure cookies are sent with requests
 });
 
-// Add request interceptor to include auth token
+// Add request interceptor for debugging
 api.interceptors.request.use(
   (config) => {
-    // Only run on client-side
-    if (typeof window !== 'undefined') {
-      try {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-          const user = JSON.parse(userData);
-          if (user?.token) {
-            config.headers.Authorization = `Bearer ${user.token}`;
-            console.log('Added Authorization header:', config.headers.Authorization);
-          } else {
-            console.warn('No token found in user data');
-          }
-        } else {
-          console.warn('No user data found in localStorage');
-        }
-      } catch (error) {
-        console.error('Error setting auth header:', error);
-      }
-    }
+    // Log request details for debugging
+    console.log('API Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -93,45 +76,44 @@ export function AuthProvider({ children }) {
     // Check if user is logged in on initial load
     const checkUserLoggedIn = async () => {
       try {
-        // First try to get user from localStorage
+        // First try to get user from localStorage for immediate UX
         const persistedUser = getPersistedUser();
         
         if (persistedUser) {
-          // Set the authorization header if we have a token
-          if (persistedUser.token) {
-            api.defaults.headers.common['Authorization'] = `Bearer ${persistedUser.token}`;
-          }
-          
           // Set user immediately for better UX
           setUser(persistedUser);
-          setLoading(false);
         }
 
-        // Then verify with the server
-        const { data } = await api.get('/auth/me');
-        const userData = data.user || data; // Accept both { user: ... } and direct user object
-        
-        // Make sure we have the latest token
-        if (persistedUser?.token) {
-          userData.token = persistedUser.token;
-        }
-        
-        setUser(userData);
-        persistUser(userData);
-      } catch (error) {
-        console.error('Auth verification error:', error);
-        // If server verification fails but we have persisted user, keep using it
-        // This helps with temporary API issues while maintaining user session
-        const persistedUser = getPersistedUser();
-        if (persistedUser) {
-          // Keep using persisted user if available
-          setUser(persistedUser);
-        } else {
-          // Only clear if we don't have a persisted user
+        // Always verify with the server using cookies
+        // The server will check httpOnly cookies for authentication
+        try {
+          const { data } = await api.get('/auth/me');
+          const userData = data.data || data; // Accept both { data: { user: ... } } and direct user object
+          
+          // Server verified user via cookies - update local data
+          setUser(userData);
+          persistUser(userData); // Save user data (without token) to localStorage
+          
+          console.log('User authenticated via server cookies:', userData.name);
+        } catch (serverError) {
+          console.error('Server authentication failed:', serverError);
+          
+          // If server authentication fails, clear any invalid session
           setUser(null);
           if (typeof window !== 'undefined') {
             localStorage.removeItem('user');
+            delete api.defaults.headers.common['Authorization'];
           }
+          
+          // If we're on a protected page, the response interceptor will handle redirect
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        // Clear any invalid data
+        setUser(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('user');
+          delete api.defaults.headers.common['Authorization'];
         }
       } finally {
         setLoading(false);
@@ -147,22 +129,18 @@ export function AuthProvider({ children }) {
       const { data } = await api.post('/auth/login', { email, password });
       
       // The API returns { data: { user, token }, status, message }
-      const user = data.data?.user || data;
-      const token = data.data?.token || data.token;
+      // The server sets httpOnly cookies automatically
+      const userData = data.data?.user || data;
       
-      if (!token) {
-        throw new Error('No authentication token received');
+      if (!userData) {
+        throw new Error('No user data received');
       }
       
-      // Add token to user object for localStorage
-      const userWithToken = { ...user, token };
-      setUser(userWithToken);
+      setUser(userData);
       
-      // Persist user data with token in localStorage
-      persistUser(userWithToken);
-      
-      // Set default authorization header
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Persist user data (without token) in localStorage for better UX
+      // The actual authentication will be handled by httpOnly cookies
+      persistUser(userData);
       
       toast.success('Logged in successfully');
       // Get redirect URL from query parameters if it exists
@@ -174,7 +152,7 @@ export function AuthProvider({ children }) {
       setTimeout(() => {
         if (redirectUrl) {
           router.push(redirectUrl);
-        } else if (user && user.isAdmin) {
+        } else if (userData && userData.isAdmin) {
           router.push('/admin/dashboard');
         } else {
           router.push('/customer/dashboard');
@@ -193,11 +171,17 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       const { data } = await api.post('/auth/register', userData);
-      setUser(data.user);
-      if (data.token) {
-        // Set default authorization header for subsequent requests
-        api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      
+      // The API returns { data: { user, token }, status, message }
+      // The server sets httpOnly cookies automatically
+      const user = data.data?.user || data.user || data;
+      
+      if (user) {
+        setUser(user);
+        // Persist user data (without token) in localStorage for better UX
+        persistUser(user);
       }
+      
       toast.success('Registered successfully');
       router.push('/');
       return data;
@@ -216,10 +200,9 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
-      // Clear all auth related data
+      // Clear user data from localStorage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('user');
-        delete api.defaults.headers.common['Authorization'];
       }
       router.push('/login');
       toast.success('Logged out successfully');
@@ -229,11 +212,15 @@ export function AuthProvider({ children }) {
   const updateProfile = async (userData) => {
     try {
       setLoading(true);
-      const { data } = await axios.put('/api/auth/update', userData);
-      setUser(data.user);
+      const { data } = await api.put('/auth/update', userData);
       
-      // Update user data in localStorage
-      persistUser(data.user);
+      // Update user data from server response
+      const updatedUser = data.data?.user || data;
+      
+      setUser(updatedUser);
+      
+      // Update user data in localStorage (without token)
+      persistUser(updatedUser);
       
       toast.success('Profile updated successfully');
       return data;

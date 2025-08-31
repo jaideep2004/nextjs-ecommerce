@@ -23,17 +23,14 @@ import {
   InputLabel,
   CircularProgress,
   Alert,
-  Breadcrumbs,
-  Link as MuiLink,
+  Grid,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Visibility as ViewIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';    
 
 // Helper function to format date
@@ -70,8 +67,6 @@ const getOrderStatus = (order) => {
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user, authLoading } = useAuth();
-  
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -147,19 +142,8 @@ export default function OrdersPage() {
   }, [page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery]);
   
   useEffect(() => {
-    if (authLoading) {
-      return;
-    }
-
-    if (!user || !user.isAdmin) {
-      router.push('/login?redirect=/admin/orders');
-      return;
-    }
-
-    if (user && user.isAdmin) {
-      fetchOrders();
-    }
-  }, [user, authLoading, router, fetchOrders]);
+    fetchOrders();
+  }, [fetchOrders]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -173,7 +157,11 @@ export default function OrdersPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(0); // Reset to first page when searching
-    fetchOrders();
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setPage(0);
   };
 
   const handleStatusFilterChange = (e) => {
@@ -191,198 +179,213 @@ export default function OrdersPage() {
     setPage(0); // Reset to first page when changing sort order
   };
 
-  if (authLoading) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink underline="hover" color="inherit" component={Link} href="/admin/dashboard">
-                Dashboard
-              </MuiLink>
-              <Typography color="text.primary">Orders</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#2c3e50',
+            mb: 1,
+          }}
+        >
+          Orders Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Track and manage customer orders, shipping, and fulfillment
+        </Typography>
+      </Box>
 
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
-              Orders Management
-            </Typography>
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-            {/* Filters and Search */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-              <form onSubmit={handleSearch} style={{ display: 'flex', flexGrow: 1 }}>
-                <TextField
-                  label="Search Orders"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Order ID, Customer Name, Email"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton type="submit" edge="end">
-                          <SearchIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ maxWidth: { xs: '100%', sm: 300 } }}
-                />
-              </form>
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        {/* Filters and Search */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Search Orders"
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch(e);
+                }
+              }}
+              placeholder="Order ID, Customer Name, Email"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClearSearch} edge="end">
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              size="small"
+            />
+          </Grid>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="status-filter-label">Status</InputLabel>
-                <Select
-                  labelId="status-filter-label"
-                  value={statusFilter}
-                  label="Status"
-                  onChange={handleStatusFilterChange}
-                >
-                  <MenuItem value="all">All Statuses</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="processing">Processing</MenuItem>
-                  <MenuItem value="shipped">Shipped</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
-                </Select>
-              </FormControl>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="status-filter-label">Status</InputLabel>
+              <Select
+                labelId="status-filter-label"
+                value={statusFilter}
+                label="Status"
+                onChange={handleStatusFilterChange}
+              >
+                <MenuItem value="all">All Statuses</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="processing">Processing</MenuItem>
+                <MenuItem value="shipped">Shipped</MenuItem>
+                <MenuItem value="delivered">Delivered</MenuItem>
+                <MenuItem value="cancelled">Cancelled</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel id="sort-by-label">Sort By</InputLabel>
-                <Select
-                  labelId="sort-by-label"
-                  value={sortBy}
-                  label="Sort By"
-                  onChange={handleSortChange}
-                >
-                  <MenuItem value="createdAt">Order Date</MenuItem>
-                  <MenuItem value="totalAmount">Total Amount</MenuItem>
-                  <MenuItem value="status">Status</MenuItem>
-                </Select>
-              </FormControl>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="sort-by-label">Sort By</InputLabel>
+              <Select
+                labelId="sort-by-label"
+                value={sortBy}
+                label="Sort By"
+                onChange={handleSortChange}
+              >
+                <MenuItem value="createdAt">Order Date</MenuItem>
+                <MenuItem value="totalAmount">Total Amount</MenuItem>
+                <MenuItem value="status">Status</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="sort-order-label">Order</InputLabel>
-                <Select
-                  labelId="sort-order-label"
-                  value={sortOrder}
-                  label="Order"
-                  onChange={handleSortOrderChange}
-                >
-                  <MenuItem value="asc">Ascending</MenuItem>
-                  <MenuItem value="desc">Descending</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="sort-order-label">Order</InputLabel>
+              <Select
+                labelId="sort-order-label"
+                value={sortOrder}
+                label="Order"
+                onChange={handleSortOrderChange}
+              >
+                <MenuItem value="asc">Ascending</MenuItem>
+                <MenuItem value="desc">Descending</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
 
-            {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-            {loading && !error ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <>
-                <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
-                  <Table>
-                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                      <TableRow>
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Customer</TableCell>
-                        <TableCell>Items</TableCell>
-                        <TableCell>Total</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell align="right">Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {orders && orders.length > 0 ? (
-                        orders.map((order) => {
-                          console.log('Rendering order:', order);
-                          return (
-                            <TableRow key={order._id || Math.random()}>
-                            <TableCell>
-                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                  {order._id ? order._id.slice(-8).toUpperCase() : 'UNKNOWN'}
-                              </Typography>
-                            </TableCell>
-                              <TableCell>{order.createdAt ? formatDate(order.createdAt) : 'N/A'}</TableCell>
-                            <TableCell>
-                              <Typography variant="body2">{order.user?.name || 'Guest'}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {order.user?.email || order.shippingAddress?.email || '-'}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>{order.orderItems?.length || 0}</TableCell>
-                              <TableCell>{formatCurrency(order.totalPrice || 0)}</TableCell>
-                            <TableCell>
-                              <Chip
-                                  label={getOrderStatus(order).charAt(0).toUpperCase() + getOrderStatus(order).slice(1) || 'Pending'}
-                                size="small"
-                                sx={{
-                                    bgcolor: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.bg || '#f5f5f5',
-                                    color: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.color || 'text.primary',
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell align="right">
-                              <IconButton
-                                color="primary"
-                                onClick={() => router.push(`/admin/orders/${order._id}`)}
-                                size="small"
-                              >
-                                <ViewIcon fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                          );
-                        })
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} align="center">
-                            No orders found
+        {loading && !error ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>Order ID</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Customer</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Items</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Total</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders && orders.length > 0 ? (
+                    orders.map((order) => {
+                      console.log('Rendering order:', order);
+                      return (
+                        <TableRow key={order._id || Math.random()} hover sx={{ '&:hover': { bgcolor: '#f8f9fa' } }}>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#2196f3' }}>
+                              #{order._id ? order._id.slice(-8).toUpperCase() : 'UNKNOWN'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {order.createdAt ? formatDate(order.createdAt) : 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                              {order.user?.name || 'Guest'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {order.user?.email || order.shippingAddress?.email || '-'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {order.orderItems?.length || 0} items
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {formatCurrency(order.totalPrice || 0)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={getOrderStatus(order).charAt(0).toUpperCase() + getOrderStatus(order).slice(1) || 'Pending'}
+                              size="small"
+                              sx={{
+                                bgcolor: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.bg || '#f5f5f5',
+                                color: statusColors[getOrderStatus(order)?.toLowerCase() || 'pending']?.color || 'text.primary',
+                                fontWeight: 600,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <IconButton
+                              onClick={() => window.location.href = `/admin/orders/${order._id}`}
+                              size="small"
+                              sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
+                            >
+                              <ViewIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No orders found
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                <TablePagination
-                  component="div"
-                  count={totalOrders}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25, 50]}
-                />
-              </>
-            )}
-          </Paper>
-        </Container>
-      </Box>
-    </Box>
+            <TablePagination
+              component="div"
+              count={totalOrders}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          </>
+        )}
+      </Paper>
+    </Container>
   );
 }

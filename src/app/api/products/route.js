@@ -27,6 +27,7 @@ export async function GET(req) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const featured = searchParams.get('featured');
+    const onSale = searchParams.get('onSale');
     const search = searchParams.get('search');
     
     // Pagination (with sane caps)

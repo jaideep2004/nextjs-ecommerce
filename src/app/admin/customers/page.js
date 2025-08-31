@@ -24,8 +24,6 @@ import {
   InputLabel,
   CircularProgress,
   Alert,
-  Breadcrumbs,
-  Link as MuiLink,
   Dialog,
   DialogActions,
   DialogContent,
@@ -33,6 +31,7 @@ import {
   DialogTitle,
   Button,
   Snackbar,
+  Grid,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -40,11 +39,9 @@ import {
   Block as BlockIcon,
   CheckCircle as CheckCircleIcon,
   Delete as DeleteIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to format date
 const formatDate = (dateString) => {
@@ -53,7 +50,6 @@ const formatDate = (dateString) => {
 };
 
 export default function CustomersPage() {
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -135,20 +131,8 @@ export default function CustomersPage() {
   }, [page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery]);
 
   useEffect(() => {
-    // Redirect if not admin
-    if (authLoading) {
-      return;
-    }
-
-    if (!user || !user.isAdmin) {
-      router.push('/login?redirect=/admin/customers');
-      return;
-    }
-
-    if (user && user.isAdmin) {
-      fetchCustomers();
-    }
-  }, [user, authLoading, router, fetchCustomers]);
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -162,7 +146,11 @@ export default function CustomersPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(0); // Reset to first page when searching
-    fetchCustomers();
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setPage(0);
   };
 
   const handleStatusFilterChange = (e) => {
@@ -189,6 +177,89 @@ export default function CustomersPage() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
+  const handleConfirmAction = async () => {
+    if (!selectedCustomer) return;
+
+    try {
+      setLoading(true);
+      console.log('Performing action:', dialogAction, 'on customer:', selectedCustomer._id);
+      
+      let endpoint = '';
+      let method = 'PUT';
+      let successMessage = '';
+      
+      switch (dialogAction) {
+        case 'block':
+          endpoint = `/api/admin/customers/${selectedCustomer._id}/block`;
+          successMessage = `${selectedCustomer.name} has been blocked`;
+          break;
+        case 'unblock':
+          endpoint = `/api/admin/customers/${selectedCustomer._id}/unblock`;
+          successMessage = `${selectedCustomer.name} has been unblocked`;
+          break;
+        case 'delete':
+          endpoint = `/api/admin/customers/${selectedCustomer._id}`;
+          method = 'DELETE';
+          successMessage = `${selectedCustomer.name} has been deleted`;
+          break;
+        default:
+          throw new Error('Invalid action');
+      }
+      
+      console.log('Sending request to:', endpoint, 'with method:', method);
+      
+      if (method === 'DELETE') {
+        await axios.delete(endpoint);
+      } else {
+        await axios.put(endpoint);
+      }
+      
+      console.log('Action completed successfully');
+      
+      // Refresh customer list
+      await fetchCustomers();
+      
+      setSnackbar({
+        open: true,
+        message: successMessage,
+        severity: 'success',
+      });
+    } catch (err) {
+      console.error(`Error performing ${dialogAction} action:`, err);
+      setSnackbar({
+        open: true,
+        message: err.message || `Failed to ${dialogAction} customer`,
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+      handleCloseDialog();
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#2c3e50',
+            mb: 1,
+          }}
+        >
+          Customers Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Manage customer accounts, orders, and support requests
+        </Typography>
+      </Box>
 
   const handleConfirmAction = async () => {
     if (!selectedCustomer) return;
@@ -363,6 +434,8 @@ export default function CustomersPage() {
             </Box>
 
             {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
 
             {loading && !error ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>

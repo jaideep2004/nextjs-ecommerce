@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Container,
@@ -23,8 +24,6 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
-  Breadcrumbs,
-  Link as MuiLink,
   Chip,
 } from '@mui/material';
 import {
@@ -35,15 +34,8 @@ import {
   CloudUpload as CloudUploadIcon,
   Image as ImageIcon,
 } from '@mui/icons-material';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/contexts/AuthContext';
 
 export default function CategoriesPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,30 +50,22 @@ export default function CategoriesPage() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    // Redirect if not admin
-    if (!authLoading && (!user || !user.isAdmin)) {
-      router.push('/login?redirect=/admin/categories');
-      return;
-    }
-
-    if (user && user.isAdmin) {
-      fetchCategories();
-    }
-  }, [user, authLoading, router]);
+    fetchCategories();
+  }, []);
 
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get('/admin/categories');
+      const response = await axios.get('/api/admin/categories');
       
       // Check if response has the expected structure
-      if (data && data.categories) {
-        setCategories(data.categories);
-      } else if (data && data.data && data.data.categories) {
+      if (response.data && response.data.categories) {
+        setCategories(response.data.categories);
+      } else if (response.data && response.data.data && response.data.data.categories) {
         // Handle both response formats for backward compatibility
-        setCategories(data.data.categories);
+        setCategories(response.data.data.categories);
       } else {
-        console.error('Unexpected API response format:', data);
+        console.error('Unexpected API response format:', response.data);
         setError('Received unexpected data format from server');
       }
     } catch (err) {
@@ -183,11 +167,15 @@ export default function CategoriesPage() {
       };
 
       const url = currentCategory
-        ? `/admin/categories/${currentCategory._id}`
-        : '/admin/categories';
-      const method = currentCategory ? 'PUT' : 'POST';
-
-      await api[method.toLowerCase()](url, dataToSubmit);
+        ? `/api/admin/categories/${currentCategory._id}`
+        : '/api/admin/categories';
+      
+      if (currentCategory) {
+        await axios.put(url, dataToSubmit);
+      } else {
+        await axios.post(url, dataToSubmit);
+      }
+      
       await fetchCategories();
       handleCloseDialog();
       setSnackbar({ 
@@ -214,7 +202,7 @@ export default function CategoriesPage() {
 
     try {
       setLoading(true);
-      await api.delete(`/admin/categories/${currentCategory._id}`);
+      await axios.delete(`/api/admin/categories/${currentCategory._id}`);
       await fetchCategories();
       handleCloseDeleteDialog();
       setSnackbar({
@@ -261,137 +249,129 @@ export default function CategoriesPage() {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  if (authLoading) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <MuiLink 
-                component={Link} 
-                href="/admin/dashboard" 
-                underline="hover" 
-                color="inherit" 
-                sx={{ cursor: 'pointer' }}
-              >
-                Dashboard
-              </MuiLink>
-              <Typography color="text.primary">Categories</Typography>
-            </Breadcrumbs>
-          </Paper>
-
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h6" component="h2">
-                Categories Management
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => handleOpenDialog()}
-                sx={{ 
-                  bgcolor: '#8D6E63',
-                  '&:hover': { bgcolor: '#6D4C41' },
-                }}
-              >
-                Add Category
-              </Button>
-            </Box>
-
-            {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-            {loading && !error ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
-                <Table>
-                  <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Slug</TableCell>
-                      <TableCell>Description</TableCell>
-                      <TableCell>Products</TableCell>
-                      <TableCell align="right">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {categories.length > 0 ? (
-                      categories.map((category) => (
-                        <TableRow key={category._id}>
-                          <TableCell>{category.name}</TableCell>
-                          <TableCell>{category.slug}</TableCell>
-                          <TableCell>
-                            {category.description
-                              ? category.description.length > 50
-                                ? `${category.description.substring(0, 50)}...`
-                                : category.description
-                              : '-'}
-                          </TableCell>
-                          <TableCell>
-                            <Chip 
-                              label={category.productCount || 0} 
-                              size="small" 
-                              sx={{ bgcolor: '#EFEBE9' }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <IconButton
-                              color="primary"
-                              onClick={() => router.push(`/category/${category.slug}`)}
-                              size="small"
-                            >
-                              <ViewIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              color="primary"
-                              onClick={() => handleOpenDialog(category)}
-                              size="small"
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              color="error"
-                              onClick={() => handleOpenDeleteDialog(category)}
-                              size="small"
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center">
-                          No categories found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </Paper>
-        </Container>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#2c3e50',
+            mb: 1,
+          }}
+        >
+          Categories Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Organize your products with categories and subcategories
+        </Typography>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            sx={{ 
+              bgcolor: '#2196f3',
+              '&:hover': { bgcolor: '#1976d2' },
+              boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)',
+            }}
+          >
+            Add Category
+          </Button>
+        </Box>
       </Box>
+
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+
+        {loading && !error ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+            <Table>
+              <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Slug</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Products</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <TableRow key={category._id} hover sx={{ '&:hover': { bgcolor: '#f8f9fa' } }}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {category.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {category.slug}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {category.description
+                            ? category.description.length > 50
+                              ? `${category.description.substring(0, 50)}...`
+                              : category.description
+                            : '-'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={category.productCount || 0} 
+                          size="small" 
+                          sx={{ bgcolor: '#e3f2fd', color: '#1976d2' }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                          onClick={() => window.open(`/category/${category.slug}`, '_blank')}
+                          size="small"
+                          sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
+                        >
+                          <ViewIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleOpenDialog(category)}
+                          size="small"
+                          sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleOpenDeleteDialog(category)}
+                          size="small"
+                          sx={{ color: '#f44336', '&:hover': { bgcolor: '#ffebee' } }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body1" color="text.secondary">
+                        No categories found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
 
       {/* Add/Edit Category Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
@@ -607,6 +587,6 @@ export default function CategoriesPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 }

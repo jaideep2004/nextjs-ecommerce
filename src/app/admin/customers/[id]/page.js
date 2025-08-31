@@ -212,334 +212,546 @@ export default function CustomerDetailPage() {
 
   if (authLoading || loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
       </Container>
     );
   }
 
   if (!customer) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="warning">Customer not found</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="warning" sx={{ mb: 3 }}>Customer not found</Alert>
       </Container>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <Link href="/admin/dashboard" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Dashboard
-                </MuiLink>
-              </Link>
-              <Link href="/admin/customers" passHref>
-                <MuiLink underline="hover" color="inherit">
-                  Customers
-                </MuiLink>
-              </Link>
-              <Typography color="text.primary">Customer Details</Typography>
-            </Breadcrumbs>
-          </Paper>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#2c3e50',
+            mb: 1,
+          }}
+        >
+          Customer Details
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          View and manage customer information, orders, and account status
+        </Typography>
+      </Box>
 
-          {/* Customer Header */}
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Box
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+
+      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', mb: 3 }}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
+          <Link href="/admin/dashboard" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Dashboard
+            </MuiLink>
+          </Link>
+          <Link href="/admin/customers" passHref>
+            <MuiLink underline="hover" color="inherit">
+              Customers
+            </MuiLink>
+          </Link>
+          <Typography color="text.primary">Customer Details</Typography>
+        </Breadcrumbs>
+        
+        {/* Customer Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              sx={{
+                width: 60,
+                height: 60,
+                borderRadius: '50%',
+                bgcolor: '#2196f3',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: 3,
+                fontSize: '1.5rem',
+                fontWeight: 600,
+              }}
+            >
+              {customer.name.charAt(0).toUpperCase()}
+            </Box>
+            <Box>
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
+                {customer.name}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Customer since {formatDate(customer.createdAt)}
+                </Typography>
+                <Chip
+                  label={customer.isBlocked ? 'Blocked' : 'Active'}
+                  size="small"
                   sx={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: '50%',
-                    bgcolor: '#8D6E63',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 2,
-                    fontSize: '1.5rem',
+                    bgcolor: customer.isBlocked ? '#ffebee' : '#e8f5e9',
+                    color: customer.isBlocked ? '#c62828' : '#2e7d32',
+                    fontWeight: 600,
                   }}
-                >
-                  {customer.name.charAt(0).toUpperCase()}
-                </Box>
-                <Box>
-                  <Typography variant="h6" component="h2">
-                    {customer.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                      Customer since {formatDate(customer.createdAt)}
-                    </Typography>
-                    <Chip
-                      label={customer.isBlocked ? 'Blocked' : 'Active'}
-                      size="small"
-                      sx={{
-                        bgcolor: customer.isBlocked ? '#FFEBEE' : '#E8F5E9',
-                        color: customer.isBlocked ? '#C62828' : '#2E7D32',
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {customer.isBlocked ? (
-                  <Button
-                    variant="outlined"
-                    color="success"
-                    startIcon={<CheckCircleIcon />}
-                    onClick={() => handleOpenDialog('unblock')}
-                  >
-                    Unblock
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    color="warning"
-                    startIcon={<BlockIcon />}
-                    onClick={() => handleOpenDialog('block')}
-                  >
-                    Block
-                  </Button>
-                )}
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                  onClick={() => handleOpenDialog('delete')}
-                >
-                  Delete
-                </Button>
+                />
               </Box>
             </Box>
-          </Paper>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {customer.isBlocked ? (
+              <Button
+                variant="outlined"
+                color="success"
+                startIcon={<CheckCircleIcon />}
+                onClick={() => handleOpenDialog('unblock')}
+                sx={{ minWidth: 120 }}
+              >
+                Unblock
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="warning"
+                startIcon={<BlockIcon />}
+                onClick={() => handleOpenDialog('block')}
+                sx={{ minWidth: 120 }}
+              >
+                Block
+              </Button>
+            )}
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={() => handleOpenDialog('delete')}
+              sx={{ minWidth: 120 }}
+            >
+              Delete
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
 
-          <Grid container spacing={3}>
-            {/* Customer Information */}
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, height: '100%' }}>
-                <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
-                  Customer Information
-                </Typography>
-                <List>
-                  <ListItem>
-                    <ListItemIcon>
-                      <PersonIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Full Name" secondary={customer.name} />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <EmailIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Email" secondary={customer.email} />
-                  </ListItem>
-                  {customer.phone && (
-                    <ListItem>
-                      <ListItemIcon>
-                        <PhoneIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Phone" secondary={customer.phone} />
-                    </ListItem>
-                  )}
-                  <ListItem>
-                    <ListItemIcon>
-                      <CalendarIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Registered" secondary={formatDate(customer.createdAt)} />
-                  </ListItem>
-                </List>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                  Default Shipping Address
-                </Typography>
-                {customer.defaultAddress ? (
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">
-                      {customer.defaultAddress.firstName} {customer.defaultAddress.lastName}
-                    </Typography>
-                    <Typography variant="body2">{customer.defaultAddress.address}</Typography>
-                    {customer.defaultAddress.address2 && (
-                      <Typography variant="body2">{customer.defaultAddress.address2}</Typography>
-                    )}
-                    <Typography variant="body2">
-                      {customer.defaultAddress.city}, {customer.defaultAddress.state} {customer.defaultAddress.zipCode}
-                    </Typography>
-                    <Typography variant="body2">{customer.defaultAddress.country}</Typography>
-                    {customer.defaultAddress.phone && (
-                      <Typography variant="body2">{customer.defaultAddress.phone}</Typography>
-                    )}
-                  </Box>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No default address set
+      {/* Customer Information Section */}
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          p: 3, 
+          mb: 3, 
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          backgroundColor: '#fafafa'
+        }}
+      >
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            mb: 3, 
+            fontWeight: 600, 
+            color: '#2c3e50',
+            display: 'flex',
+            alignItems: 'center',
+            '&:before': {
+              content: '"1"',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: '#2196f3',
+              color: 'white',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              mr: 2,
+            }
+          }}
+        >
+          Customer Information
+        </Typography>
+        
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <List sx={{ bgcolor: 'white', borderRadius: 2, p: 2 }}>
+              <ListItem sx={{ px: 0 }}>
+                <ListItemIcon>
+                  <PersonIcon sx={{ color: '#2196f3' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Full Name" 
+                  secondary={customer.name}
+                  primaryTypographyProps={{ fontWeight: 600, fontSize: '0.875rem' }}
+                  secondaryTypographyProps={{ fontSize: '1rem', color: 'text.primary' }}
+                />
+              </ListItem>
+              <ListItem sx={{ px: 0 }}>
+                <ListItemIcon>
+                  <EmailIcon sx={{ color: '#2196f3' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Email" 
+                  secondary={customer.email}
+                  primaryTypographyProps={{ fontWeight: 600, fontSize: '0.875rem' }}
+                  secondaryTypographyProps={{ fontSize: '1rem', color: 'text.primary' }}
+                />
+              </ListItem>
+              {customer.phone && (
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemIcon>
+                    <PhoneIcon sx={{ color: '#2196f3' }} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Phone" 
+                    secondary={customer.phone}
+                    primaryTypographyProps={{ fontWeight: 600, fontSize: '0.875rem' }}
+                    secondaryTypographyProps={{ fontSize: '1rem', color: 'text.primary' }}
+                  />
+                </ListItem>
+              )}
+              <ListItem sx={{ px: 0 }}>
+                <ListItemIcon>
+                  <CalendarIcon sx={{ color: '#2196f3' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Registered" 
+                  secondary={formatDate(customer.createdAt)}
+                  primaryTypographyProps={{ fontWeight: 600, fontSize: '0.875rem' }}
+                  secondaryTypographyProps={{ fontSize: '1rem', color: 'text.primary' }}
+                />
+              </ListItem>
+            </List>
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <Box sx={{ bgcolor: 'white', borderRadius: 2, p: 2, height: '100%' }}>
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+                <LocationIcon sx={{ color: '#2196f3', mr: 1 }} />
+                Default Shipping Address
+              </Typography>
+              {customer.defaultAddress ? (
+                <Box sx={{ pl: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                    {customer.defaultAddress.firstName} {customer.defaultAddress.lastName}
                   </Typography>
-                )}
-              </Paper>
-            </Grid>
-
-            {/* Customer Stats */}
-            <Grid item xs={12} md={8}>
-              <Paper sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h6" component="h3" sx={{ mb: 3 }}>
-                  Customer Stats
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>{customer.defaultAddress.address}</Typography>
+                  {customer.defaultAddress.address2 && (
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>{customer.defaultAddress.address2}</Typography>
+                  )}
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>
+                    {customer.defaultAddress.city}, {customer.defaultAddress.state} {customer.defaultAddress.zipCode}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>{customer.defaultAddress.country}</Typography>
+                  {customer.defaultAddress.phone && (
+                    <Typography variant="body2">{customer.defaultAddress.phone}</Typography>
+                  )}
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                  No default address set
                 </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#EFEBE9' }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                          Total Orders
-                        </Typography>
-                        <Typography variant="h4">{customer.orderCount || 0}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#EFEBE9' }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                          Total Spent
-                        </Typography>
-                        <Typography variant="h4">{formatCurrency(customer.totalSpent)}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#EFEBE9' }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                          Wishlist Items
-                        </Typography>
-                        <Typography variant="h4">{customer.wishlistCount || 0}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#EFEBE9' }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                          Avg. Order Value
-                        </Typography>
-                        <Typography variant="h4">
-                          {customer.orderCount > 0
-                            ? formatCurrency(customer.totalSpent / customer.orderCount)
-                            : '$0.00'}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </Paper>
+              )}
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+      {/* Customer Statistics Section */}
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          p: 3, 
+          mb: 3, 
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          backgroundColor: '#fafafa'
+        }}
+      >
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            mb: 3, 
+            fontWeight: 600, 
+            color: '#2c3e50',
+            display: 'flex',
+            alignItems: 'center',
+            '&:before': {
+              content: '"2"',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: '#4caf50',
+              color: 'white',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              mr: 2,
+            }
+          }}
+        >
+          Customer Statistics
+        </Typography>
+        
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ 
+              bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #2196f3 0%, #21cbf3 100%)',
+              color: 'white',
+              borderRadius: 3,
+              boxShadow: '0 8px 25px rgba(33, 150, 243, 0.3)'
+            }}>
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <CartIcon sx={{ fontSize: 48, mb: 1, opacity: 0.8 }} />
+                <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                  {customer.orderCount || 0}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                  Total Orders
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)',
+              color: 'white',
+              borderRadius: 3,
+              boxShadow: '0 8px 25px rgba(76, 175, 80, 0.3)'
+            }}>
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="h2" sx={{ fontSize: '2rem', mb: 1 }}>💰</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                  {formatCurrency(customer.totalSpent)}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                  Total Spent
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+              color: 'white',
+              borderRadius: 3,
+              boxShadow: '0 8px 25px rgba(255, 152, 0, 0.3)'
+            }}>
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <WishlistIcon sx={{ fontSize: 48, mb: 1, opacity: 0.8 }} />
+                <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                  {customer.wishlistCount || 0}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                  Wishlist Items
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ 
+              background: 'linear-gradient(135deg, #9c27b0 0%, #e91e63 100%)',
+              color: 'white',
+              borderRadius: 3,
+              boxShadow: '0 8px 25px rgba(156, 39, 176, 0.3)'
+            }}>
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="h2" sx={{ fontSize: '2rem', mb: 1 }}>📊</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                  {customer.orderCount > 0
+                    ? formatCurrency(customer.totalSpent / customer.orderCount)
+                    : '$0.00'}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                  Avg. Order Value
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Paper>
 
-              {/* Tabs for Orders and Wishlist */}
-              <Paper sx={{ p: 3 }}>
-                <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-                  <Tab label="Orders" icon={<CartIcon />} iconPosition="start" />
-                  <Tab label="Wishlist" icon={<WishlistIcon />} iconPosition="start" />
-                </Tabs>
+      {/* Orders and Activity Section */}
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          p: 3, 
+          mb: 3, 
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          backgroundColor: '#fafafa'
+        }}
+      >
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            mb: 3, 
+            fontWeight: 600, 
+            color: '#2c3e50',
+            display: 'flex',
+            alignItems: 'center',
+            '&:before': {
+              content: '"3"',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: '#ff9800',
+              color: 'white',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              mr: 2,
+            }
+          }}
+        >
+          Orders & Activity
+        </Typography>
+        
+        <Box sx={{ bgcolor: 'white', borderRadius: 2, p: 0, overflow: 'hidden' }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            sx={{ 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              '& .MuiTab-root': {
+                minHeight: 64,
+                fontSize: '1rem',
+                fontWeight: 600,
+              }
+            }}
+          >
+            <Tab 
+              label="Recent Orders" 
+              icon={<CartIcon />} 
+              iconPosition="start" 
+              sx={{ minWidth: 200 }}
+            />
+            <Tab 
+              label="Wishlist Items" 
+              icon={<WishlistIcon />} 
+              iconPosition="start" 
+              sx={{ minWidth: 200 }}
+            />
+          </Tabs>
 
-                {/* Orders Tab */}
-                {tabValue === 0 && (
+          <Box sx={{ p: 3 }}>
+
+            {/* Orders Tab */}
+            {tabValue === 0 && (
+              <>
+                {orders && orders.length > 0 ? (
                   <>
-                    <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                      Recent Orders
-                    </Typography>
-                    {orders && orders.length > 0 ? (
-                      <TableContainer>
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Order ID</TableCell>
-                              <TableCell>Date</TableCell>
-                              <TableCell>Items</TableCell>
-                              <TableCell>Total</TableCell>
-                              <TableCell>Status</TableCell>
-                              <TableCell align="right">Actions</TableCell>
+                    <TableContainer>
+                      <Table>
+                        <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 600 }}>Order ID</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Items</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Total</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {orders.map((order) => (
+                            <TableRow key={order._id} hover sx={{ '&:hover': { bgcolor: '#f8f9fa' } }}>
+                              <TableCell>
+                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#2196f3' }}>
+                                  #{order._id.substring(order._id.length - 8).toUpperCase()}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>{formatDate(order.createdAt)}</TableCell>
+                              <TableCell>
+                                <Chip 
+                                  label={`${order.orderItems?.length || 0} items`} 
+                                  size="small" 
+                                  sx={{ bgcolor: '#e3f2fd', color: '#1976d2' }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body2" sx={{ fontWeight: 600, color: '#2196f3' }}>
+                                  {formatCurrency(order.totalAmount || order.totalPrice || 0)}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  label={(order.status || order.orderStatus || 'pending').charAt(0).toUpperCase() + (order.status || order.orderStatus || 'pending').slice(1)}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: 
+                                      (order.status || order.orderStatus) === 'pending' ? '#fff8e1' :
+                                      (order.status || order.orderStatus) === 'processing' ? '#e3f2fd' :
+                                      (order.status || order.orderStatus) === 'shipped' ? '#e8f5e9' :
+                                      (order.status || order.orderStatus) === 'delivered' ? '#e0f2f1' :
+                                      '#ffebee',
+                                    color: 
+                                      (order.status || order.orderStatus) === 'pending' ? '#f57f17' :
+                                      (order.status || order.orderStatus) === 'processing' ? '#1565c0' :
+                                      (order.status || order.orderStatus) === 'shipped' ? '#2e7d32' :
+                                      (order.status || order.orderStatus) === 'delivered' ? '#00695c' :
+                                      '#c62828',
+                                    fontWeight: 600,
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell align="right">
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  onClick={() => router.push(`/admin/orders/${order._id}`)}
+                                  sx={{ color: '#2196f3', borderColor: '#2196f3' }}
+                                >
+                                  View
+                                </Button>
+                              </TableCell>
                             </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {orders.map((order) => (
-                              <TableRow key={order._id}>
-                                <TableCell>
-                                  <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                    {order._id.substring(order._id.length - 8).toUpperCase()}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell>{formatDate(order.createdAt)}</TableCell>
-                                <TableCell>{order.orderItems?.length || 0}</TableCell>
-                                <TableCell>{formatCurrency(order.totalAmount || order.totalPrice || 0)}</TableCell>
-                                <TableCell>
-                                  <Chip
-                                    label={(order.status || order.orderStatus || 'pending').charAt(0).toUpperCase() + (order.status || order.orderStatus || 'pending').slice(1)}
-                                    size="small"
-                                    sx={{
-                                      bgcolor: 
-                                        (order.status || order.orderStatus) === 'pending' ? '#FFF8E1' :
-                                        (order.status || order.orderStatus) === 'processing' ? '#E3F2FD' :
-                                        (order.status || order.orderStatus) === 'shipped' ? '#E8F5E9' :
-                                        (order.status || order.orderStatus) === 'delivered' ? '#E0F2F1' :
-                                        '#FFEBEE',
-                                      color: 
-                                        (order.status || order.orderStatus) === 'pending' ? '#F57F17' :
-                                        (order.status || order.orderStatus) === 'processing' ? '#1565C0' :
-                                        (order.status || order.orderStatus) === 'shipped' ? '#2E7D32' :
-                                        (order.status || order.orderStatus) === 'delivered' ? '#00695C' :
-                                        '#C62828',
-                                    }}
-                                  />
-                                </TableCell>
-                                <TableCell align="right">
-                                  <Button
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={() => router.push(`/admin/orders/${order._id}`)}
-                                  >
-                                    View
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        This customer has not placed any orders yet.
-                      </Typography>
-                    )}
-                    {orders.length > 0 && (
-                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => router.push(`/admin/orders?customer=${customer._id}`)}
-                        >
-                          View All Orders
-                        </Button>
-                      </Box>
-                    )}
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => router.push(`/admin/orders?customer=${customer._id}`)}
+                        sx={{ color: '#2196f3', borderColor: '#2196f3' }}
+                      >
+                        View All Orders
+                      </Button>
+                    </Box>
                   </>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <CartIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                      No Orders Yet
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      This customer has not placed any orders yet.
+                    </Typography>
+                  </Box>
                 )}
+              </>
+            )}
 
                 {/* Wishlist Tab */}
                 {tabValue === 1 && (

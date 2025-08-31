@@ -2,14 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Container, Paper, Typography, Breadcrumbs, Link as MuiLink, CircularProgress, Alert } from '@mui/material';
+import { 
+  Box, 
+  Container, 
+  Paper, 
+  Typography, 
+  Breadcrumbs, 
+  Link as MuiLink, 
+  CircularProgress, 
+  Alert 
+} from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ProductForm from '@/components/admin/ProductForm';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import EditIcon from '@mui/icons-material/Edit';
 
 export default function EditProductPage({ params }) {
   const { id } = params;
@@ -54,24 +60,26 @@ export default function EditProductPage({ params }) {
 
   if (authLoading || loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress sx={{ color: '#8D6E63' }} />
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
       </Container>
     );
   }
 
   if (!product) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="warning">Product not found</Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="warning" sx={{ mb: 3 }}>Product not found</Alert>
       </Container>
     );
   }

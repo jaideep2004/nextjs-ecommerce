@@ -37,6 +37,7 @@ import {
   DialogContent,
   TextField,
   DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 import {
@@ -54,6 +55,50 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
 } from '@mui/icons-material';
+
+// Helper function to get user avatar background color
+const getUserAvatarColor = (user) => {
+  if (!user) return '#2196f3';
+  
+  if (user.isAdmin) {
+    return '#8D6E63'; // Brown for admin
+  }
+  
+  // Different colors for regular users based on first letter
+  const firstLetter = user.name ? user.name.charAt(0).toLowerCase() : 'u';
+  const colors = {
+    'a': '#f44336', 'b': '#e91e63', 'c': '#9c27b0', 'd': '#673ab7',
+    'e': '#3f51b5', 'f': '#2196f3', 'g': '#03a9f4', 'h': '#00bcd4',
+    'i': '#009688', 'j': '#4caf50', 'k': '#8bc34a', 'l': '#cddc39',
+    'm': '#ffeb3b', 'n': '#ffc107', 'o': '#ff9800', 'p': '#ff5722',
+    'q': '#795548', 'r': '#607d8b', 's': '#e91e63', 't': '#9c27b0',
+    'u': '#3f51b5', 'v': '#2196f3', 'w': '#009688', 'x': '#4caf50',
+    'y': '#ff9800', 'z': '#f44336'
+  };
+  
+  return colors[firstLetter] || '#2196f3';
+};
+
+// Helper function to get user initials
+const getUserInitials = (user) => {
+  if (!user || !user.name) return 'U';
+  
+  const names = user.name.trim().split(' ');
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase();
+  }
+  
+  return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+};
+
+const adminAvatarPulse = keyframes`
+  0%, 100% { 
+    box-shadow: 0 2px 8px rgba(141, 110, 99, 0.3);
+  }
+  50% { 
+    box-shadow: 0 4px 16px rgba(141, 110, 99, 0.5), 0 0 20px rgba(141, 110, 99, 0.3);
+  }
+`;
 
 // 4th Dimensional Header Animations
 const dimensionalFloat = keyframes`
@@ -422,7 +467,7 @@ export default function Header() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { cartItems } = useCart();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [wishlistItemCount, setWishlistItemCount] = useState(0);
@@ -910,21 +955,43 @@ export default function Header() {
                         }
                       }}
                     >
-                      {user ? (
+                      {authLoading ? (
                         <Avatar 
-                          alt="User" 
-                          src="/images/avatar/1.jpg" 
                           sx={{ 
                             width: { xs: 32, sm: 36 }, 
                             height: { xs: 32, sm: 36 },
-                            border: '2px solid rgba(162, 146, 120, 0.2)',
+                            bgcolor: '#e0e0e0',
+                            color: '#9e9e9e',
+                          }}
+                        >
+                          <CircularProgress size={16} sx={{ color: '#9e9e9e' }} />
+                        </Avatar>
+                      ) : user ? (
+                        <Avatar 
+                          alt={user.name || 'User'}
+                          sx={{ 
+                            width: { xs: 32, sm: 36 }, 
+                            height: { xs: 32, sm: 36 },
+                            border: `2px solid ${user.isAdmin ? 'rgba(141, 110, 99, 0.3)' : 'rgba(33, 150, 243, 0.3)'}`,
                             transition: 'all 0.3s ease',
+                            bgcolor: getUserAvatarColor(user),
+                            color: 'white',
+                            fontWeight: 700,
+                            fontSize: { xs: '0.85rem', sm: '0.95rem' },
+                            boxShadow: user.isAdmin 
+                              ? '0 2px 8px rgba(141, 110, 99, 0.3)' 
+                              : '0 2px 8px rgba(33, 150, 243, 0.3)',
                             '&:hover': {
-                              border: '2px solid rgba(162, 146, 120, 0.5)',
-                              transform: 'scale(1.05)',
+                              border: `2px solid ${user.isAdmin ? 'rgba(141, 110, 99, 0.6)' : 'rgba(33, 150, 243, 0.6)'}`,
+                              transform: 'scale(1.08)',
+                              boxShadow: user.isAdmin 
+                                ? '0 4px 16px rgba(141, 110, 99, 0.4)' 
+                                : '0 4px 16px rgba(33, 150, 243, 0.4)',
                             },
                           }}
-                        />
+                        >
+                          {getUserInitials(user)}
+                        </Avatar>
                       ) : (
                         <AccountCircle sx={{ fontSize: { xs: 28, sm: 32 } }} />
                       )}
@@ -969,6 +1036,28 @@ export default function Header() {
                         <Typography variant="body2" color="text.secondary">
                           {user.email}
                         </Typography>
+                        {user.isAdmin && (
+                          <Box sx={{ mt: 0.5 }}>
+                            <Chip 
+                              label="Administrator" 
+                              size="small" 
+                              sx={{ 
+                                bgcolor: 'linear-gradient(135deg, #8D6E63, #A1887F)',
+                                background: 'linear-gradient(135deg, #8D6E63 0%, #A1887F 100%)',
+                                color: 'white',
+                                fontWeight: 700,
+                                fontSize: '0.65rem',
+                                letterSpacing: '0.5px',
+                                textTransform: 'uppercase',
+                                border: '1px solid rgba(141, 110, 99, 0.3)',
+                                boxShadow: '0 2px 4px rgba(141, 110, 99, 0.3)',
+                                '& .MuiChip-label': {
+                                  px: 1.5
+                                }
+                              }} 
+                            />
+                          </Box>
+                        )}
                       </Box>,
                       <Divider key="divider-1" />,
                       ...userMenuItems.map((item) => (

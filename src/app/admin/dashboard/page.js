@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
@@ -351,136 +351,139 @@ export default function AdminDashboard() {
   };
   
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AdminSidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          bgcolor: '#f5f5f5',
-          minHeight: '100vh',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-              <Typography color="text.primary">Dashboard</Typography>
-            </Breadcrumbs>
-          </Paper>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-            <Typography variant="h6" component="h1">
-              Admin Dashboard
-            </Typography>
-            <Button 
-              variant="contained" 
-              startIcon={<Add />}
-              component={Link}
-              href="/admin/products/new"
-              sx={{ 
-                bgcolor: '#8D6E63',
-                '&:hover': { bgcolor: '#6D4C41' },
-              }}
-            >
-              Add New Product
-            </Button>
-          </Box>
-          
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress sx={{ color: '#8D6E63' }} />
-            </Box>
-          ) : error ? (
-            <Alert severity="error" sx={{ mb: 4 }}>
-              {error}
-            </Alert>
-          ) : (
-            <>
-              {/* Stats Cards */}
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <StatCard 
-                    title="Total Sales" 
-                    value={`$${data.stats.totalSales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
-                    icon={<AttachMoney />} 
-                    color="success"
-                    percentChange={data.salesChange}
-                    changeType="increase"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <StatCard 
-                    title="Total Orders" 
-                    value={data.stats.totalOrders} 
-                    icon={<ShoppingBag />} 
-                    color="info"
-                    percentChange={data.ordersChange}
-                    changeType="increase"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <StatCard 
-                    title="Total Customers" 
-                    value={data.stats.totalCustomers} 
-                    icon={<People />} 
-                    color="warning"
-                    percentChange={data.customersChange}
-                    changeType="increase"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <StatCard 
-                    title="Total Products" 
-                    value={data.stats.totalProducts} 
-                    icon={<Inventory />} 
-                    color="error"
-                  />
-                </Grid>
-              </Grid>
-              
-              <Grid container spacing={4}>
-                {/* Main Content */}
-                <Grid item xs={12}>
-                  {/* Recent Orders */}
-                  <Paper sx={{ p: 3, mb: 4 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6" component="h2">
-                        Recent Orders
-                      </Typography>
-                      <Button 
-                        component={Link} 
-                        href="/admin/orders"
-                        size="small"
-                      >
-                        View All
-                      </Button>
-                    </Box>
-                    <RecentOrders orders={data.recentOrders} />
-                  </Paper>
-                  
-                  {/* Low Stock Products */}
-                  <Paper sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6" component="h2">
-                        Low Stock Products
-                      </Typography>
-                      <Button 
-                        component={Link} 
-                        href="/admin/products"
-                        size="small"
-                      >
-                        View All
-                      </Button>
-                    </Box>
-                    <LowStockProducts products={data.lowStockProducts} />
-                  </Paper>
-                </Grid>
-              </Grid>
-            </>
-          )}
-        </Container>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#2c3e50',
+            mb: 1,
+          }}
+        >
+          Dashboard Overview
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Monitor your store's performance and key metrics
+        </Typography>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+          <Button 
+            variant="contained" 
+            startIcon={<Add />}
+            component={Link}
+            href="/admin/products/new"
+            sx={{ 
+              bgcolor: '#2196f3',
+              '&:hover': { bgcolor: '#1976d2' },
+              boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)',
+            }}
+          >
+            Add New Product
+          </Button>
+        </Box>
       </Box>
-    </Box>
+      
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress sx={{ color: '#2196f3' }} size={48} />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+      ) : (
+        <>
+          {/* Stats Cards */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} lg={3}>
+              <StatCard 
+                title="Total Sales" 
+                value={`$${data.stats.totalSales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
+                icon={<AttachMoney />} 
+                color="success"
+                percentChange={data.salesChange}
+                changeType="increase"
+                isLoading={loading}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <StatCard 
+                title="Total Orders" 
+                value={data.stats.totalOrders} 
+                icon={<ShoppingBag />} 
+                color="info"
+                percentChange={data.ordersChange}
+                changeType="increase"
+                isLoading={loading}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <StatCard 
+                title="Total Customers" 
+                value={data.stats.totalCustomers} 
+                icon={<People />} 
+                color="warning"
+                percentChange={data.customersChange}
+                changeType="increase"
+                isLoading={loading}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <StatCard 
+                title="Total Products" 
+                value={data.stats.totalProducts} 
+                icon={<Inventory />} 
+                color="primary"
+                isLoading={loading}
+              />
+            </Grid>
+          </Grid>
+          
+          <Grid container spacing={4}>
+            {/* Recent Orders */}
+            <Grid item xs={12} lg={8}>
+              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                    Recent Orders
+                  </Typography>
+                  <Button 
+                    component={Link} 
+                    href="/admin/orders"
+                    size="small"
+                    variant="outlined"
+                  >
+                    View All
+                  </Button>
+                </Box>
+                <RecentOrders orders={data.recentOrders} isLoading={loading} />
+              </Paper>
+            </Grid>
+            
+            {/* Low Stock Products */}
+            <Grid item xs={12} lg={4}>
+              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                    Low Stock Alert
+                  </Typography>
+                  <Button 
+                    component={Link} 
+                    href="/admin/products"
+                    size="small"
+                    variant="outlined"
+                  >
+                    View All
+                  </Button>
+                </Box>
+                <LowStockProducts products={data.lowStockProducts} isLoading={loading} />
+              </Paper>
+            </Grid>
+          </Grid>
+        </>
+      )}
+    </Container>
   );
 }
