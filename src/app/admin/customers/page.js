@@ -32,6 +32,8 @@ import {
   Button,
   Snackbar,
   Grid,
+  Breadcrumbs,
+  Link as MuiLink,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -42,6 +44,9 @@ import {
   Clear as ClearIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to format date
 const formatDate = (dateString) => {
@@ -50,6 +55,7 @@ const formatDate = (dateString) => {
 };
 
 export default function CustomersPage() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,8 +137,19 @@ export default function CustomersPage() {
   }, [page, rowsPerPage, statusFilter, sortBy, sortOrder, searchQuery]);
 
   useEffect(() => {
-    fetchCustomers();
-  }, [fetchCustomers]);
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !user.isAdmin) {
+      router.push('/login');
+      return;
+    }
+
+    if (user && user.isAdmin) {
+      fetchCustomers();
+    }
+  }, [user, authLoading, router, fetchCustomers]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -177,89 +194,6 @@ export default function CustomersPage() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-
-  const handleConfirmAction = async () => {
-    if (!selectedCustomer) return;
-
-    try {
-      setLoading(true);
-      console.log('Performing action:', dialogAction, 'on customer:', selectedCustomer._id);
-      
-      let endpoint = '';
-      let method = 'PUT';
-      let successMessage = '';
-      
-      switch (dialogAction) {
-        case 'block':
-          endpoint = `/api/admin/customers/${selectedCustomer._id}/block`;
-          successMessage = `${selectedCustomer.name} has been blocked`;
-          break;
-        case 'unblock':
-          endpoint = `/api/admin/customers/${selectedCustomer._id}/unblock`;
-          successMessage = `${selectedCustomer.name} has been unblocked`;
-          break;
-        case 'delete':
-          endpoint = `/api/admin/customers/${selectedCustomer._id}`;
-          method = 'DELETE';
-          successMessage = `${selectedCustomer.name} has been deleted`;
-          break;
-        default:
-          throw new Error('Invalid action');
-      }
-      
-      console.log('Sending request to:', endpoint, 'with method:', method);
-      
-      if (method === 'DELETE') {
-        await axios.delete(endpoint);
-      } else {
-        await axios.put(endpoint);
-      }
-      
-      console.log('Action completed successfully');
-      
-      // Refresh customer list
-      await fetchCustomers();
-      
-      setSnackbar({
-        open: true,
-        message: successMessage,
-        severity: 'success',
-      });
-    } catch (err) {
-      console.error(`Error performing ${dialogAction} action:`, err);
-      setSnackbar({
-        open: true,
-        message: err.message || `Failed to ${dialogAction} customer`,
-        severity: 'error',
-      });
-    } finally {
-      setLoading(false);
-      handleCloseDialog();
-    }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            fontWeight: 700,
-            color: '#2c3e50',
-            mb: 1,
-          }}
-        >
-          Customers Management
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage customer accounts, orders, and support requests
-        </Typography>
-      </Box>
 
   const handleConfirmAction = async () => {
     if (!selectedCustomer) return;
@@ -435,121 +369,104 @@ export default function CustomersPage() {
 
             {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-      <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
 
-            {loading && !error ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <>
-                <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
-                  <Table>
-                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                      <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Registered</TableCell>
-                        <TableCell>Orders</TableCell>
-                        <TableCell>Total Spent</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell align="right">Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {customers && customers.length > 0 ? (
-                        customers.map((customer) => {
-                          console.log('Rendering customer:', customer);
-                          return (
-                            <TableRow key={customer._id || Math.random()}>
-                              <TableCell>{customer.name || 'Unknown'}</TableCell>
-                              <TableCell>{customer.email || 'No Email'}</TableCell>
-                              <TableCell>{customer.createdAt ? formatDate(customer.createdAt) : 'N/A'}</TableCell>
-                            <TableCell>
-                              <Chip 
-                                label={customer.orderCount || 0} 
-                                size="small" 
-                                sx={{ bgcolor: '#EFEBE9' }}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              {new Intl.NumberFormat('en-US', {
-                                style: 'currency',
-                                currency: 'USD',
-                              }).format(customer.totalSpent || 0)}
-                            </TableCell>
-                            <TableCell>
-                              <Chip
-                                label={customer.isBlocked ? 'Blocked' : 'Active'}
-                                size="small"
-                                sx={{
-                                  bgcolor: customer.isBlocked ? '#FFEBEE' : '#E8F5E9',
-                                  color: customer.isBlocked ? '#C62828' : '#2E7D32',
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell align="right">
-                              <IconButton
-                                color="primary"
-                                onClick={() => router.push(`/admin/customers/${customer._id}`)}
-                                size="small"
-                                title="View Details"
-                              >
-                                <ViewIcon fontSize="small" />
-                              </IconButton>
-                              {customer.isBlocked ? (
-                                <IconButton
-                                  color="success"
-                                  onClick={() => handleOpenDialog(customer, 'unblock')}
-                                  size="small"
-                                  title="Unblock Customer"
-                                >
-                                  <CheckCircleIcon fontSize="small" />
-                                </IconButton>
-                              ) : (
-                                <IconButton
-                                  color="warning"
-                                  onClick={() => handleOpenDialog(customer, 'block')}
-                                  size="small"
-                                  title="Block Customer"
-                                >
-                                  <BlockIcon fontSize="small" />
-                                </IconButton>
-                              )}
-                              <IconButton
-                                color="error"
-                                onClick={() => handleOpenDialog(customer, 'delete')}
-                                size="small"
-                                title="Delete Customer"
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
+              {loading && !error ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <>
+                  <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+                    <Table>
+                      <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                        <TableRow>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Registered</TableCell>
+                          <TableCell>Orders</TableCell>
+                          <TableCell>Total Spent</TableCell>
+                          <TableCell>Status</TableCell>
+                          <TableCell align="right">Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {customers && customers.length > 0 ? (
+                          customers.map((customer) => {
+                            console.log('Rendering customer:', customer);
+                            return (
+                              <TableRow key={customer._id || Math.random()}>
+                                <TableCell>{customer.name || 'Unknown'}</TableCell>
+                                <TableCell>{customer.email || 'No Email'}</TableCell>
+                                <TableCell>{customer.createdAt ? formatDate(customer.createdAt) : 'N/A'}</TableCell>
+                                <TableCell>
+                                  <Chip 
+                                    label={customer.orderCount || 0} 
+                                    size="small" 
+                                    sx={{ bgcolor: '#EFEBE9' }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  {new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD',
+                                  }).format(customer.totalSpent || 0)}
+                                </TableCell>
+                                <TableCell>
+                                  <Chip
+                                    label={customer.isBlocked ? 'Blocked' : 'Active'}
+                                    size="small"
+                                    color={customer.isBlocked ? 'error' : 'success'}
+                                  />
+                                </TableCell>
+                                <TableCell align="right">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => router.push(`/admin/customers/${customer._id}`)}
+                                  >
+                                    <ViewIcon />
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleOpenDialog(customer, customer.isBlocked ? 'unblock' : 'block')}
+                                  >
+                                    {customer.isBlocked ? <CheckCircleIcon /> : <BlockIcon />}
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleOpenDialog(customer, 'delete')}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={7} align="center">
+                              <Typography variant="body2" color="textSecondary">
+                                No customers found
+                              </Typography>
                             </TableCell>
                           </TableRow>
-                          );
-                        })
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} align="center">
-                            No customers found
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
 
-                <TablePagination
-                  component="div"
-                  count={totalCustomers}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25, 50]}
-                />
-              </>
-            )}
+                  <TablePagination
+                    component="div"
+                    count={totalCustomers}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                  />
+                </>
+              )}
+            </Paper>
           </Paper>
         </Container>
       </Box>
@@ -570,18 +487,11 @@ export default function CustomersPage() {
               <>Are you sure you want to unblock <strong>{selectedCustomer?.name}</strong>? They will regain full access to their account.</>  
             )}
             {dialogAction === 'delete' && (
-              <>
-                Are you sure you want to delete <strong>{selectedCustomer?.name}</strong>? This action cannot be undone.
-                {selectedCustomer?.orderCount > 0 && (
-                  <Typography color="error" sx={{ mt: 1 }}>
-                    Warning: This customer has {selectedCustomer.orderCount} orders. Deleting this customer may affect order history.
-                  </Typography>
-                )}
-              </>
+              <>Are you sure you want to delete <strong>{selectedCustomer?.name}</strong>? This action cannot be undone.</>
             )}
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button 
             onClick={handleConfirmAction} 

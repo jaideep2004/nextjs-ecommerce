@@ -587,6 +587,6 @@ export default function CategoriesPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </>
+    </Container>
   );
 }

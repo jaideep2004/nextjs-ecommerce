@@ -1137,5 +1137,6 @@ export default function ProductForm({ product, categories = [], isEdit = false }
           </Box>
         </Box>
       </form>
+    </Paper>
   );
 }
