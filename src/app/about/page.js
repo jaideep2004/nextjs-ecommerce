@@ -439,7 +439,7 @@ export default function AboutPage() {
 								There are many variations of passages of Lorem Ipsum available,
 								but the our majority have suffered alteration in some form, by
 								injected humour, or randomised words which don't look even
-								slightly believable you are going to.
+								slightly believable.
 							</Typography>
 
 							{/* Key Points with Images */}
