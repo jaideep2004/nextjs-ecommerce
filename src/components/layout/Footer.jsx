@@ -247,7 +247,7 @@ export default function Footer() {
           {/* Company Info */}
           <Grid item xs={12} sm={6} md={3} lg={2.4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'start' }, minWidth: { xs: 'auto', md: '250px' }, textAlign: { xs: 'center', md: 'left' } }}>
             <FooterTitle variant="h6">
-              Punjabi Attire
+              India Inspired
             </FooterTitle>
             <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.8, color: 'rgba(255, 255, 255, 1)', fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
               Discover authentic traditional Punjabi suits and turbans with<br/> premium quality and timeless designs from the UK.
@@ -525,7 +525,7 @@ export default function Footer() {
                   fontWeight: 500
                 }}
               >
-                © {currentYear} Punjabi Attire. All rights reserved.
+                © {currentYear} India Inspired. All rights reserved.
               </Typography>
               <Typography 
                 variant="caption" 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -10,13 +10,6 @@ import {
   Box,
   Grid,
   Paper,
-  Tabs,
-  Tab,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
   Button,
   TextField,
   CircularProgress,
@@ -29,20 +22,24 @@ import {
   TableHead,
   TableRow,
   Chip,
+  Card,
+  CardContent,
+  Divider,
 } from '@mui/material';
 import {
   Person,
   ShoppingBag,
-  Favorite,
   LocationOn,
   VpnKey,
   NavigateNext,
   Edit,
   Save,
   Cancel,
+  Add,
+  AttachMoney,
+  TrendingUp,
 } from '@mui/icons-material';
-import Avatar from '@mui/material/Avatar';
-import { Add } from '@mui/icons-material';
+import CustomerSidebar from '@/components/customer/CustomerSidebar';
 
 // Profile Information Component
 const ProfileInfo = ({ user, onUpdate }) => {
@@ -730,10 +727,54 @@ const RecentOrders = () => {
   );
 };
 
+// Dashboard Stat Card Component for Customer
+const CustomerStatCard = ({ title, value, icon, color, description }) => {
+  return (
+    <Card sx={{ height: '100%' }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              {title}
+            </Typography>
+            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
+              {value}
+            </Typography>
+            {description && (
+              <Typography variant="body2" color="text.secondary">
+                {description}
+              </Typography>
+            )}
+          </Box>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: '50%', 
+              bgcolor: `${color}.light`,
+              color: `${color}.main`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {icon}
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
 export default function CustomerDashboard() {
   const router = useRouter();
   const { user, loading: authLoading, logout, updateUserData } = useAuth();
-  const [tabValue, setTabValue] = useState(0);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [dashboardStats, setDashboardStats] = useState({
+    totalOrders: 0,
+    totalSpent: 0,
+    wishlistItems: 0,
+    pendingOrders: 0,
+  });
   
   // Redirect if user is not logged in
   useEffect(() => {
@@ -741,9 +782,50 @@ export default function CustomerDashboard() {
       router.push('/login?redirect=/customer/dashboard');
     }
   }, [user, authLoading, router]);
+
+  // Fetch dashboard stats
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      if (!user) return;
+      
+      try {
+        // Fetch user orders to calculate stats
+        const ordersRes = await fetch('/api/orders');
+        if (ordersRes.ok) {
+          const ordersData = await ordersRes.json();
+          const orders = ordersData.data?.orders || [];
+          
+          const totalSpent = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+          const pendingOrders = orders.filter(order => order.orderStatus === 'Pending').length;
+          
+          setDashboardStats({
+            totalOrders: orders.length,
+            totalSpent,
+            pendingOrders,
+            wishlistItems: 0, // We'll update this when we fetch wishlist
+          });
+        }
+        
+        // Fetch wishlist items count
+        const wishlistRes = await fetch('/api/wishlist');
+        if (wishlistRes.ok) {
+          const wishlistData = await wishlistRes.json();
+          const wishlistItems = wishlistData.data?.wishlist || [];
+          setDashboardStats(prev => ({
+            ...prev,
+            wishlistItems: wishlistItems.length,
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard stats:', err);
+      }
+    };
+    
+    fetchDashboardStats();
+  }, [user]);
   
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
   };
   
   if (authLoading) {
@@ -759,152 +841,189 @@ export default function CustomerDashboard() {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Breadcrumbs 
-        separator={<NavigateNext fontSize="small" />} 
-        aria-label="breadcrumb"
-        sx={{ mb: 3 }}
+    <Box sx={{ display: 'flex' }}>
+      <CustomerSidebar activeTab={activeTab} onTabChange={handleTabChange} />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          bgcolor: '#f5f5f5',
+          minHeight: '100vh',
+        }}
       >
-        <Link href="/" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            Home
-          </Typography>
-        </Link>
-        <Typography color="text.primary">My Account</Typography>
-      </Breadcrumbs>
-      
-      <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
-        My Account
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {/* Sidebar */}
-        <Grid item xs={12} md={3}>
-          <Paper sx={{ p: 2, mb: { xs: 3, md: 0 } }}>
-            <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Avatar sx={{ width: 80, height: 80, mx: 'auto', mb: 2, bgcolor: '#8D6E63' }}>
-                <Person fontSize="large" />
-              </Avatar>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {user.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {user.email}
-              </Typography>
-              <Button 
-                variant="outlined" 
-                size="small" 
-                onClick={logout}
-                fullWidth
-              >
-                Log Out
-              </Button>
-            </Box>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <List component="nav" sx={{ p: 0 }}>
-              <ListItem 
-                button 
-                selected={tabValue === 0}
-                onClick={() => setTabValue(0)}
-              >
-                <ListItemIcon>
-                  <Person />
-                </ListItemIcon>
-                <ListItemText primary="Profile" />
-              </ListItem>
-              
-              <ListItem 
-                button 
-                selected={tabValue === 1}
-                onClick={() => setTabValue(1)}
-              >
-                <ListItemIcon>
-                  <ShoppingBag />
-                </ListItemIcon>
-                <ListItemText primary="Orders" />
-              </ListItem>
-              
-              <ListItem 
-                button 
-                selected={tabValue === 2}
-                onClick={() => setTabValue(2)}
-              >
-                <ListItemIcon>
-                  <LocationOn />
-                </ListItemIcon>
-                <ListItemText primary="Addresses" />
-              </ListItem>
-              
-              <ListItem 
-                button 
-                selected={tabValue === 3}
-                onClick={() => setTabValue(3)}
-              >
-                <ListItemIcon>
-                  <VpnKey />
-                </ListItemIcon>
-                <ListItemText primary="Password" />
-              </ListItem>
-              
-              <ListItem 
-                button 
-                component={Link}
-                href="/customer/wishlist"
-              >
-                <ListItemIcon>
-                  <Favorite />
-                </ListItemIcon>
-                <ListItemText primary="Wishlist" />
-              </ListItem>
-            </List>
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+          <Paper sx={{ p: 2, mb: 3 }}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+              <Link href="/" passHref>
+                <Typography 
+                  color="inherit" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' },
+                    cursor: 'pointer',
+                  }}
+                >
+                  Home
+                </Typography>
+              </Link>
+              <Typography color="text.primary">My Account</Typography>
+            </Breadcrumbs>
           </Paper>
-        </Grid>
-        
-        {/* Main Content */}
-        <Grid item xs={12} md={9}>
-          <Paper sx={{ p: 3 }}>
-            {/* Mobile Tabs */}
-            <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 3 }}>
-              <Tabs 
-                value={tabValue} 
-                onChange={handleTabChange} 
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{ 
-                  borderBottom: 1, 
-                  borderColor: 'divider',
-                  '& .Mui-selected': { color: '#8D6E63' },
-                  '& .MuiTabs-indicator': { backgroundColor: '#8D6E63' },
-                }}
-              >
-                <Tab label="Profile" />
-                <Tab label="Orders" />
-                <Tab label="Addresses" />
-                <Tab label="Password" />
-              </Tabs>
+
+          {/* Dashboard Overview - only show for profile tab */}
+          {activeTab === 'profile' && (
+            <>
+              {/* Page Header */}
+              <Box sx={{ mb: 4 }}>
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    fontWeight: 700,
+                    color: '#2c3e50',
+                    mb: 1,
+                  }}
+                >
+                  Welcome back, {user?.name?.split(' ')[0] || 'Customer'}!
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Manage your account, orders, and preferences
+                </Typography>
+              </Box>
+
+              {/* Stats Cards */}
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} lg={3} style={{minWidth: '240px'}}>
+                  <CustomerStatCard 
+                    title="Total Orders" 
+                    value={dashboardStats.totalOrders} 
+                    icon={<ShoppingBag />} 
+                    color="info"
+                    description="Lifetime orders"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} lg={3} style={{minWidth: '240px'}}>
+                  <CustomerStatCard 
+                    title="Total Spent" 
+                    value={`$${dashboardStats.totalSpent.toFixed(2)}`} 
+                    icon={<AttachMoney />} 
+                    color="success"
+                    description="Lifetime spending"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} lg={3} style={{minWidth: '240px'}}>
+                  <CustomerStatCard 
+                    title="Pending Orders" 
+                    value={dashboardStats.pendingOrders} 
+                    icon={<TrendingUp />} 
+                    color="warning"
+                    description="Awaiting processing"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} lg={3} style={{minWidth: '240px'}}>
+                  <CustomerStatCard 
+                    title="Wishlist Items" 
+                    value={dashboardStats.wishlistItems} 
+                    icon={<Person />} 
+                    color="primary"
+                    description="Saved for later"
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={4}>
+                {/* Quick Actions */}
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50', mb: 3 }}>
+                      Quick Actions
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<ShoppingBag />}
+                        onClick={() => handleTabChange('orders')}
+                        sx={{ justifyContent: 'flex-start' }}
+                      >
+                        View My Orders
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<LocationOn />}
+                        onClick={() => handleTabChange('addresses')}
+                        sx={{ justifyContent: 'flex-start' }}
+                      >
+                        Manage Addresses
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<VpnKey />}
+                        onClick={() => handleTabChange('password')}
+                        sx={{ justifyContent: 'flex-start' }}
+                      >
+                        Change Password
+                      </Button>
+                      <Button 
+                        variant="contained" 
+                        fullWidth 
+                        component={Link}
+                        href="/products"
+                        sx={{ 
+                          bgcolor: '#2196f3',
+                          '&:hover': { bgcolor: '#1976d2' },
+                        }}
+                      >
+                        Continue Shopping
+                      </Button>
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Recent Orders Summary */}
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                        Recent Orders
+                      </Typography>
+                      <Button 
+                        onClick={() => handleTabChange('orders')}
+                        size="small"
+                        variant="outlined"
+                      >
+                        View All
+                      </Button>
+                    </Box>
+                    <RecentOrders />
+                  </Paper>
+                </Grid>
+              </Grid>
+            </>
+          )}
+
+          {/* Tab Content - Only show for non-profile tabs */}
+          {activeTab !== 'profile' && (
+            <Box sx={{ mt: 4 }}>
+              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                {activeTab === 'orders' && (
+                  <RecentOrders /> 
+                )}
+                
+                {activeTab === 'addresses' && (
+                  <AddressInfo user={user} onUpdate={updateUserData} />
+                )}
+                
+                {activeTab === 'password' && (
+                  <PasswordChange />
+                )}
+              </Paper>
             </Box>
-            
-            {/* Tab Content */}
-            {tabValue === 0 && (
-              <ProfileInfo user={user} onUpdate={updateUserData} />
-            )}
-            
-            {tabValue === 1 && (
-              <RecentOrders />
-            )}
-            
-            {tabValue === 2 && (
-              <AddressInfo user={user} onUpdate={updateUserData} />
-            )}
-            
-            {tabValue === 3 && (
-              <PasswordChange />
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+          )}
+        </Container>
+      </Box>
+    </Box>
   );
 }

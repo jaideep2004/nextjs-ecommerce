@@ -252,8 +252,20 @@ export default function CategoryPage() {
     const fetchWishlist = async () => {
       if (user) {
         try {
-          const res = await axios.get('/api/wishlist');
-          const items = res.data.wishlist || [];
+          // Get authentication token from cookies
+          const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('token='))
+            ?.split('=')[1];
+          
+          // Set up headers with authentication token
+          const headers = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const res = await axios.get('/api/wishlist', { headers });
+          const items = res.data.data?.wishlist || res.data.wishlist || [];
           setWishlistItems(items.map(item => item.product || { _id: item.productId }));
         } catch (error) {
           console.error('Error fetching wishlist:', error);
@@ -276,19 +288,49 @@ export default function CategoryPage() {
     }
     
     try {
-      await axios.post('/api/wishlist', { productId: product._id });
+      // Get authentication token from cookies
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+      
+      // Set up headers with authentication token
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      await axios.post('/api/wishlist', { productId: product._id }, { headers });
       setWishlistItems(prev => [...prev, product]);
     } catch (error) {
       console.error('Add to wishlist failed:', error);
+      if (error.response?.status === 401) {
+        router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      }
     }
   };
   
   const handleRemoveFromWishlist = async (productId) => {
     try {
-      await axios.delete(`/api/wishlist/${productId}`);
+      // Get authentication token from cookies
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+      
+      // Set up headers with authentication token
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      await axios.delete(`/api/wishlist/${productId}`, { headers });
       setWishlistItems(prev => prev.filter(item => item._id !== productId));
     } catch (error) {
       console.error('Remove from wishlist failed:', error);
+      if (error.response?.status === 401) {
+        router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      }
     }
   };
   

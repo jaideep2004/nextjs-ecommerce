@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -28,6 +28,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { NavigateNext, ArrowBack } from '@mui/icons-material';
+import CustomerSidebar from '@/components/customer/CustomerSidebar';
 
 export default function CustomerOrders() {
   const router = useRouter();
@@ -138,187 +139,215 @@ export default function CustomerOrders() {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Breadcrumbs 
-        separator={<NavigateNext fontSize="small" />} 
-        aria-label="breadcrumb"
-        sx={{ mb: 3 }}
+    <Box sx={{ display: 'flex' }}>
+      <CustomerSidebar activeTab="orders" />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          bgcolor: '#f5f5f5',
+          minHeight: '100vh',
+        }}
       >
-        <Link href="/" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            Home
-          </Typography>
-        </Link>
-        <Link href="/customer/dashboard" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-            My Account
-          </Typography>
-        </Link>
-        <Typography color="text.primary">My Orders</Typography>
-      </Breadcrumbs>
-      
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <Button 
-          component={Link} 
-          href="/customer/dashboard"
-          startIcon={<ArrowBack />}
-          sx={{ mr: 2 }}
-        >
-          Back to Dashboard
-        </Button>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          My Orders
-        </Typography>
-      </Box>
-      
-      <Paper sx={{ p: 3, mb: 4 }}>
-        {/* Filters */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel id="status-filter-label">Status</InputLabel>
-            <Select
-              labelId="status-filter-label"
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              label="Status"
-              size="small"
-            >
-              <MenuItem value="all">All Orders</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Processing">Processing</MenuItem>
-              <MenuItem value="Shipped">Shipped</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
-              <MenuItem value="Cancelled">Cancelled</MenuItem>
-            </Select>
-          </FormControl>
-          
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel id="sort-by-label">Sort By</InputLabel>
-            <Select
-              labelId="sort-by-label"
-              value={sortBy}
-              onChange={handleSortChange}
-              label="Sort By"
-              size="small"
-            >
-              <MenuItem value="newest">Newest First</MenuItem>
-              <MenuItem value="oldest">Oldest First</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-        
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress sx={{ color: '#8D6E63' }} />
-          </Box>
-        ) : error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : orders.length === 0 ? (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              {statusFilter === 'all' 
-                ? "You haven't placed any orders yet." 
-                : `You don't have any ${statusFilter.toLowerCase()} orders.`}
-            </Typography>
-            {statusFilter !== 'all' ? (
-              <Button 
-                onClick={() => setStatusFilter('all')}
-                variant="outlined"
-                sx={{ mr: 2 }}
-              >
-                View All Orders
-              </Button>
-            ) : null}
-            <Button 
-              component={Link} 
-              href="/products" 
-              variant="contained"
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+          <Paper sx={{ p: 2, mb: 3 }}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+              <Link href="/" passHref>
+                <Typography 
+                  color="inherit" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' },
+                    cursor: 'pointer',
+                  }}
+                >
+                  Home
+                </Typography>
+              </Link>
+              <Link href="/customer/dashboard" passHref>
+                <Typography 
+                  color="inherit" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' },
+                    cursor: 'pointer',
+                  }}
+                >
+                  My Account
+                </Typography>
+              </Link>
+              <Typography color="text.primary">My Orders</Typography>
+            </Breadcrumbs>
+          </Paper>
+
+          {/* Page Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography 
+              variant="h4" 
               sx={{ 
-                bgcolor: '#8D6E63',
-                '&:hover': { bgcolor: '#6D4C41' },
+                fontWeight: 700,
+                color: '#2c3e50',
+                mb: 1,
               }}
             >
-              Start Shopping
-            </Button>
+              My Orders
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              View and track all your orders
+            </Typography>
           </Box>
-        ) : (
-          <>
-            <TableContainer>
-              <Table>
-                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                  <TableRow>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Items</TableCell>
-                    <TableCell align="right">Total</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="right">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order._id}>
-                      <TableCell component="th" scope="row">
-                        #{order._id && order._id.substring(0, 8)}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {order.orderItems && order.orderItems.length ? 
-                          `${order.orderItems.length} ${order.orderItems.length === 1 ? 'item' : 'items'}` : 
-                          '0 items'}
-                      </TableCell>
-                      <TableCell align="right">
-                        ${order.totalPrice.toFixed(2)}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip 
-                          label={order.orderStatus} 
-                          color={getStatusColor(order.orderStatus)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button 
-                          component={Link} 
-                          href={`/customer/orders/${order._id}`}
-                          size="small"
-                          variant="outlined"
-                          sx={{ 
-                            borderColor: '#8D6E63',
-                            color: '#8D6E63',
-                            '&:hover': { borderColor: '#6D4C41', color: '#6D4C41' },
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+
+          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+            {/* Filters */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel id="status-filter-label">Status</InputLabel>
+                <Select
+                  labelId="status-filter-label"
+                  value={statusFilter}
+                  onChange={handleStatusFilterChange}
+                  label="Status"
+                  size="small"
+                >
+                  <MenuItem value="all">All Orders</MenuItem>
+                  <MenuItem value="Pending">Pending</MenuItem>
+                  <MenuItem value="Processing">Processing</MenuItem>
+                  <MenuItem value="Shipped">Shipped</MenuItem>
+                  <MenuItem value="Delivered">Delivered</MenuItem>
+                  <MenuItem value="Cancelled">Cancelled</MenuItem>
+                </Select>
+              </FormControl>
+              
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel id="sort-by-label">Sort By</InputLabel>
+                <Select
+                  labelId="sort-by-label"
+                  value={sortBy}
+                  onChange={handleSortChange}
+                  label="Sort By"
+                  size="small"
+                >
+                  <MenuItem value="newest">Newest First</MenuItem>
+                  <MenuItem value="oldest">Oldest First</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
             
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', pt: 3 }}>
-                <Pagination 
-                  count={totalPages} 
-                  page={page} 
-                  onChange={handlePageChange} 
-                  color="primary"
-                  sx={{ 
-                    '& .MuiPaginationItem-root.Mui-selected': { bgcolor: '#8D6E63' },
-                  }}
-                />
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress sx={{ color: '#2196f3' }} />
               </Box>
+            ) : error ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            ) : orders.length === 0 ? (
+              <Box sx={{ py: 4, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                  {statusFilter === 'all' 
+                    ? "You haven't placed any orders yet." 
+                    : `You don't have any ${statusFilter.toLowerCase()} orders.`}
+                </Typography>
+                {statusFilter !== 'all' ? (
+                  <Button 
+                    onClick={() => setStatusFilter('all')}
+                    variant="outlined"
+                    sx={{ mr: 2 }}
+                  >
+                    View All Orders
+                  </Button>
+                ) : null}
+                <Button 
+                  component={Link} 
+                  href="/products" 
+                  variant="contained"
+                  sx={{ 
+                    bgcolor: '#2196f3',
+                    '&:hover': { bgcolor: '#1976d2' },
+                  }}
+                >
+                  Start Shopping
+                </Button>
+              </Box>
+            ) : (
+              <>
+                <TableContainer>
+                  <Table>
+                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                      <TableRow>
+                        <TableCell>Order ID</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Items</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                        <TableCell align="center">Status</TableCell>
+                        <TableCell align="right">Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {orders.map((order) => (
+                        <TableRow key={order._id}>
+                          <TableCell component="th" scope="row">
+                            #{order._id && order._id.substring(0, 8)}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            {order.orderItems && order.orderItems.length ? 
+                              `${order.orderItems.length} ${order.orderItems.length === 1 ? 'item' : 'items'}` : 
+                              '0 items'}
+                          </TableCell>
+                          <TableCell align="right">
+                            ${order.totalPrice.toFixed(2)}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip 
+                              label={order.orderStatus} 
+                              color={getStatusColor(order.orderStatus)}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <Button 
+                              component={Link} 
+                              href={`/customer/orders/${order._id}`}
+                              size="small"
+                              variant="outlined"
+                              sx={{ 
+                                borderColor: '#2196f3',
+                                color: '#2196f3',
+                                '&:hover': { borderColor: '#1976d2', color: '#1976d2' },
+                              }}
+                            >
+                              View Details
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', pt: 3 }}>
+                    <Pagination 
+                      count={totalPages} 
+                      page={page} 
+                      onChange={handlePageChange} 
+                      color="primary"
+                      sx={{ 
+                        '& .MuiPaginationItem-root.Mui-selected': { bgcolor: '#2196f3' },
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
             )}
-          </>
-        )}
-      </Paper>
-    </Container>
+          </Paper>
+        </Container>
+      </Box>
+    </Box>
   );
 }

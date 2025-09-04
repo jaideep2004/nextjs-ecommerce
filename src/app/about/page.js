@@ -244,9 +244,9 @@ export default function AboutPage() {
 						flexWrap: { xs: "wrap", md: "nowrap" },
 						flexDirection: { xs: "column-reverse", md: "row" },
 					}}
-					style={{ padding: { xs: "20px 0px", md: "30px 0px" } }}>
+					style={{ padding: { xs: "30px 0px", md: "30px 0px" } }}>
 					{/* Left Side - Images Section */}
-					<Grid item xs={12} md={6} sx={{ minWidth: { md: "550px" } }}>
+					<Grid item xs={12} md={6} sx={{ minWidth: { md: "550px" } }} style={{paddingBottom: { xs: "20px", md: "0px" }}}>
 						<Box
 							sx={{
 								position: "relative",
@@ -518,7 +518,7 @@ export default function AboutPage() {
 							</Box>
 
 							{/* CEO Testimonial Card */}
-							<Paper
+							{/* <Paper
 								sx={{
 									mt: 4,
 									p: { xs: 2, md: 3 },
@@ -578,7 +578,7 @@ export default function AboutPage() {
 										</Typography>
 									</Box>
 								</Box>
-							</Paper>
+							</Paper> */}
 						</Box>
 					</Grid>
 				</Grid>

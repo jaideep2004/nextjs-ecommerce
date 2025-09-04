@@ -46,12 +46,41 @@ import {
 } from '@mui/icons-material';
 
 // Step components
-const ShippingForm = ({ formData, setFormData, user }) => {
-  // Countries list (simplified)
-  const countries = ['United States', 'Canada', 'United Kingdom', 'Australia', 'India'];
+const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
+  // Countries with their states
+  const countriesWithStates = {
+    'United States': [
+      'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 
+      'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 
+      'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 
+      'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 
+      'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 
+      'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 
+      'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+    ],
+    'Canada': [
+      'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador',
+      'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island',
+      'Quebec', 'Saskatchewan', 'Yukon'
+    ],
+    'United Kingdom': [
+      'England', 'Scotland', 'Wales', 'Northern Ireland'
+    ],
+    'Australia': [
+      'Australian Capital Territory', 'New South Wales', 'Northern Territory', 'Queensland',
+      'South Australia', 'Tasmania', 'Victoria', 'Western Australia'
+    ],
+    'India': [
+      'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
+      'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+      'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+      'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
+      'Uttarakhand', 'West Bengal'
+    ]
+  };
   
-  // States list (simplified for US)
-  const states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+  const countries = Object.keys(countriesWithStates);
+  const availableStates = countriesWithStates[formData.country] || [];
   
   // Pre-fill form with user data if available
   useEffect(() => {
@@ -72,14 +101,92 @@ const ShippingForm = ({ formData, setFormData, user }) => {
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear state when country changes
+    if (name === 'country') {
+      setFormData(prev => ({ ...prev, [name]: value, state: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    
+    // Clear errors for the field being edited
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+  
+  const validateField = (name, value) => {
+    let error = '';
+    
+    switch (name) {
+      case 'fullName':
+        if (!value.trim()) error = 'Full name is required';
+        else if (value.trim().length < 2) error = 'Full name must be at least 2 characters';
+        break;
+      case 'email':
+        if (!value.trim()) error = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email address';
+        break;
+      case 'phone':
+        if (!value.trim()) error = 'Phone number is required';
+        else if (!/^[\d\s()+-]{10,15}$/.test(value.replace(/[\s()-]/g, ''))) error = 'Please enter a valid phone number';
+        break;
+      case 'address':
+        if (!value.trim()) error = 'Address is required';
+        else if (value.trim().length < 5) error = 'Please enter a complete address';
+        break;
+      case 'city':
+        if (!value.trim()) error = 'City is required';
+        break;
+      case 'state':
+        if (!value.trim()) error = 'State/Province is required';
+        break;
+      case 'zipCode':
+        if (!value.trim()) error = 'ZIP/Postal code is required';
+        else if (formData.country === 'United States' && !/^\d{5}(-\d{4})?$/.test(value)) {
+          error = 'Please enter a valid US ZIP code';
+        } else if (formData.country === 'Canada' && !/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/.test(value)) {
+          error = 'Please enter a valid Canadian postal code (e.g., A1A 1A1)';
+        }
+        break;
+      case 'country':
+        if (!value.trim()) error = 'Country is required';
+        break;
+    }
+    
+    return error;
+  };
+  
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    setErrors(prev => ({ ...prev, [name]: error }));
   };
   
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Shipping Address
-      </Typography>
+    <Box sx={{ 
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+      p: 4,
+      borderRadius: 3,
+      border: '1px solid #e0e0e0',
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Box sx={{
+          width: 50,
+          height: 50,
+          borderRadius: 2,
+          background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mr: 2,
+        }}>
+          <LocalShipping sx={{ color: 'white', fontSize: 24 }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+          Shipping Address
+        </Typography>
+      </Box>
       
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -90,6 +197,24 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.fullName}
+            helperText={errors.fullName}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
@@ -102,6 +227,24 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             type="email"
             value={formData.email}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.email}
+            helperText={errors.email}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
@@ -113,6 +256,24 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.phone}
+            helperText={errors.phone}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
@@ -124,6 +285,24 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             name="address"
             value={formData.address}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.address}
+            helperText={errors.address}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
@@ -135,25 +314,74 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             name="city"
             value={formData.city}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.city}
+            helperText={errors.city}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel id="state-select-label">State</InputLabel>
+          <FormControl fullWidth required error={!!errors.state} style={{minWidth: '155px'}}>
+            <InputLabel 
+              id="state-select-label"
+              sx={{
+                '&.Mui-focused': {
+                  color: '#a29278',
+                },
+              }}
+            >
+              State/Province
+            </InputLabel>
             <Select
               labelId="state-select-label"
               name="state"
               value={formData.state}
-              label="State"
+              label="State/Province"
               onChange={handleChange}
+              onBlur={handleBlur}
+              disabled={!availableStates.length}
+              sx={{
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              }}
             >
-              {states.map((state) => (
+              {availableStates.map((state) => (
                 <MenuItem key={state} value={state}>
                   {state}
                 </MenuItem>
               ))}
             </Select>
+            {errors.state && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                {errors.state}
+              </Typography>
+            )}
+            {!availableStates.length && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                Please select a country first
+              </Typography>
+            )}
           </FormControl>
         </Grid>
         
@@ -165,18 +393,56 @@ const ShippingForm = ({ formData, setFormData, user }) => {
             name="zipCode"
             value={formData.zipCode}
             onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!errors.zipCode}
+            helperText={errors.zipCode || (formData.country === 'Canada' ? 'Format: A1A 1A1' : formData.country === 'United States' ? 'Format: 12345 or 12345-6789' : '')}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#a29278',
+              },
+            }}
           />
         </Grid>
         
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel id="country-select-label">Country</InputLabel>
+          <FormControl fullWidth required error={!!errors.country}>
+            <InputLabel 
+              id="country-select-label"
+              sx={{
+                '&.Mui-focused': {
+                  color: '#a29278',
+                },
+              }}
+            >
+              Country
+            </InputLabel>
             <Select
               labelId="country-select-label"
               name="country"
               value={formData.country}
               label="Country"
               onChange={handleChange}
+              onBlur={handleBlur}
+              sx={{
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#a29278',
+                    borderWidth: 2,
+                  },
+                },
+              }}
             >
               {countries.map((country) => (
                 <MenuItem key={country} value={country}>
@@ -184,21 +450,42 @@ const ShippingForm = ({ formData, setFormData, user }) => {
                 </MenuItem>
               ))}
             </Select>
+            {errors.country && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                {errors.country}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
         
         <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Checkbox 
-                color="primary" 
-                name="saveAddress" 
-                checked={formData.saveAddress}
-                onChange={(e) => setFormData(prev => ({ ...prev, saveAddress: e.target.checked }))}
-              />
-            }
-            label="Save this address for future orders"
-          />
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: 'rgba(162, 146, 120, 0.1)',
+            borderRadius: 2,
+            border: '1px solid rgba(162, 146, 120, 0.3)',
+          }}>
+            <FormControlLabel
+              control={
+                <Checkbox 
+                  sx={{
+                    color: '#a29278',
+                    '&.Mui-checked': {
+                      color: '#a29278',
+                    },
+                  }}
+                  name="saveAddress" 
+                  checked={formData.saveAddress}
+                  onChange={(e) => setFormData(prev => ({ ...prev, saveAddress: e.target.checked }))}
+                />
+              }
+              label={
+                <Typography sx={{ fontWeight: 500, color: '#2c3e50' }}>
+                  Save this address for future orders
+                </Typography>
+              }
+            />
+          </Box>
         </Grid>
       </Grid>
     </Box>
@@ -212,10 +499,29 @@ const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, on
   };
   
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Payment Method
-      </Typography>
+    <Box sx={{ 
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100)',
+      p: 4,
+      borderRadius: 3,
+      border: '1px solid #e0e0e0',
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Box sx={{
+          width: 50,
+          height: 50,
+          borderRadius: 2,
+          background: 'linear-gradient(135deg, #2c3e50, #34495e)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mr: 2,
+        }}>
+          <Payment sx={{ color: 'white', fontSize: 24 }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+          Payment Method
+        </Typography>
+      </Box>
       
       <FormControl component="fieldset" sx={{ width: '100%' }}>
         <RadioGroup
@@ -223,13 +529,22 @@ const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, on
           value={formData.paymentMethod}
           onChange={handleChange}
         >
-          <Paper sx={{ mb: 2, p: 2 }}>
+          <Paper sx={{ 
+            mb: 3, 
+            p: 3,
+            borderRadius: 2,
+            border: formData.paymentMethod === 'paypal' ? '2px solid #a29278' : '1px solid #e0e0e0',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+            },
+          }}>
             <FormControlLabel 
               value="paypal" 
-              control={<Radio />} 
+              control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography sx={{ mr: 2 }}>PayPal</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 600 }}>PayPal</Typography>
                   <Image 
                     src="/images/paypal-logo.png" 
                     alt="PayPal" 
@@ -240,8 +555,8 @@ const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, on
               } 
             />
             {formData.paymentMethod === 'paypal' && (
-              <Box sx={{ mt: 2, ml: 4 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              <Box sx={{ mt: 3, ml: 4 }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
                   Complete your payment securely with PayPal below:
                 </Typography>
                 {/* Only show PayPal button if we have valid shipping data */}
@@ -255,7 +570,7 @@ const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, on
                     onError={onPayPalError}
                   />
                 ) : (
-                  <Alert severity="info" sx={{ mt: 1 }}>
+                  <Alert severity="info" sx={{ mt: 1, borderRadius: 2 }}>
                     Please complete shipping information first, then return to this step to pay with PayPal.
                   </Alert>
                 )}
@@ -263,36 +578,34 @@ const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, on
             )}
           </Paper>
           
-          <Paper sx={{ mb: 2, p: 2 }}>
-            <FormControlLabel 
-              value="stripe" 
-              control={<Radio />} 
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography sx={{ mr: 2 }}>Credit Card</Typography>
-                  <Image 
-                    src="/images/credit-cards.png" 
-                    alt="Credit Cards" 
-                    width={120} 
-                    height={30} 
-                  />
-                </Box>
-              } 
-            />
-          </Paper>
-          
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ 
+            p: 3,
+            borderRadius: 2,
+            border: formData.paymentMethod === 'cod' ? '2px solid #a29278' : '1px solid #e0e0e0',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+            },
+          }}>
             <FormControlLabel 
               value="cod" 
-              control={<Radio />} 
-              label="Cash on Delivery" 
+              control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
+              label={<Typography sx={{ fontWeight: 600 }}>Cash on Delivery</Typography>} 
             />
           </Paper>
         </RadioGroup>
       </FormControl>
       
       {formData.paymentMethod === 'stripe' && (
-        <Alert severity="info" sx={{ mt: 2 }}>
+        <Alert 
+          severity="info" 
+          sx={{ 
+            mt: 3,
+            borderRadius: 2,
+            bgcolor: '#e3f2fd',
+            border: '1px solid #bbdefb',
+          }}
+        >
           Credit card payment will be processed securely on the next step.
         </Alert>
       )}
@@ -391,7 +704,6 @@ const ReviewOrder = ({ formData, cart, cartTotal, shippingCost, taxAmount, final
       
       <Typography gutterBottom>
         {formData.paymentMethod === 'paypal' && 'PayPal'}
-        {formData.paymentMethod === 'stripe' && 'Credit Card'}
         {formData.paymentMethod === 'cod' && 'Cash on Delivery'}
       </Typography>
     </Box>
@@ -414,6 +726,8 @@ export default function CheckoutPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   // State for PayPal client ID
   const [paypalClientId, setPaypalClientId] = useState('test');
+  // Form validation errors
+  const [errors, setErrors] = useState({});
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -495,6 +809,10 @@ export default function CheckoutPage() {
   
   // Handle next step
   const handleNext = () => {
+    if (!validateStep()) {
+      return;
+    }
+    
     if (activeStep === steps.length - 1) {
       handlePlaceOrder();
     } else {
@@ -509,27 +827,41 @@ export default function CheckoutPage() {
   
   // Validate current step
   const validateStep = () => {
+    const newErrors = {};
+    
     if (activeStep === 0) {
       // Validate shipping form
       const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'zipCode', 'country'];
+      
       for (const field of requiredFields) {
-        if (!formData[field]) {
-          setError(`Please fill in all required fields`);
-          return false;
+        if (!formData[field] || !formData[field].toString().trim()) {
+          newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
         }
       }
       
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        setError('Please enter a valid email address');
-        return false;
+      // Email validation
+      if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
       }
       
-      // Basic phone validation
-      const phoneRegex = /^\d{10,15}$/;
-      if (!phoneRegex.test(formData.phone.replace(/[\s()-]/g, ''))) {
-        setError('Please enter a valid phone number');
+      // Phone validation
+      if (formData.phone && !/^[\d\s()+-]{10,15}$/.test(formData.phone.replace(/[\s()-]/g, ''))) {
+        newErrors.phone = 'Please enter a valid phone number';
+      }
+      
+      // ZIP code validation based on country
+      if (formData.zipCode) {
+        if (formData.country === 'United States' && !/^\d{5}(-\d{4})?$/.test(formData.zipCode)) {
+          newErrors.zipCode = 'Please enter a valid US ZIP code';
+        } else if (formData.country === 'Canada' && !/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/.test(formData.zipCode)) {
+          newErrors.zipCode = 'Please enter a valid Canadian postal code (e.g., A1A 1A1)';
+        }
+      }
+      
+      setErrors(newErrors);
+      
+      if (Object.keys(newErrors).length > 0) {
+        setError('Please fill in all required fields correctly');
         return false;
       }
     } else if (activeStep === 1) {
@@ -629,7 +961,7 @@ export default function CheckoutPage() {
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-        return <ShippingForm formData={formData} setFormData={setFormData} user={user} />;
+        return <ShippingForm formData={formData} setFormData={setFormData} user={user} errors={errors} setErrors={setErrors} />;
       case 1:
         return (
           <PaymentForm 
@@ -677,31 +1009,115 @@ export default function CheckoutPage() {
 
   return (
     <PayPalScriptProvider options={{ "client-id": paypalClientId }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Breadcrumbs 
-          separator={<NavigateNext fontSize="small" />} 
-          aria-label="breadcrumb"
-          sx={{ mb: 3 }}
-        >
-          <Link href="/" passHref>
-            <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-              Home
-            </Typography>
-          </Link>
-          <Link href="/cart" passHref>
-            <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-              Cart
-            </Typography>
-          </Link>
-          <Typography color="text.primary">Checkout</Typography>
-        </Breadcrumbs>
-        
-        <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
-          Checkout
-        </Typography>
+      <Box sx={{ 
+        minHeight: '100vh',
+        bgcolor: '#f8f9fa',
+      }}>
+        {/* Hero Header */}
+        <Box sx={{ 
+          background: 'linear-gradient(135deg, #a29278 0%, #8b7d65 100%)',
+          py: 4,
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <Box sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
+          }} />
+          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+            <Breadcrumbs 
+              separator={<NavigateNext fontSize="small" />} 
+              aria-label="breadcrumb"
+              sx={{ mb: 3 }}
+            >
+              <Link href="/" passHref>
+                <Typography color="white" sx={{ 
+                  '&:hover': { textDecoration: 'underline' },
+                  opacity: 0.9,
+                  fontWeight: 500,
+                }}>
+                  Home
+                </Typography>
+              </Link>
+              <Link href="/cart" passHref>
+                <Typography color="white" sx={{ 
+                  '&:hover': { textDecoration: 'underline' },
+                  opacity: 0.9,
+                  fontWeight: 500,
+                }}>
+                  Cart
+                </Typography>
+              </Link>
+              <Typography color="white" sx={{ fontWeight: 600 }}>Checkout</Typography>
+            </Breadcrumbs>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 60,
+                height: 60,
+                borderRadius: 2,
+                background: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <Payment sx={{ fontSize: 30, color: 'white' }} />
+              </Box>
+              <Box>
+                <Typography variant="h3" component="h1" sx={{ 
+                  fontWeight: 800, 
+                  color: 'white',
+                  mb: 1,
+                  textShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                }}>
+                  Secure Checkout
+                </Typography>
+                <Typography variant="h6" sx={{ 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontWeight: 500,
+                }}>
+                  Complete your order safely and securely
+                </Typography>
+              </Box>
+            </Box>
+          </Container>
+        </Box>
+
+        <Container maxWidth="lg" sx={{ py: 4 }}>
       
-      <Paper sx={{ p: { xs: 2, md: 4 } }}>
-        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        <Paper sx={{ 
+          p: { xs: 2, md: 4 },
+          borderRadius: 3,
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+          border: '1px solid #e0e0e0',
+        }}>
+        <Stepper 
+          activeStep={activeStep} 
+          sx={{ 
+            mb: 4,
+            '& .MuiStepLabel-root .Mui-completed': {
+              color: '#a29278',
+            },
+            '& .MuiStepLabel-root .Mui-active': {
+              color: '#a29278',
+            },
+            '& .MuiStep-root': {
+              '& .MuiStepIcon-root': {
+                '&.Mui-completed': {
+                  color: '#a29278',
+                },
+                '&.Mui-active': {
+                  color: '#a29278',
+                },
+              },
+            },
+          }}
+        >
           {steps.map((label) => {
             const stepProps = {};
             const labelProps = {};
@@ -716,37 +1132,74 @@ export default function CheckoutPage() {
         
         {activeStep === steps.length ? (
           // Order complete
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <CheckCircle sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
-            <Typography variant="h5" gutterBottom>
+          <Box sx={{ textAlign: 'center', py: 6 }}>
+            <Box sx={{
+              width: 100,
+              height: 100,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 3,
+              boxShadow: '0 10px 30px rgba(76, 175, 80, 0.3)',
+            }}>
+              <CheckCircle sx={{ fontSize: 50, color: 'white' }} />
+            </Box>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, color: '#2c3e50', mb: 2 }}>
               Thank you for your order!
             </Typography>
-            <Typography variant="body1" sx={{ mb: 4 }}>
-              Your order number is #{completedOrderId}. We have emailed your order confirmation,
+            <Typography variant="h6" sx={{ mb: 4, color: '#5f6368', maxWidth: 600, mx: 'auto' }}>
+              Your order number is <strong>#{completedOrderId}</strong>. We have emailed your order confirmation,
               and will send you an update when your order has shipped.
             </Typography>
-            <Button 
-              variant="contained" 
-              component={Link} 
-              href="/"
-              sx={{ 
-                bgcolor: '#8D6E63',
-                '&:hover': { bgcolor: '#6D4C41' },
-                px: 4,
-                py: 1.5,
-                mr: 2,
-              }}
-            >
-              Continue Shopping
-            </Button>
-            <Button 
-              variant="outlined" 
-              component={Link} 
-              href={`/customer/orders/${completedOrderId}`}
-              sx={{ px: 4, py: 1.5 }}
-            >
-              View Order
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Button 
+                variant="contained" 
+                component={Link} 
+                href="/"
+                size="large"
+                sx={{ 
+                  background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+                  '&:hover': { 
+                    background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(162, 146, 120, 0.4)',
+                  },
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Continue Shopping
+              </Button>
+              <Button 
+                variant="outlined" 
+                component={Link} 
+                href={`/customer/orders/${completedOrderId}`}
+                size="large"
+                sx={{ 
+                  px: 4, 
+                  py: 1.5,
+                  borderRadius: 2,
+                  borderColor: '#a29278',
+                  color: '#a29278',
+                  '&:hover': {
+                    borderColor: '#8b7d65',
+                    color: '#8b7d65',
+                    bgcolor: 'rgba(162, 146, 120, 0.05)',
+                    transform: 'translateY(-2px)',
+                  },
+                  fontWeight: 600,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                View Order
+              </Button>
+            </Box>
           </Box>
         ) : (
           // Checkout steps
@@ -759,26 +1212,64 @@ export default function CheckoutPage() {
             
             {getStepContent(activeStep)}
             
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>
               {activeStep !== 0 && (
-                <Button onClick={handleBack} sx={{ mr: 1 }}>
+                <Button 
+                  onClick={handleBack} 
+                  size="large"
+                  sx={{
+                    px: 3,
+                    py: 1.5,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    color: '#5f6368',
+                    '&:hover': {
+                      bgcolor: '#f5f5f5',
+                    },
+                  }}
+                >
                   Back
                 </Button>
               )}
               
               {/* Show different button text based on step and payment method */}
               {activeStep === 1 && formData.paymentMethod === 'paypal' ? (
-                <Typography variant="body1" color="primary" sx={{ py: 1.5, px: 2 }}>
-                  Complete payment with PayPal above to proceed
-                </Typography>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  px: 3,
+                  py: 1.5,
+                  bgcolor: '#e3f2fd',
+                  borderRadius: 2,
+                  border: '1px solid #bbdefb',
+                }}>
+                  <Payment sx={{ mr: 1, color: '#1976d2' }} />
+                  <Typography variant="body1" color="#1976d2" sx={{ fontWeight: 600 }}>
+                    Complete payment with PayPal above to proceed
+                  </Typography>
+                </Box>
               ) : (
                 <Button
                   variant="contained"
                   onClick={handleNext}
-                  disabled={loading || (activeStep === 1 && formData.paymentMethod === 'paypal')}
+                  disabled={loading}
+                  size="large"
                   sx={{ 
-                    bgcolor: '#8D6E63',
-                    '&:hover': { bgcolor: '#6D4C41' },
+                    background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+                    '&:hover': { 
+                      background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(162, 146, 120, 0.4)',
+                    },
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    transition: 'all 0.3s ease',
+                    '&:disabled': {
+                      background: '#e0e0e0',
+                      color: '#9e9e9e',
+                    },
                   }}
                 >
                   {loading ? (
@@ -793,8 +1284,9 @@ export default function CheckoutPage() {
             </Box>
           </Box>
         )}
-      </Paper>
-      </Container>
+        </Paper>
+        </Container>
+      </Box>
       </PayPalScriptProvider>
   );
 }

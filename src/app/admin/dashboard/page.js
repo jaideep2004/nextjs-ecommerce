@@ -396,7 +396,7 @@ export default function AdminDashboard() {
         <>
           {/* Stats Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={3}  style={{minWidth: '230px'}}>
               <StatCard 
                 title="Total Sales" 
                 value={`$${data.stats.totalSales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
@@ -407,7 +407,7 @@ export default function AdminDashboard() {
                 isLoading={loading}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={3} style={{minWidth: '230px'}}>
               <StatCard 
                 title="Total Orders" 
                 value={data.stats.totalOrders} 
@@ -418,7 +418,7 @@ export default function AdminDashboard() {
                 isLoading={loading}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={3} style={{minWidth: '230px'}}>
               <StatCard 
                 title="Total Customers" 
                 value={data.stats.totalCustomers} 
@@ -429,7 +429,7 @@ export default function AdminDashboard() {
                 isLoading={loading}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={3} style={{minWidth: '230px'}}>
               <StatCard 
                 title="Total Products" 
                 value={data.stats.totalProducts} 

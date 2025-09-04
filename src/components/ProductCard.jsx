@@ -520,14 +520,32 @@ const ProductCard = ({ product, enhanced = false, isInWishlist, onAddToCart, onA
     if (user && product) {
       const checkWishlist = async () => {
         try {
-          const res = await axios.get('/api/wishlist');
-          const wishlistItems = res.data.wishlist || [];
+          // Get authentication token from cookies
+          const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('token='))
+            ?.split('=')[1];
+          
+          // Set up headers with authentication token
+          const headers = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const res = await axios.get('/api/wishlist', { headers });
+          const wishlistItems = res.data.data?.wishlist || res.data.wishlist || [];
           const isInWishlist = wishlistItems.some(item => 
-            item.product?._id === product._id || item.productId === product._id
+            item._id === product._id || 
+            item.product?._id === product._id || 
+            item.productId === product._id
           );
           setIsFavorite(isInWishlist);
         } catch (error) {
           console.error('Error checking wishlist status:', error);
+          if (error.response?.status === 401) {
+            // Clear favorite state if not authenticated
+            setIsFavorite(false);
+          }
         }
       };
       
@@ -552,18 +570,36 @@ const ProductCard = ({ product, enhanced = false, isInWishlist, onAddToCart, onA
     }
     
     try {
+      // Get authentication token from cookies
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+      
+      // Set up headers with authentication token
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       if (isFavorite) {
         // Remove from wishlist
-        await axios.delete(`/api/wishlist/${product._id}`);
+        await axios.delete(`/api/wishlist/${product._id}`, { headers });
+        console.log('Product removed from wishlist');
       } else {
         // Add to wishlist
-        await axios.post('/api/wishlist', { productId: product._id });
+        await axios.post('/api/wishlist', { productId: product._id }, { headers });
+        console.log('Product added to wishlist');
       }
       
       // Toggle state after successful API call
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error('Wishlist operation failed:', error);
+      if (error.response?.status === 401) {
+        // Redirect to login if token is invalid
+        router.push('/login?redirect=/products');
+      }
     }
   };
 
