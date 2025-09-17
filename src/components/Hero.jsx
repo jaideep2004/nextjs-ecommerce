@@ -425,7 +425,7 @@ const Hero = () => {
                   textShadow: '0 2px 4px rgba(162, 146, 120, 0.3)',
                 }}
               >
-                New Collection 2024
+                New Collection 2025
               </Typography>
             </motion.div>
             

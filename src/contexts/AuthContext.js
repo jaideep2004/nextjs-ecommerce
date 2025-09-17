@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession, getSession } from 'next-auth/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -55,6 +56,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   // Function to persist user data in localStorage
   const persistUser = (userData) => {
@@ -76,25 +78,51 @@ export function AuthProvider({ children }) {
     // Check if user is logged in on initial load
     const checkUserLoggedIn = async () => {
       try {
+        // First check NextAuth session
+        if (status === 'loading') {
+          return; // Wait for NextAuth to finish loading
+        }
+        
+        if (session?.user) {
+          // User is authenticated via NextAuth (Google)
+          console.log('User authenticated via NextAuth:', session.user.email);
+          
+          // Convert NextAuth session to our user format
+          const nextAuthUser = {
+            _id: session.user.userId || session.user.id,
+            name: session.user.name,
+            email: session.user.email,
+            image: session.user.image,
+            isAdmin: session.user.isAdmin || false,
+            provider: 'google'
+          };
+          
+          setUser(nextAuthUser);
+          persistUser(nextAuthUser);
+          setLoading(false);
+          return;
+        }
+        
+        // If no NextAuth session, check for custom JWT authentication
         // First try to get user from localStorage for immediate UX
         const persistedUser = getPersistedUser();
         
-        if (persistedUser) {
-          // Set user immediately for better UX
+        if (persistedUser && !persistedUser.provider) {
+          // Set user immediately for better UX (only for custom auth users)
           setUser(persistedUser);
         }
 
-        // Always verify with the server using cookies
-        // The server will check httpOnly cookies for authentication
+        // Always verify with the server using cookies or NextAuth
+        // The server will check both httpOnly cookies and NextAuth sessions
         try {
           const { data } = await api.get('/auth/me');
           const userData = data.data || data; // Accept both { data: { user: ... } } and direct user object
           
-          // Server verified user via cookies - update local data
+          // Server verified user via cookies or NextAuth - update local data
           setUser(userData);
           persistUser(userData); // Save user data (without token) to localStorage
           
-          console.log('User authenticated via server cookies:', userData.name);
+          console.log('User authenticated via server:', userData.name, userData.provider || 'custom');
         } catch (serverError) {
           console.log('Server authentication check failed (likely logged out):', serverError.response?.status);
           
@@ -124,7 +152,7 @@ export function AuthProvider({ children }) {
     };
 
     checkUserLoggedIn();
-  }, []);
+  }, [session, status]); // Re-run when NextAuth session changes
 
   const login = async (email, password) => {
     try {
@@ -198,7 +226,18 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      // If user was authenticated via NextAuth (Google), sign them out
+      if (user?.provider === 'google' || session?.user) {
+        const { signOut } = await import('next-auth/react');
+        await signOut({ redirect: false });
+      }
+      
+      // Always try to call custom logout endpoint for JWT users
+      try {
+        await api.post('/auth/logout');
+      } catch (error) {
+        console.log('Custom logout failed (likely not a JWT user):', error.message);
+      }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

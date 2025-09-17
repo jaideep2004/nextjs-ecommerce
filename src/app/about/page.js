@@ -235,7 +235,51 @@ export default function AboutPage() {
 	return (
 		<Container sx={{ py: 4 }} style={{ maxWidth: "1300px" }}>
 			{/* Hero Section - Mobile Responsive */}
-			<Box sx={{ mb: 10, overflow: "hidden" }}>
+			<Box sx={{ mb: 10, overflow: "hidden", position: "relative" }}>
+				{/* Light Background Elements */}
+				<Box sx={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					pointerEvents: "none",
+					zIndex: 0,
+				}}>
+					{/* Geometric shapes */}
+					<Box sx={{
+						position: "absolute",
+						top: "10%",
+						right: "10%",
+						width: { xs: 100, md: 150 },
+						height: { xs: 100, md: 150 },
+						borderRadius: "50%",
+						background: "linear-gradient(135deg, rgba(162, 146, 120, 0.1), rgba(139, 125, 101, 0.08))",
+						filter: "blur(20px)",
+					}} />
+					<Box sx={{
+						position: "absolute",
+						bottom: "20%",
+						left: "15%",
+						width: { xs: 80, md: 120 },
+						height: { xs: 80, md: 120 },
+						borderRadius: "20px",
+						background: "linear-gradient(45deg, rgba(44, 62, 80, 0.08), rgba(52, 73, 94, 0.06))",
+						filter: "blur(15px)",
+						transform: "rotate(45deg)",
+					}} />
+					<Box sx={{
+						position: "absolute",
+						top: "50%",
+						right: "25%",
+						width: { xs: 60, md: 90 },
+						height: { xs: 60, md: 90 },
+						borderRadius: "15px",
+						background: "rgba(255, 193, 7, 0.1)",
+						filter: "blur(10px)",
+						transform: "rotate(-30deg)",
+					}} />
+				</Box>
 				<Grid
 					container
 					spacing={{ xs: 2, md: 4 }}
@@ -243,6 +287,8 @@ export default function AboutPage() {
 					sx={{
 						flexWrap: { xs: "wrap", md: "nowrap" },
 						flexDirection: { xs: "column-reverse", md: "row" },
+						position: "relative",
+						zIndex: 1,
 					}}
 					style={{ padding: { xs: "30px 0px", md: "30px 0px" } }}>
 					{/* Left Side - Images Section */}
@@ -305,37 +351,7 @@ export default function AboutPage() {
 								/>
 							</Box>
 
-							{/* Orange Star Badge */}
-							<Box
-								sx={{
-									position: "absolute",
-									left: { xs: "35%", md: "39%" },
-									bottom: { xs: "8%", md: "5%" },
-									width: { xs: 60, sm: 70, md: 80 },
-									height: { xs: 60, sm: 70, md: 80 },
-									minWidth: { xs: "50px", md: "auto" },
-									minHeight: { xs: "50px", md: "auto" },
-									bgcolor: "warning.main",
-									borderRadius: { xs: "15px", md: "20px" },
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									transform: "rotate(15deg)",
-									boxShadow: {
-										xs: "0 5px 15px rgba(0,0,0,0.15)",
-										md: "0 10px 30px rgba(0,0,0,0.2)",
-									},
-									zIndex: 3,
-								}}>
-								<Typography
-									sx={{
-										fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" },
-										color: "white",
-										transform: "rotate(-15deg)",
-									}}>
-									✱
-								</Typography>
-							</Box>
+							
 
 							{/* Experience Badge */}
 							<Paper
@@ -375,7 +391,7 @@ export default function AboutPage() {
 											lineHeight: 1.2,
 											fontSize: { xs: "0.75rem", sm: "0.875rem" },
 										}}>
-										Year's
+										Years Industry
 										<br />
 										Experience
 									</Typography>
@@ -423,7 +439,7 @@ export default function AboutPage() {
 									color: "text.primary",
 									px: { xs: 1, md: 0 },
 								}}>
-								Online Shopping Is Buying Things From Stores On The Internet.
+								Our Story
 							</Typography>
 
 							<Typography
@@ -436,10 +452,9 @@ export default function AboutPage() {
 									maxWidth: { xs: "100%", md: "90%" },
 									px: { xs: 1, md: 0 },
 								}}>
-								There are many variations of passages of Lorem Ipsum available,
-								but the our majority have suffered alteration in some form, by
-								injected humour, or randomised words which don't look even
-								slightly believable.
+								For us, fashion is more than just clothing—it's a bridge to culture, identity, and community. Our platform helps Indians worldwide rediscover their roots, express their individuality, and participate in India's unfolding fashion revolution, wherever their journey takes them.
+								<br /><br />
+								Join us as we connect hearts and wardrobes—bringing the spirit of India to your doorstep, and making every Indian around the globe part of the country's ever-evolving story of fashion innovation.
 							</Typography>
 
 							{/* Key Points with Images */}

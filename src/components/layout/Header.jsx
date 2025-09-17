@@ -722,7 +722,7 @@ export default function Header() {
                 }}
               >
                 <img 
-                  src="/images/lp3.png" 
+                  src="/images/ll2.jpg" 
                   alt="Punjabi Attire Logo" 
                   style={{
                     width: '65px',

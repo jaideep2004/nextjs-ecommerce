@@ -492,123 +492,278 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
   );
 };
 
-const PaymentForm = ({ formData, setFormData, finalTotal, cart, shippingData, onPayPalSuccess, onPayPalError }) => {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading }) => {
+  const [paymentMethod, setPaymentMethod] = useState('paypal');
+  
+  const handlePaymentChange = (e) => {
+    setPaymentMethod(e.target.value);
+    setFormData(prev => ({ ...prev, paymentMethod: e.target.value }));
+  };
+  
+  const handlePlaceOrderClick = () => {
+    if (!paymentMethod) {
+      alert('Please select a payment method');
+      return;
+    }
+    
+    // For PayPal, the payment will be handled by PayPal button
+    if (paymentMethod === 'paypal') {
+      // PayPal button will handle the payment
+      return;
+    }
+    
+    // For COD, place order directly
+    if (paymentMethod === 'cod') {
+      onPlaceOrder();
+    }
   };
   
   return (
     <Box sx={{ 
-      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100)',
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
       p: 4,
       borderRadius: 3,
       border: '1px solid #e0e0e0',
+      maxWidth: '1300px'
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Box sx={{
-          width: 50,
-          height: 50,
-          borderRadius: 2,
-          background: 'linear-gradient(135deg, #2c3e50, #34495e)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          mr: 2,
-        }}>
-          <Payment sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
-          Payment Method
-        </Typography>
-      </Box>
-      
-      <FormControl component="fieldset" sx={{ width: '100%' }}>
-        <RadioGroup
-          name="paymentMethod"
-          value={formData.paymentMethod}
-          onChange={handleChange}
-        >
-          <Paper sx={{ 
-            mb: 3, 
-            p: 3,
-            borderRadius: 2,
-            border: formData.paymentMethod === 'paypal' ? '2px solid #a29278' : '1px solid #e0e0e0',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-            },
-          }}>
-            <FormControlLabel 
-              value="paypal" 
-              control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography sx={{ mr: 2, fontWeight: 600 }}>PayPal</Typography>
-                  <Image 
-                    src="/images/paypal-logo.png" 
-                    alt="PayPal" 
-                    width={80} 
-                    height={30} 
+      <Grid container spacing={4} >
+        {/* Order Summary */}
+        <Grid item xs={12} md={8} style={{ flex:1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <Box sx={{
+              width: 50,
+              height: 50,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #2c3e50, #34495e)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 2,
+            }}>
+              <CheckCircle sx={{ color: 'white', fontSize: 24 }} />
+            </Box>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+              Review Your Order
+            </Typography>
+          </Box>
+          
+          {/* Cart Items */}
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Order Items
+            </Typography>
+            <List>
+              {cart.map((item) => (
+                <ListItem key={`${item._id}-${item.color}-${item.size}`} sx={{ py: 2, px: 0 }}>
+                  <ListItemAvatar>
+                    <Avatar 
+                      variant="square" 
+                      sx={{ width: 60, height: 60, borderRadius: 1 }}
+                    >
+                      <Image 
+                        src={item.image} 
+                        alt={item.name}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        sizes="60px"
+                      />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        {item.name}
+                      </Typography>
+                    }
+                    secondary={
+                      <Box>
+                        {item.color && `Color: ${item.color}`}
+                        {item.color && item.size && ' | '}
+                        {item.size && `Size: ${item.size}`}
+                        <br />
+                        <Typography component="span" sx={{ fontWeight: 600, color: '#a29278' }}>
+                          ${item.price.toFixed(2)} × {item.quantity}
+                        </Typography>
+                      </Box>
+                    }
+                    sx={{ ml: 2 }}
                   />
-                </Box>
-              } 
-            />
-            {formData.paymentMethod === 'paypal' && (
-              <Box sx={{ mt: 3, ml: 4 }}>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
-                  Complete your payment securely with PayPal below:
-                </Typography>
-                {/* Only show PayPal button if we have valid shipping data */}
-                {shippingData.fullName && shippingData.address && shippingData.email ? (
-                  <PayPalButton 
-                    amount={finalTotal} 
-                    cart={cart}
-                    shippingData={shippingData}
-                    formData={formData}
-                    onSuccess={onPayPalSuccess}
-                    onError={onPayPalError}
-                  />
-                ) : (
-                  <Alert severity="info" sx={{ mt: 1, borderRadius: 2 }}>
-                    Please complete shipping information first, then return to this step to pay with PayPal.
-                  </Alert>
-                )}
-              </Box>
-            )}
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </Typography>
+                </ListItem>
+              ))}
+            </List>
           </Paper>
           
-          <Paper sx={{ 
-            p: 3,
-            borderRadius: 2,
-            border: formData.paymentMethod === 'cod' ? '2px solid #a29278' : '1px solid #e0e0e0',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-            },
-          }}>
-            <FormControlLabel 
-              value="cod" 
-              control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
-              label={<Typography sx={{ fontWeight: 600 }}>Cash on Delivery</Typography>} 
-            />
+          {/* Shipping Address */}
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Shipping Address
+            </Typography>
+            <Box sx={{ 
+              p: 2, 
+              bgcolor: '#f8f9fa',
+              borderRadius: 2,
+              border: '1px solid #e9ecef'
+            }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                {formData.fullName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {formData.address}<br />
+                {formData.city}, {formData.state} {formData.zipCode}<br />
+                {formData.country}<br />
+                Phone: {formData.phone}<br />
+                Email: {formData.email}
+              </Typography>
+            </Box>
           </Paper>
-        </RadioGroup>
-      </FormControl>
-      
-      {formData.paymentMethod === 'stripe' && (
-        <Alert 
-          severity="info" 
-          sx={{ 
-            mt: 3,
-            borderRadius: 2,
-            bgcolor: '#e3f2fd',
-            border: '1px solid #bbdefb',
-          }}
-        >
-          Credit card payment will be processed securely on the next step.
-        </Alert>
-      )}
+        </Grid>
+        
+        {/* Payment & Summary */}
+        <Grid item xs={12} md={4} style={{ flex:1 }}>
+          {/* Payment Method Selection */}
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Payment Method
+            </Typography>
+            
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={paymentMethod}
+                onChange={handlePaymentChange}
+              >
+                <Box sx={{ 
+                  mb: 2, 
+                  p: 2,
+                  borderRadius: 2,
+                  border: paymentMethod === 'paypal' ? '2px solid #a29278' : '1px solid #e0e0e0',
+                  transition: 'all 0.3s ease',
+                }}>
+                  <FormControlLabel 
+                    value="paypal" 
+                    control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography sx={{ mr: 2, fontWeight: 600 }}>PayPal</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          (Credit/Debit Cards)
+                        </Typography>
+                      </Box>
+                    } 
+                  />
+                </Box>
+                
+                <Box sx={{ 
+                  p: 2,
+                  borderRadius: 2,
+                  border: paymentMethod === 'cod' ? '2px solid #a29278' : '1px solid #e0e0e0',
+                  transition: 'all 0.3s ease',
+                }}>
+                  <FormControlLabel 
+                    value="cod" 
+                    control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
+                    label={<Typography sx={{ fontWeight: 600 }}>Cash on Delivery</Typography>} 
+                  />
+                </Box>
+              </RadioGroup>
+            </FormControl>
+          </Paper>
+          
+          {/* Order Summary */}
+          <Paper sx={{ p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Order Summary
+            </Typography>
+            
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body1">Subtotal</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  ${cartTotal.toFixed(2)}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body1">Shipping</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: shippingCost === 0 ? '#4caf50' : 'inherit' }}>
+                  {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="body1">Tax (7%)</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  ${taxAmount.toFixed(2)}
+                </Typography>
+              </Box>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Total</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: '#a29278' }}>
+                  ${finalTotal.toFixed(2)}
+                </Typography>
+              </Box>
+            </Box>
+            
+            {/* Place Order Button */}
+            {paymentMethod === 'paypal' ? (
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, textAlign: 'center' }}>
+                  Click below to complete payment with PayPal
+                </Typography>
+                <PayPalButton 
+                  amount={finalTotal} 
+                  cart={cart}
+                  shippingData={{
+                    fullName: formData.fullName,
+                    address: formData.address,
+                    city: formData.city,
+                    state: formData.state,
+                    zipCode: formData.zipCode,
+                    country: formData.country,
+                    phone: formData.phone,
+                    email: formData.email
+                  }}
+                  formData={formData}
+                  onSuccess={onPayPalSuccess}
+                  onError={onPayPalError}
+                />
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                size="large"
+                fullWidth
+                onClick={handlePlaceOrderClick}
+                disabled={loading}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+                  '&:hover': { 
+                    background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(162, 146, 120, 0.4)',
+                  },
+                  py: 2,
+                  borderRadius: 2,
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: 'white' }} />
+                ) : (
+                  'Place Order'
+                )}
+              </Button>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
@@ -712,7 +867,7 @@ const ReviewOrder = ({ formData, cart, cartTotal, shippingCost, taxAmount, final
 
 export default function CheckoutPage() {
   // Steps for the checkout process
-  const steps = ['Shipping', 'Payment', 'Review Order'];
+  const steps = ['Shipping', 'Review & Payment'];
 
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
@@ -813,11 +968,8 @@ export default function CheckoutPage() {
       return;
     }
     
-    if (activeStep === steps.length - 1) {
-      handlePlaceOrder();
-    } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    }
+    // Go directly to review step (step 1) after shipping (step 0)
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
   
   // Handle back step
@@ -862,12 +1014,6 @@ export default function CheckoutPage() {
       
       if (Object.keys(newErrors).length > 0) {
         setError('Please fill in all required fields correctly');
-        return false;
-      }
-    } else if (activeStep === 1) {
-      // Validate payment form
-      if (!formData.paymentMethod) {
-        setError('Please select a payment method');
         return false;
       }
     }
@@ -964,34 +1110,18 @@ export default function CheckoutPage() {
         return <ShippingForm formData={formData} setFormData={setFormData} user={user} errors={errors} setErrors={setErrors} />;
       case 1:
         return (
-          <PaymentForm 
+          <ReviewAndPayment 
             formData={formData} 
             setFormData={setFormData} 
-            finalTotal={finalTotal}
             cart={cart}
-            shippingData={{
-              fullName: formData.fullName,
-              address: formData.address,
-              city: formData.city,
-              state: formData.state,
-              zipCode: formData.zipCode,
-              country: formData.country,
-              phone: formData.phone,
-              email: formData.email
-            }}
+            cartTotal={cartTotal}
+            shippingCost={shippingCost}
+            taxAmount={taxAmount}
+            finalTotal={finalTotal}
             onPayPalSuccess={handlePayPalSuccess}
             onPayPalError={handlePayPalError}
-          />
-        );
-      case 2:
-        return (
-          <ReviewOrder 
-            formData={formData} 
-            cart={cart} 
-            cartTotal={cartTotal} 
-            shippingCost={shippingCost} 
-            taxAmount={taxAmount} 
-            finalTotal={finalTotal} 
+            onPlaceOrder={handlePlaceOrder}
+            loading={loading}
           />
         );
       default:
@@ -1232,23 +1362,8 @@ export default function CheckoutPage() {
                 </Button>
               )}
               
-              {/* Show different button text based on step and payment method */}
-              {activeStep === 1 && formData.paymentMethod === 'paypal' ? (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  px: 3,
-                  py: 1.5,
-                  bgcolor: '#e3f2fd',
-                  borderRadius: 2,
-                  border: '1px solid #bbdefb',
-                }}>
-                  <Payment sx={{ mr: 1, color: '#1976d2' }} />
-                  <Typography variant="body1" color="#1976d2" sx={{ fontWeight: 600 }}>
-                    Complete payment with PayPal above to proceed
-                  </Typography>
-                </Box>
-              ) : (
+              {/* Show Next button only for step 0 (Shipping) */}
+              {activeStep === 0 && (
                 <Button
                   variant="contained"
                   onClick={handleNext}
@@ -1274,10 +1389,8 @@ export default function CheckoutPage() {
                 >
                   {loading ? (
                     <CircularProgress size={24} sx={{ color: 'white' }} />
-                  ) : activeStep === steps.length - 1 ? (
-                    'Place Order'
                   ) : (
-                    'Next'
+                    'Continue to Review & Payment'
                   )}
                 </Button>
               )}

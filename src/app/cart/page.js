@@ -82,7 +82,7 @@ export default function CartPage() {
         background: 'linear-gradient(135deg, #a29278 0%, #8b7d65 100%)',
         py: 6 
       }}>
-        <Container maxWidth="lg">
+        <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
           <Breadcrumbs 
             separator={<NavigateNext fontSize="small" />} 
             aria-label="breadcrumb"
@@ -181,7 +181,7 @@ export default function CartPage() {
           bottom: 0,
           background: 'url("data:image/svg+xml,%3Csvg width=\\"60\\" height=\\"60\\" viewBox=\\"0 0 60 60\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cg fill=\\"none\\" fill-rule=\\"evenodd\\"%3E%3Cg fill=\\"%23ffffff\\" fill-opacity=\\"0.05\\"%3E%3Cpath d=\\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
         }} />
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
           <Breadcrumbs 
             separator={<NavigateNext fontSize="small" />} 
             aria-label="breadcrumb"
@@ -235,8 +235,8 @@ export default function CartPage() {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={4}>
+      <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
+        <Grid container spacing={{ xs: 3, md: 4, lg: 6 }} style={{justifyContent: 'center'}}>
           {/* Cart Items */}
           <Grid item xs={12} lg={8}>
             <Card sx={{ 
@@ -254,7 +254,7 @@ export default function CartPage() {
                   Cart Items
                 </Typography>
               </Box>
-              <TableContainer>
+              <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table>
                   <TableHead sx={{ 
                     bgcolor: '#f8f9fa',
@@ -262,14 +262,16 @@ export default function CartPage() {
                       fontWeight: 600,
                       color: '#2c3e50',
                       borderBottom: '2px solid #e9ecef',
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      whiteSpace: 'nowrap',
                     }
                   }}>
                     <TableRow>
-                      <TableCell>Product</TableCell>
-                      <TableCell align="center">Price</TableCell>
-                      <TableCell align="center">Quantity</TableCell>
-                      <TableCell align="right">Subtotal</TableCell>
-                      <TableCell align="right">Actions</TableCell>
+                      <TableCell sx={{ minWidth: { xs: 280, md: 320 } }}>Product</TableCell>
+                      <TableCell align="center" sx={{ minWidth: 80 }}>Price</TableCell>
+                      <TableCell align="center" sx={{ minWidth: 120 }}>Quantity</TableCell>
+                      <TableCell align="right" sx={{ minWidth: 100 }}>Subtotal</TableCell>
+                      <TableCell align="right" sx={{ minWidth: 80 }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -588,12 +590,12 @@ export default function CartPage() {
                   <Box sx={{ 
                     display: 'flex', 
                     justifyContent: 'space-between',
-                    p: 3,
+                    p: 2,
                     background: 'linear-gradient(135deg, #a29278, #8b7d65)',
                     borderRadius: 2,
                     color: 'white',
                   }}>
-                    <Typography variant="h5" sx={{ fontWeight: 800 }}>Total</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1.4 }}>Total</Typography>
                     <Typography variant="h4" sx={{ fontWeight: 900 }}>
                       ${finalTotal.toFixed(2)}
                     </Typography>

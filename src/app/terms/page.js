@@ -20,7 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function TermsPage() {
   // Last updated date
-  const lastUpdated = 'January 15, 2023';
+  const lastUpdated = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
@@ -43,10 +43,20 @@ export default function TermsPage() {
         <Divider sx={{ my: 3 }} />
 
         <Typography paragraph>
-          Welcome to our website. If you continue to browse and use this website, you are agreeing to comply with and be bound by the following terms and conditions of use, which together with our privacy policy govern our relationship with you in relation to this website.
+          Welcome to India Inspired. These terms and conditions ("Terms") govern your use of our website 
+          and the purchase of products from us. By accessing our website or making a purchase, you agree 
+          to be bound by these Terms and our Privacy Policy. These Terms comply with UK law, including 
+          the Consumer Rights Act 2015, Consumer Contracts Regulations 2013, and UK GDPR.
         </Typography>
+        
         <Typography paragraph>
-          The term 'our company' or 'us' or 'we' refers to the owner of the website. The term 'you' refers to the user or viewer of our website.
+          <strong>Company Information:</strong><br />
+          India Inspired<br />
+          Registered Office: 123 High Street, London, UK<br />
+          Company Registration Number: 12345678<br />
+          VAT Number: GB123456789<br />
+          Email: info@indiainspired.com<br />
+          Data Protection Officer: dpo@indiainspired.com
         </Typography>
 
         <Box sx={{ my: 4 }}>
@@ -64,27 +74,58 @@ export default function TermsPage() {
             </ListItem>
             <ListItem>
               <ListItemText>
-                This website uses cookies to monitor browsing preferences. If you do allow cookies to be used, personal information may be stored by us for use by third parties.
+                This website uses cookies to monitor browsing preferences in accordance with our Cookie Policy and UK GDPR requirements. By using our website, you consent to our use of cookies as described in our Privacy Policy.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials found or offered on this website for any particular purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law.
+                We provide information and materials on this website in good faith, but we do not guarantee their accuracy, completeness, or suitability for any particular purpose.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                Your use of any information or materials on this website is entirely at your own risk, for which we shall not be liable. It shall be your own responsibility to ensure that any products, services or information available through this website meet your specific requirements.
+                Your use of any information or materials on this website is entirely at your own risk, for which we shall not be liable.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                All trademarks reproduced in this website, which are not the property of, or licensed to the operator, are acknowledged on the website.
+                All trademarks reproduced in this website are acknowledged and remain the property of their respective owners.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                Unauthorized use of this website may give rise to a claim for damages and/or be a criminal offense.
+                Unauthorized use of this website may give rise to a claim for damages and/or be a criminal offense under UK law.
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            2. Consumer Rights (UK)
+          </Typography>
+          <Typography paragraph>
+            As a UK consumer, you have important rights under the Consumer Rights Act 2015 and Consumer Contracts Regulations 2013:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Cancel:</strong> You have 14 days from delivery to cancel your order for any reason (we extend this to 30 days).
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Refund:</strong> You're entitled to a full refund, including original delivery costs, for cancelled orders.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Repair or Replace:</strong> If goods are faulty, we'll repair or replace them free of charge.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Reject:</strong> You can reject faulty goods within 30 days for a full refund.
               </ListItemText>
             </ListItem>
           </List>
@@ -140,16 +181,42 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            6. Personal Information
+            6. Data Protection and Privacy
           </Typography>
           <Typography paragraph>
-            Your submission of personal information through the store is governed by our Privacy Policy. To view our Privacy Policy, please see the link in the footer of our website.
+            We are committed to protecting your personal data in accordance with UK GDPR and the Data Protection Act 2018. 
+            Your submission of personal information through our website is governed by our Privacy Policy, which explains:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                What personal data we collect and how we use it
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Your rights under UK data protection law (access, rectification, erasure, portability, etc.)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                How long we retain your data and our lawful basis for processing
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                How to contact our Data Protection Officer with privacy concerns
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Typography paragraph>
+            To view our Privacy Policy, please see the link in the footer of our website or contact us at privacy@indiainspired.com.
           </Typography>
         </Box>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            7. Errors, Inaccuracies, and Omissions
+            8. Errors, Inaccuracies, and Omissions
           </Typography>
           <Typography paragraph>
             Occasionally there may be information on our site or in the Service that contains typographical errors, inaccuracies, or omissions that may relate to product descriptions, pricing, promotions, offers, product shipping charges, transit times, and availability. We reserve the right to correct any errors, inaccuracies, or omissions, and to change or update information or cancel orders if any information in the Service or on any related website is inaccurate at any time without prior notice (including after you have submitted your order).
@@ -158,7 +225,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            8. Prohibited Uses
+            9. Prohibited Uses
           </Typography>
           <Typography paragraph>
             In addition to other prohibitions as set forth in the Terms of Service, you are prohibited from using the site or its content:
@@ -227,7 +294,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            9. Disclaimer of Warranties; Limitation of Liability
+            10. Disclaimer of Warranties; Limitation of Liability
           </Typography>
           <Typography paragraph>
             We do not guarantee, represent, or warrant that your use of our service will be uninterrupted, timely, secure, or error-free. We do not warrant that the results that may be obtained from the use of the service will be accurate or reliable. You agree that from time to time we may remove the service for indefinite periods of time or cancel the service at any time, without notice to you.
@@ -239,7 +306,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            10. Indemnification
+            11. Indemnification
           </Typography>
           <Typography paragraph>
             You agree to indemnify, defend and hold harmless our company and our parent, subsidiaries, affiliates, partners, officers, directors, agents, contractors, licensors, service providers, subcontractors, suppliers, interns and employees, harmless from any claim or demand, including reasonable attorneys' fees, made by any third-party due to or arising out of your breach of these Terms of Service or the documents they incorporate by reference, or your violation of any law or the rights of a third-party.
@@ -248,7 +315,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            11. Severability
+            12. Severability
           </Typography>
           <Typography paragraph>
             In the event that any provision of these Terms of Service is determined to be unlawful, void or unenforceable, such provision shall nonetheless be enforceable to the fullest extent permitted by applicable law, and the unenforceable portion shall be deemed to be severed from these Terms of Service, such determination shall not affect the validity and enforceability of any other remaining provisions.
@@ -257,7 +324,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            12. Termination
+            13. Termination
           </Typography>
           <Typography paragraph>
             The obligations and liabilities of the parties incurred prior to the termination date shall survive the termination of this agreement for all purposes. These Terms of Service are effective unless and until terminated by either you or us. You may terminate these Terms of Service at any time by notifying us that you no longer wish to use our Services, or when you cease using our site.
@@ -269,7 +336,7 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            13. Entire Agreement
+            14. Entire Agreement
           </Typography>
           <Typography paragraph>
             The failure of us to exercise or enforce any right or provision of these Terms of Service shall not constitute a waiver of such right or provision. These Terms of Service and any policies or operating rules posted by us on this site or in respect to The Service constitutes the entire agreement and understanding between you and us and govern your use of the Service, superseding any prior or contemporaneous agreements, communications and proposals, whether oral or written, between you and us (including, but not limited to, any prior versions of the Terms of Service).
@@ -281,16 +348,16 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            14. Governing Law
+            15. Governing Law
           </Typography>
           <Typography paragraph>
-            These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of the country where our company is registered.
+            These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of England and Wales. Any disputes arising from these terms will be subject to the exclusive jurisdiction of the courts of England and Wales.
           </Typography>
         </Box>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            15. Changes to Terms of Service
+            16. Changes to Terms of Service
           </Typography>
           <Typography paragraph>
             You can review the most current version of the Terms of Service at any time at this page. We reserve the right, at our sole discretion, to update, change or replace any part of these Terms of Service by posting updates and changes to our website. It is your responsibility to check our website periodically for changes. Your continued use of or access to our website or the Service following the posting of any changes to these Terms of Service constitutes acceptance of those changes.
@@ -299,10 +366,10 @@ export default function TermsPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            16. Contact Information
+            17. Contact Information
           </Typography>
           <Typography paragraph>
-            Questions about the Terms of Service should be sent to us at support@yourdomain.com.
+            Questions about the Terms of Service should be sent to us at info@indiainspired.com or dpo@indiainspired.com for data protection related queries.
           </Typography>
         </Box>
 

@@ -16,13 +16,14 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
+  Alert,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SecurityIcon from '@mui/icons-material/Security';
 
 export default function PrivacyPolicyPage() {
   // Last updated date
-  const lastUpdated = 'January 15, 2023';
+  const lastUpdated = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
@@ -47,125 +48,98 @@ export default function PrivacyPolicyPage() {
         </Typography>
         <Divider sx={{ my: 3 }} />
 
+        <Alert severity="info" sx={{ mb: 3 }}>
+          This Privacy Policy complies with UK GDPR, Data Protection Act 2018, and the Privacy and Electronic Communications Regulations (PECR).
+        </Alert>
+
         <Typography paragraph>
-          At our company, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.
+          India Inspired ("we", "our", "us") is committed to protecting and respecting your privacy. 
+          This Privacy Policy explains how we collect, use, disclose, and safeguard your personal data 
+          when you visit our website or make a purchase. We are the data controller for the purposes 
+          of UK data protection law.
+        </Typography>
+
+        <Typography paragraph>
+          <strong>Data Controller Contact Information:</strong><br />
+          India Inspired<br />
+          123 High Street, London, UK<br />
+          Email: privacy@indiainspired.com<br />
+          Data Protection Officer: dpo@indiainspired.com<br />
+          Phone: +44 (0) 20 1234 5678
         </Typography>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            1. Collection of Your Information
+            1. What Personal Data We Collect
           </Typography>
           <Typography paragraph>
-            We may collect information about you in a variety of ways. The information we may collect via the website includes:
+            We collect and process the following personal data about you:
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Personal Data
+            Identity Data
           </Typography>
           <Typography paragraph>
-            Personally identifiable information, such as your name, shipping address, email address, and telephone number, and demographic information, such as your age, gender, hometown, and interests, that you voluntarily give to us when you register with the website or when you choose to participate in various activities related to the website. You are under no obligation to provide us with personal information of any kind, however your refusal to do so may prevent you from using certain features of the website.
+            Name, title, date of birth, and other personal identifiers.
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Derivative Data
+            Contact Data
           </Typography>
           <Typography paragraph>
-            Information our servers automatically collect when you access the website, such as your IP address, your browser type, your operating system, your access times, and the pages you have viewed directly before and after accessing the website.
+            Email address, telephone numbers, billing and delivery addresses.
           </Typography>
           <Typography variant="h6" gutterBottom>
             Financial Data
           </Typography>
           <Typography paragraph>
-            Financial information, such as data related to your payment method (e.g. valid credit card number, card brand, expiration date) that we may collect when you purchase, order, return, exchange, or request information about our services from the website. We store only very limited, if any, financial information that we collect. Otherwise, all financial information is stored by our payment processor and you are encouraged to review their privacy policy and contact them directly for responses to your questions.
+            Payment card details (processed by our secure payment providers - we don't store full card details).
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Mobile Device Data
+            Transaction Data
           </Typography>
           <Typography paragraph>
-            Device information, such as your mobile device ID, model, and manufacturer, and information about the location of your device, if you access the website from a mobile device.
+            Details about payments to and from you, and other details of products and services you've purchased.
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Data From Contests, Giveaways, and Surveys
+            Technical Data
           </Typography>
           <Typography paragraph>
-            Personal and other information you may provide when entering contests or giveaways and/or responding to surveys.
+            IP address, browser type and version, device information, operating system, and other technology on devices used to access our website.
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Usage Data
+          </Typography>
+          <Typography paragraph>
+            Information about how you use our website, products and services.
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Marketing and Communications Data
+          </Typography>
+          <Typography paragraph>
+            Your preferences in receiving marketing from us and your communication preferences.
           </Typography>
         </Box>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            2. Use of Your Information
+            2. How We Collect Your Personal Data
           </Typography>
           <Typography paragraph>
-            Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the website to:
+            We collect personal data through:
           </Typography>
           <List>
             <ListItem>
               <ListItemText>
-                Create and manage your account.
+                <strong>Direct interactions:</strong> When you create an account, make a purchase, subscribe to our newsletter, or contact us.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                Process your orders and manage your transactions.
+                <strong>Automated technologies:</strong> As you interact with our website, we may automatically collect technical data about your equipment and browsing actions using cookies and similar technologies.
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                Email you regarding your account or order.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Fulfill and manage purchases, orders, payments, and other transactions related to the website.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Send you a newsletter with product updates, special offers, and related information.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Deliver targeted advertising, coupons, newsletters, and other information regarding promotions and the website to you.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Administer sweepstakes, promotions, and contests.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Compile anonymous statistical data and analysis for use internally or with third parties.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Increase the efficiency and operation of the website.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Monitor and analyze usage and trends to improve your experience with the website.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Notify you of updates to the website.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Request feedback and contact you about your use of the website.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Resolve disputes and troubleshoot problems.
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Respond to product and customer service requests.
+                <strong>Third parties:</strong> We may receive personal data from payment providers, delivery companies, and analytics providers.
               </ListItemText>
             </ListItem>
           </List>
@@ -173,181 +147,319 @@ export default function PrivacyPolicyPage() {
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            3. Disclosure of Your Information
+            3. Lawful Basis for Processing
           </Typography>
           <Typography paragraph>
-            We may share information we have collected about you in certain situations. Your information may be disclosed as follows:
+            Under UK GDPR, we must have a lawful basis to process your personal data. We rely on:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <strong>Contract:</strong> To perform our contract with you (processing orders, delivery, customer service)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Legitimate interests:</strong> For our business purposes like improving our services, fraud prevention, and direct marketing
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Consent:</strong> For marketing communications and cookies (where required)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Legal obligation:</strong> To comply with legal requirements (e.g., accounting records)
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            4. Your Rights Under UK GDPR
+          </Typography>
+          <Typography paragraph>
+            Under UK data protection law, you have the following rights:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <strong>Right of Access:</strong> You can request copies of your personal data and information about how we process it.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Rectification:</strong> You can request correction of inaccurate or incomplete personal data.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Erasure:</strong> You can request deletion of your personal data in certain circumstances.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Restrict Processing:</strong> You can request that we limit how we use your personal data.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Data Portability:</strong> You can request to receive your personal data in a machine-readable format.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Object:</strong> You can object to processing based on legitimate interests or for direct marketing.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Right to Withdraw Consent:</strong> Where we rely on consent, you can withdraw it at any time.
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Typography paragraph>
+            To exercise any of these rights, please contact us at privacy@indiainspired.com. 
+            We will respond to your request within one month. If you're not satisfied with our response, 
+            you have the right to complain to the Information Commissioner's Office (ICO).
+          </Typography>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            5. How Long We Keep Your Data
+          </Typography>
+          <Typography paragraph>
+            We will only retain your personal data for as long as necessary to fulfil the purposes for which it was collected:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <strong>Account data:</strong> Until you delete your account, plus 30 days for backup deletion
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Order data:</strong> 7 years for tax and accounting purposes as required by law
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Marketing data:</strong> Until you unsubscribe or object to marketing
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Website analytics:</strong> 26 months for Google Analytics data
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            6. International Transfers
+          </Typography>
+          <Typography paragraph>
+            Some of our service providers are located outside the UK/EEA. When we transfer your personal data 
+            to these countries, we ensure appropriate safeguards are in place, such as:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                Standard Contractual Clauses approved by the European Commission
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Adequacy decisions by the UK government or European Commission
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Certification schemes or codes of conduct
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            7. Cookies and Tracking
+          </Typography>
+          <Typography paragraph>
+            We use cookies and similar technologies in accordance with the Privacy and Electronic Communications Regulations (PECR). 
+            Our cookies fall into these categories:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <strong>Strictly Necessary:</strong> Essential for website operation (no consent required)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Functional:</strong> Remember your preferences and enhance functionality
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Analytics:</strong> Help us understand how visitors use our website
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <strong>Marketing:</strong> Used to deliver relevant advertisements (consent required)
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Typography paragraph>
+            You can manage your cookie preferences through our cookie banner or your browser settings. 
+            Withdrawing consent for cookies may affect website functionality.
+          </Typography>
+        </Box>
+
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            8. Data Security
+          </Typography>
+          <Typography paragraph>
+            We have implemented appropriate technical and organisational security measures to protect your personal data against:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                Accidental or unlawful destruction, loss, alteration, unauthorised disclosure or access
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Data breaches and cyber attacks
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Unauthorised or unlawful processing
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Typography paragraph>
+            Our security measures include encryption, access controls, regular security assessments, and staff training. 
+            However, no electronic transmission or storage is 100% secure. If we detect a personal data breach that 
+            is likely to result in a high risk to your rights and freedoms, we will notify you within 72 hours 
+            as required by UK GDPR.
+          </Typography>
+        </Box>
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            9. How We Share Your Personal Data
+          </Typography>
+          <Typography paragraph>
+            We may share your personal data with third parties in the following circumstances:
           </Typography>
           <Typography variant="h6" gutterBottom>
-            By Law or to Protect Rights
+            Service Providers
           </Typography>
           <Typography paragraph>
-            If we believe the release of information about you is necessary to respond to legal process, to investigate or remedy potential violations of our policies, or to protect the rights, property, and safety of others, we may share your information as permitted or required by any applicable law, rule, or regulation. This includes exchanging information with other entities for fraud protection and credit risk reduction.
+            We work with trusted third-party service providers who process personal data on our behalf, including:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText>
+                Payment processors (to handle transactions securely)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Delivery companies (to fulfill orders)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Email service providers (for marketing communications)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Analytics providers (to improve our website)
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                Customer service platforms (to provide support)
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Typography paragraph>
+            All service providers are bound by Data Processing Agreements that ensure they handle your data securely 
+            and in accordance with UK GDPR requirements.
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Third-Party Service Providers
+            Legal Requirements
           </Typography>
           <Typography paragraph>
-            We may share your information with third parties that perform services for us or on our behalf, including payment processing, data analysis, email delivery, hosting services, customer service, and marketing assistance.
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Marketing Communications
-          </Typography>
-          <Typography paragraph>
-            With your consent, or with an opportunity for you to withdraw consent, we may share your information with third parties for marketing purposes, as permitted by law.
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Interactions with Other Users
-          </Typography>
-          <Typography paragraph>
-            If you interact with other users of the website, those users may see your name, profile photo, and descriptions of your activity, including sending invitations to other users, chatting with other users, liking posts, following blogs.
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Online Postings
-          </Typography>
-          <Typography paragraph>
-            When you post comments, contributions or other content to the website, your posts may be viewed by all users and may be publicly distributed outside the website in perpetuity.
+            We may disclose your personal data if required by law, regulation, legal process, or to protect our 
+            rights, property, or safety, or that of others.
           </Typography>
           <Typography variant="h6" gutterBottom>
             Business Transfers
           </Typography>
           <Typography paragraph>
-            We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition of all or a portion of our business to another company.
+            In the event of a merger, acquisition, or sale of assets, your personal data may be transferred to the 
+            new entity. We will notify you of any such change and ensure your rights remain protected.
           </Typography>
         </Box>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            4. Tracking Technologies
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Cookies and Web Beacons
+            10. Children's Privacy
           </Typography>
           <Typography paragraph>
-            We may use cookies, web beacons, tracking pixels, and other tracking technologies on the website to help customize the website and improve your experience. When you access the website, your personal information is not collected through the use of tracking technology. Most browsers are set to accept cookies by default. You can remove or reject cookies, but be aware that such action could affect the availability and functionality of the website. You may not decline web beacons. However, they can be rendered ineffective by declining all cookies or by modifying your web browser's settings to notify you each time a cookie is tendered, permitting you to accept or decline cookies on an individual basis.
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Internet-Based Advertising
+            We do not knowingly collect, use, or disclose personal data from children under 13 years of age. 
+            If we become aware that we have collected personal data from a child under 13, we will take steps 
+            to delete such information as quickly as possible.
           </Typography>
           <Typography paragraph>
-            Additionally, we may use third-party software to serve ads on the website, implement email marketing campaigns, and manage other interactive marketing initiatives. This third-party software may use cookies or similar tracking technology to help manage and optimize your online experience with us. For more information about opting-out of interest-based ads, visit the Network Advertising Initiative Opt-Out Tool or Digital Advertising Alliance Opt-Out Tool.
+            If you are a parent or guardian and believe your child has provided us with personal data, 
+            please contact us immediately at privacy@indiainspired.com.
           </Typography>
         </Box>
 
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            5. Third-Party Websites
+            11. Changes to This Privacy Policy
           </Typography>
           <Typography paragraph>
-            The website may contain links to third-party websites and applications of interest, including advertisements and external services, that are not affiliated with us. Once you have used these links to leave the website, any information you provide to these third parties is not covered by this Privacy Policy, and we cannot guarantee the safety and privacy of your information. Before visiting and providing any information to any third-party websites, you should inform yourself of the privacy policies and practices (if any) of the third party responsible for that website, and should take those steps necessary to, in your discretion, protect the privacy of your information. We are not responsible for the content or privacy and security practices and policies of any third parties, including other sites, services or applications that may be linked to or from the website.
+            We may update this Privacy Policy from time to time to reflect changes in our practices, 
+            technology, legal requirements, or other factors. We will notify you of any material changes 
+            by posting the updated policy on our website and updating the "Last Updated" date.
+          </Typography>
+          <Typography paragraph>
+            For significant changes that affect your rights, we may provide additional notice such as 
+            email notification or prominent website notices. Your continued use of our services after 
+            the changes take effect constitutes acceptance of the updated Privacy Policy.
           </Typography>
         </Box>
-
         <Box sx={{ my: 4 }}>
           <Typography variant="h5" gutterBottom>
-            6. Security of Your Information
-          </Typography>
-          <Typography paragraph>
-            We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse. Any information disclosed online is vulnerable to interception and misuse by unauthorized parties. Therefore, we cannot guarantee complete security if you provide personal information.
-          </Typography>
-        </Box>
-
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            7. Policy for Children
-          </Typography>
-          <Typography paragraph>
-            We do not knowingly solicit information from or market to children under the age of 13. If you become aware of any data we have collected from children under age 13, please contact us using the contact information provided below.
-          </Typography>
-        </Box>
-
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            8. Controls for Do-Not-Track Features
-          </Typography>
-          <Typography paragraph>
-            Most web browsers and some mobile operating systems include a Do-Not-Track ("DNT") feature or setting you can activate to signal your privacy preference not to have data about your online browsing activities monitored and collected. No uniform technology standard for recognizing and implementing DNT signals has been finalized. As such, we do not currently respond to DNT browser signals or any other mechanism that automatically communicates your choice not to be tracked online. If a standard for online tracking is adopted that we must follow in the future, we will inform you about that practice in a revised version of this Privacy Policy.
-          </Typography>
-        </Box>
-
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            9. Options Regarding Your Information
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Account Information
-          </Typography>
-          <Typography paragraph>
-            You may at any time review or change the information in your account or terminate your account by:
-          </Typography>
-          <List>
-            <ListItem>
-              <ListItemText>
-                Logging into your account settings and updating your account
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Contacting us using the contact information provided below
-              </ListItemText>
-            </ListItem>
-          </List>
-          <Typography paragraph>
-            Upon your request to terminate your account, we will deactivate or delete your account and information from our active databases. However, some information may be retained in our files to prevent fraud, troubleshoot problems, assist with any investigations, enforce our Terms of Use and/or comply with legal requirements.
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Emails and Communications
-          </Typography>
-          <Typography paragraph>
-            If you no longer wish to receive correspondence, emails, or other communications from us, you may opt-out by:
-          </Typography>
-          <List>
-            <ListItem>
-              <ListItemText>
-                Noting your preferences at the time you register your account with the website
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Logging into your account settings and updating your preferences
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                Contacting us using the contact information provided below
-              </ListItemText>
-            </ListItem>
-          </List>
-          <Typography paragraph>
-            If you no longer wish to receive correspondence, emails, or other communications from third parties, you are responsible for contacting the third party directly.
-          </Typography>
-        </Box>
-
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            10. California Privacy Rights
-          </Typography>
-          <Typography paragraph>
-            California Civil Code Section 1798.83, also known as the "Shine The Light" law, permits our users who are California residents to request and obtain from us, once a year and free of charge, information about categories of personal information (if any) we disclosed to third parties for direct marketing purposes and the names and addresses of all third parties with which we shared personal information in the immediately preceding calendar year. If you are a California resident and would like to make such a request, please submit your request in writing to us using the contact information provided below.
-          </Typography>
-          <Typography paragraph>
-            If you are under 18 years of age, reside in California, and have a registered account with the website, you have the right to request removal of unwanted data that you publicly post on the website. To request removal of such data, please contact us using the contact information provided below, and include the email address associated with your account and a statement that you reside in California. We will make sure the data is not publicly displayed on the website, but please be aware that the data may not be completely or comprehensively removed from our systems.
-          </Typography>
-        </Box>
-
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            11. Contact Us
+            12. Contact Us
           </Typography>
           <Typography paragraph>
             If you have questions or comments about this Privacy Policy, please contact us at:
           </Typography>
           <Typography paragraph>
-            Our Company<br />
-            123 Main Street<br />
-            Anytown, ST 12345<br />
-            Email: privacy@yourdomain.com<br />
-            Phone: (123) 456-7890
+            India Inspired<br />
+            123 High Street, London, UK<br />
+            Email: privacy@indiainspired.com<br />
+            Data Protection Officer: dpo@indiainspired.com<br />
+            Phone: +44 (0) 20 1234 5678
+          </Typography>
+          <Typography paragraph>
+            <strong>Information Commissioner's Office (ICO):</strong><br />
+            If you believe we have not handled your personal data in accordance with UK data protection law, 
+            you have the right to lodge a complaint with the ICO at ico.org.uk or by calling 0303 123 1113.
           </Typography>
         </Box>
 

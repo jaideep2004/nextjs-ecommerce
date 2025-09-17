@@ -257,19 +257,19 @@ export default function Footer() {
               <ContactInfo>
                 <Email sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
-                  info@punjabiattire.com
+                  info@indiainspired.com
                 </Typography>
               </ContactInfo>
-              <ContactInfo>
+              {/* <ContactInfo>
                 <Phone sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
                   +44 123 456 7890
                 </Typography>
-              </ContactInfo>
+              </ContactInfo> */}
               <ContactInfo>
                 <LocationOn sx={{ mr: 2, color: '#a29278', fontSize: 20 }} />
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 1)' }}>
-                  123 High Street, London, UK
+                  Patiala, Punjab - 147001
                 </Typography>
               </ContactInfo>
             </Box>

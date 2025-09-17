@@ -1,7 +1,18 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { getServerSession } from 'next-auth/next';
+import connectToDatabase from '@/lib/mongodb';
+import User from '@/models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Import authOptions dynamically to avoid circular imports
+let authOptions;
+try {
+  authOptions = require('@/app/api/auth/[...nextauth]/route').authOptions;
+} catch (error) {
+  console.log('AuthOptions not available in auth utils');
+}
 
 // Hash password
 export const hashPassword = async (password) => {
@@ -66,9 +77,38 @@ export const parseToken = (req) => {
   return null;
 };
 
-// Authentication middleware
+// Enhanced authentication middleware that supports both NextAuth and JWT
 export const isAuthenticated = async (req) => {
+  console.log('=== isAuthenticated called ===');
+  
+  // First try NextAuth session if authOptions is available
+  if (authOptions) {
+    try {
+      console.log('Checking NextAuth session...');
+      const session = await getServerSession(authOptions);
+      console.log('NextAuth session result:', session ? 'Found session for ' + session.user?.email : 'No session');
+      
+      if (session?.user?.email) {
+        await connectToDatabase();
+        const user = await User.findOne({ email: session.user.email }).select('-password');
+        if (user) {
+          console.log('Found user via NextAuth:', user.email);
+          return {
+            _id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin || false
+          };
+        }
+      }
+    } catch (nextAuthError) {
+      console.log('NextAuth session check failed:', nextAuthError.message);
+    }
+  }
+  
+  // Fallback to custom JWT authentication
   try {
+    console.log('Trying custom JWT authentication...');
     const token = parseToken(req);
     
     if (!token) {
@@ -76,15 +116,19 @@ export const isAuthenticated = async (req) => {
     }
     
     const decoded = verifyToken(token);
+    console.log('JWT decoded successfully for user:', decoded._id);
     return decoded;
-  } catch (error) {
-    throw new Error(error.message || 'Authentication failed');
+  } catch (jwtError) {
+    console.log('JWT authentication failed:', jwtError.message);
+    throw new Error('Authentication failed - no valid session or token');
   }
 };
 
-// Admin middleware
+// Enhanced admin middleware that supports both NextAuth and JWT
 export const isAdmin = async (req) => {
   try {
+    console.log('=== isAdmin called ===');
+    
     // If req is a user object (from isAuthenticated result)
     if (req && typeof req === 'object' && req.isAdmin !== undefined) {
       if (!req.isAdmin) {
