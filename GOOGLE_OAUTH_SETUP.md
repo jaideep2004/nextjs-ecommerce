@@ -13,7 +13,7 @@
 
 ## 2. Environment Variables
 
-Create a `.env.local` file in your project root with:
+Create a `.env` file in your project root with:
 
 ```
 NEXTAUTH_URL=http://localhost:3000

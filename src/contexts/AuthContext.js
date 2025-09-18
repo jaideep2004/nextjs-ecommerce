@@ -127,24 +127,30 @@ export function AuthProvider({ children }) {
           console.log('Server authentication check failed (likely logged out):', serverError.response?.status);
           
           // Only clear session if it's actually a 401/403 error, not network issues
-          if (serverError.response?.status === 401 || serverError.response?.status === 403) {
+          // For Google users, don't clear the session immediately as NextAuth might still be valid
+          const isGoogleUser = user?.provider === 'google' || session?.user;
+          if (!isGoogleUser && (serverError.response?.status === 401 || serverError.response?.status === 403)) {
             setUser(null);
             if (typeof window !== 'undefined') {
               localStorage.removeItem('user');
               delete api.defaults.headers.common['Authorization'];
             }
-          } else {
+          } else if (!isGoogleUser) {
             // For network errors or other issues, keep the user logged in locally
             console.log('Network error during auth check, maintaining local session');
           }
+          // For Google users, we keep the session as NextAuth will handle it
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        // Clear any invalid data
-        setUser(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('user');
-          delete api.defaults.headers.common['Authorization'];
+        // Only clear data for non-Google users
+        const isGoogleUser = user?.provider === 'google' || session?.user;
+        if (!isGoogleUser) {
+          setUser(null);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('user');
+            delete api.defaults.headers.common['Authorization'];
+          }
         }
       } finally {
         setLoading(false);

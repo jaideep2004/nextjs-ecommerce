@@ -28,7 +28,7 @@ A modern e-commerce application built with Next.js, Material-UI, and MongoDB.
    # or
    yarn install
    ```
-3. Create a `.env.local` file in the root directory with the following variables:
+3. Create a `.env` file in the root directory with the following variables:
    ```
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret

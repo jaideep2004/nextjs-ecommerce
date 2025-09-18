@@ -107,21 +107,20 @@ export default function LoginPage() {
       setGoogleLoading(true);
       setError('');
       
-      // Get redirect URL from query parameters if it exists
-      let redirectUrl = '/customer/dashboard';
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        redirectUrl = urlParams.get('redirect') || '/customer/dashboard';
-      }
-      
       // Use NextAuth signIn with Google provider
       const result = await signIn('google', {
-        callbackUrl: redirectUrl,
-        redirect: true, // Let NextAuth handle the redirect
+        callbackUrl: typeof window !== 'undefined' ? 
+          new URLSearchParams(window.location.search).get('redirect') || '/customer/dashboard' 
+          : '/customer/dashboard',
+        redirect: false,
       });
       
       if (result?.error) {
         setError('Google Sign-In failed. Please try again.');
+      } else if (result?.ok) {
+        // Instead of immediately redirecting, let NextAuth handle the session
+        // The AuthContext will detect the session and redirect appropriately
+        console.log('Google Sign-In successful, waiting for session sync...');
       }
     } catch (err) {
       console.error('Google Sign-In error:', err);
@@ -227,10 +226,11 @@ export default function LoginPage() {
                 component="h1" 
                 sx={{ 
                   fontWeight: 800,
-                  fontSize: { xs: '2.5rem', md: '3.5rem', lg: '4rem' },
+                  fontSize: { xs: '2.5rem', md: '3.5rem', lg: '3.5rem' },
                   lineHeight: 1.2,
                   mb: 3,
                   color: '#2c3e50',
+                  textAlign: 'center',
                 }}
               >
                 Welcome Back!
@@ -243,7 +243,7 @@ export default function LoginPage() {
                   lineHeight: 1.6,
                   mb: 4,
                   color: '#5f6368',
-                  maxWidth: { lg: '500px' }
+                  // maxWidth: { lg: '500px' }
                 }}
               >
                 Sign in to your India Inspired account to continue your journey with authentic fashion and traditional elegance.
@@ -252,7 +252,7 @@ export default function LoginPage() {
               {/* Features */}
               <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                 <Grid container spacing={3} style={{flexWrap: 'nowrap'}}>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} style={{flex: '1'}}>
                     <Box sx={{ textAlign: 'center', p: 2 }}>
                       <Box sx={{
                         width: 60,
@@ -271,7 +271,7 @@ export default function LoginPage() {
                       <Typography variant="body2" sx={{ color: '#5f6368' }}>Your data is protected with enterprise-grade security</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} style={{flex: '1'}}>
                     <Box sx={{ textAlign: 'center', p: 2 }}>
                       <Box sx={{
                         width: 60,

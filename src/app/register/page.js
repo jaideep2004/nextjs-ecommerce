@@ -480,14 +480,13 @@ export default function RegisterPage() {
 
 								<form onSubmit={handleSubmit}>
 									<Grid container spacing={2}>
-										{/* Full Name and Email in one row */}
 										<div
 											style={{
 												display: "flex",
-												flexDirection: "row",
+												alignItems: "center",
 												gap: "10px",
 											}}>
-											<Grid item xs={12} md={6}>
+											<Grid item xs={12}>
 												<TextField
 													fullWidth
 													label='Full Name'
@@ -523,7 +522,7 @@ export default function RegisterPage() {
 												/>
 											</Grid>
 
-											<Grid item xs={12}>
+											<Grid item xs={12} md={6}>
 												<TextField
 													fullWidth
 													label='Phone Number (optional)'
@@ -559,8 +558,7 @@ export default function RegisterPage() {
 											</Grid>
 										</div>
 
-										{/* Phone Number in full width */}
-										<Grid item xs={12} md={6} style={{ width: "100%" }}>
+										<Grid item xs={12} md={6} style={{ width: '100%' }}>
 											<TextField
 												fullWidth
 												label='Email'
@@ -596,11 +594,11 @@ export default function RegisterPage() {
 											/>
 										</Grid>
 
-                    {/* Password and Confirm Password in one row */}
+                    
                     <div
 											style={{
 												display: "flex",
-												flexDirection: "row",
+												alignItems: "center",
 												gap: "10px",
 											}}>
 										<Grid item xs={12} md={6}>
@@ -692,7 +690,8 @@ export default function RegisterPage() {
 												}}
 											/>
                       </Grid>
-                      </div>
+                    </div>
+                    
 									</Grid>
 
 									<Button

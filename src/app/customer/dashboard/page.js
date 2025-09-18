@@ -775,13 +775,23 @@ export default function CustomerDashboard() {
     wishlistItems: 0,
     pendingOrders: 0,
   });
+  const [initialLoad, setInitialLoad] = useState(true);
   
   // Redirect if user is not logged in
   useEffect(() => {
-    if (!authLoading && !user && typeof window !== 'undefined') {
+    // Add a small delay to allow NextAuth to fully synchronize
+    const timer = setTimeout(() => {
+      setInitialLoad(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  useEffect(() => {
+    if (!initialLoad && !authLoading && !user && typeof window !== 'undefined') {
       router.push('/login?redirect=/customer/dashboard');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, initialLoad]);
 
   // Fetch dashboard stats
   useEffect(() => {
