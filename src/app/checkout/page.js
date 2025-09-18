@@ -37,6 +37,7 @@ import {
   Select,
   MenuItem,
   Checkbox,
+  useTheme,
 } from '@mui/material';
 import {
   NavigateNext,
@@ -47,6 +48,7 @@ import {
 
 // Step components
 const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
+  const theme = useTheme();
   // Countries with their states
   const countriesWithStates = {
     'United States': [
@@ -165,10 +167,10 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
   
   return (
     <Box sx={{ 
-      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+      background: theme.palette.mode === 'dark' ? 'linear-gradient(135deg, #1a1a1a 0%, #111111 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
       p: 4,
       borderRadius: 3,
-      border: '1px solid #e0e0e0',
+      border: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <Box sx={{
@@ -183,7 +185,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
         }}>
           <LocalShipping sx={{ color: 'white', fontSize: 24 }} />
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
           Shipping Address
         </Typography>
       </Box>
@@ -202,7 +204,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.fullName}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -210,9 +212,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -232,7 +243,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.email}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -240,9 +251,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -261,7 +281,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.phone}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -269,9 +289,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -290,7 +319,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.address}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -298,9 +327,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -319,7 +357,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.city}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -327,9 +365,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -343,6 +390,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                 '&.Mui-focused': {
                   color: '#a29278',
                 },
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               }}
             >
               State/Province
@@ -356,7 +404,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
               onBlur={handleBlur}
               disabled={!availableStates.length}
               sx={{
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -364,21 +412,27 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+                '& .MuiSelect-select': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
+                },
               }}
             >
               {availableStates.map((state) => (
-                <MenuItem key={state} value={state}>
+                <MenuItem key={state} value={state} sx={{ color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                   {state}
                 </MenuItem>
               ))}
             </Select>
             {errors.state && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography variant="caption" color={theme.palette.mode === 'dark' ? '#FF6B6B' : 'error'} sx={{ mt: 0.5, ml: 1.5 }}>
                 {errors.state}
               </Typography>
             )}
             {!availableStates.length && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography variant="caption" sx={{ mt: 0.5, ml: 1.5, color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
                 Please select a country first
               </Typography>
             )}
@@ -398,7 +452,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
             helperText={errors.zipCode || (formData.country === 'Canada' ? 'Format: A1A 1A1' : formData.country === 'United States' ? 'Format: 12345 or 12345-6789' : '')}
             sx={{
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -406,9 +460,18 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#a29278',
+              },
+              '& .MuiFormHelperText-root': {
+                color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
               },
             }}
           />
@@ -422,6 +485,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                 '&.Mui-focused': {
                   color: '#a29278',
                 },
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
               }}
             >
               Country
@@ -434,7 +498,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               sx={{
-                bgcolor: 'white',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -442,16 +506,22 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                },
+                '& .MuiSelect-select': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
+                },
               }}
             >
               {countries.map((country) => (
-                <MenuItem key={country} value={country}>
+                <MenuItem key={country} value={country} sx={{ color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                   {country}
                 </MenuItem>
               ))}
             </Select>
             {errors.country && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography variant="caption" color={theme.palette.mode === 'dark' ? '#FF6B6B' : 'error'} sx={{ mt: 0.5, ml: 1.5 }}>
                 {errors.country}
               </Typography>
             )}
@@ -461,9 +531,9 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
         <Grid item xs={12}>
           <Box sx={{ 
             p: 2, 
-            bgcolor: 'rgba(162, 146, 120, 0.1)',
+            bgcolor: theme.palette.mode === 'dark' ? 'rgba(162, 146, 120, 0.1)' : 'rgba(162, 146, 120, 0.1)',
             borderRadius: 2,
-            border: '1px solid rgba(162, 146, 120, 0.3)',
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(162, 146, 120, 0.3)' : '1px solid rgba(162, 146, 120, 0.3)',
           }}>
             <FormControlLabel
               control={
@@ -480,7 +550,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
                 />
               }
               label={
-                <Typography sx={{ fontWeight: 500, color: '#2c3e50' }}>
+                <Typography sx={{ fontWeight: 500, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                   Save this address for future orders
                 </Typography>
               }
@@ -494,6 +564,7 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
 
 const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading }) => {
   const [paymentMethod, setPaymentMethod] = useState('paypal');
+  const theme = useTheme();
   
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
@@ -520,13 +591,13 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
   
   return (
     <Box sx={{ 
-      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+      background: theme.palette.mode === 'dark' ? 'linear-gradient(135deg, #1a1a1a 0%, #111111 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
       p: 4,
       borderRadius: 3,
-      border: '1px solid #e0e0e0',
+      border: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
       maxWidth: '1300px'
     }}>
-      <Grid container spacing={4} >
+      <Grid container spacing={4}>
         {/* Order Summary */}
         <Grid item xs={12} md={8} style={{ flex:1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -542,14 +613,14 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
             }}>
               <CheckCircle sx={{ color: 'white', fontSize: 24 }} />
             </Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
               Review Your Order
             </Typography>
           </Box>
           
           {/* Cart Items */}
-          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
               Order Items
             </Typography>
             <List>
@@ -571,7 +642,7 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                   </ListItemAvatar>
                   <ListItemText
                     primary={
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                         {item.name}
                       </Typography>
                     }
@@ -586,9 +657,9 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                         </Typography>
                       </Box>
                     }
-                    sx={{ ml: 2 }}
+                    sx={{ ml: 2, color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}
                   />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                     ${(item.price * item.quantity).toFixed(2)}
                   </Typography>
                 </ListItem>
@@ -597,20 +668,20 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
           </Paper>
           
           {/* Shipping Address */}
-          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
               Shipping Address
             </Typography>
             <Box sx={{ 
               p: 2, 
-              bgcolor: '#f8f9fa',
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : '#f8f9fa',
               borderRadius: 2,
-              border: '1px solid #e9ecef'
+              border: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e9ecef'
             }}>
-              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                 {formData.fullName}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
                 {formData.address}<br />
                 {formData.city}, {formData.state} {formData.zipCode}<br />
                 {formData.country}<br />
@@ -624,8 +695,8 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
         {/* Payment & Summary */}
         <Grid item xs={12} md={4} style={{ flex:1 }}>
           {/* Payment Method Selection */}
-          <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
               Payment Method
             </Typography>
             
@@ -638,16 +709,17 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                   mb: 2, 
                   p: 2,
                   borderRadius: 2,
-                  border: paymentMethod === 'paypal' ? '2px solid #a29278' : '1px solid #e0e0e0',
+                  border: paymentMethod === 'paypal' ? '2px solid #a29278' : (theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0'),
                   transition: 'all 0.3s ease',
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'inherit',
                 }}>
                   <FormControlLabel 
                     value="paypal" 
                     control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography sx={{ mr: 2, fontWeight: 600 }}>PayPal</Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography sx={{ mr: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>PayPal</Typography>
+                        <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
                           (Credit/Debit Cards)
                         </Typography>
                       </Box>
@@ -658,13 +730,14 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                 <Box sx={{ 
                   p: 2,
                   borderRadius: 2,
-                  border: paymentMethod === 'cod' ? '2px solid #a29278' : '1px solid #e0e0e0',
+                  border: paymentMethod === 'cod' ? '2px solid #a29278' : (theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0'),
                   transition: 'all 0.3s ease',
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'inherit',
                 }}>
                   <FormControlLabel 
                     value="cod" 
                     control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
-                    label={<Typography sx={{ fontWeight: 600 }}>Cash on Delivery</Typography>} 
+                    label={<Typography sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Cash on Delivery</Typography>} 
                   />
                 </Box>
               </RadioGroup>
@@ -672,37 +745,37 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
           </Paper>
           
           {/* Order Summary */}
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          <Paper sx={{ p: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
               Order Summary
             </Typography>
             
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body1">Subtotal</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Subtotal</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                   ${cartTotal.toFixed(2)}
                 </Typography>
               </Box>
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body1">Shipping</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 600, color: shippingCost === 0 ? '#4caf50' : 'inherit' }}>
+                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Shipping</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: shippingCost === 0 ? '#4caf50' : (theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary') }}>
                   {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                 </Typography>
               </Box>
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="body1">Tax (7%)</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Tax (7%)</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                   ${taxAmount.toFixed(2)}
                 </Typography>
               </Box>
               
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0,0,0,0.1)' }} />
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Total</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Total</Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, color: '#a29278' }}>
                   ${finalTotal.toFixed(2)}
                 </Typography>
@@ -712,7 +785,7 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
             {/* Place Order Button */}
             {paymentMethod === 'paypal' ? (
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ mb: 2, textAlign: 'center', color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
                   Click below to complete payment with PayPal
                 </Typography>
                 <PayPalButton 
@@ -872,6 +945,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
+  const theme = useTheme();
   
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -1141,7 +1215,7 @@ export default function CheckoutPage() {
     <PayPalScriptProvider options={{ "client-id": paypalClientId }}>
       <Box sx={{ 
         minHeight: '100vh',
-        bgcolor: '#f8f9fa',
+        bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f8f9fa',
       }}>
         {/* Hero Header */}
         <Box sx={{ 
@@ -1156,7 +1230,7 @@ export default function CheckoutPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
+            background: 'url("data:image/svg+xml,%3Csvg width=\\"60\\" height=\\"60\\" viewBox=\\"0 0 60 60\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cg fill=\\"none\\" fill-rule=\\"evenodd\\"%3E%3Cg fill=\\"%23ffffff\\" fill-opacity=\\"0.05\\"%3E%3Cpath d=\\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
           }} />
           <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
             <Breadcrumbs 
@@ -1223,8 +1297,9 @@ export default function CheckoutPage() {
         <Paper sx={{ 
           p: { xs: 2, md: 4 },
           borderRadius: 3,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0',
+          boxShadow: theme.palette.mode === 'dark' ? '0 10px 40px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.1)',
+          border: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
+          bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'background.paper',
         }}>
         <Stepper 
           activeStep={activeStep} 
@@ -1277,10 +1352,10 @@ export default function CheckoutPage() {
             }}>
               <CheckCircle sx={{ fontSize: 50, color: 'white' }} />
             </Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, color: '#2c3e50', mb: 2 }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50', mb: 2 }}>
               Thank you for your order!
             </Typography>
-            <Typography variant="h6" sx={{ mb: 4, color: '#5f6368', maxWidth: 600, mx: 'auto' }}>
+            <Typography variant="h6" sx={{ mb: 4, color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368', maxWidth: 600, mx: 'auto' }}>
               Your order number is <strong>#{completedOrderId}</strong>. We have emailed your order confirmation,
               and will send you an update when your order has shipped.
             </Typography>
@@ -1320,7 +1395,7 @@ export default function CheckoutPage() {
                   '&:hover': {
                     borderColor: '#8b7d65',
                     color: '#8b7d65',
-                    bgcolor: 'rgba(162, 146, 120, 0.05)',
+                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(162, 146, 120, 0.1)' : 'rgba(162, 146, 120, 0.05)',
                     transform: 'translateY(-2px)',
                   },
                   fontWeight: 600,
@@ -1335,7 +1410,7 @@ export default function CheckoutPage() {
           // Checkout steps
           <Box>
             {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
+              <Alert severity="error" sx={{ mb: 3, bgcolor: theme.palette.mode === 'dark' ? '#331111' : '#ffebee', color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f' }}>
                 {error}
               </Alert>
             )}
@@ -1352,9 +1427,9 @@ export default function CheckoutPage() {
                     py: 1.5,
                     borderRadius: 2,
                     fontWeight: 600,
-                    color: '#5f6368',
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368',
                     '&:hover': {
-                      bgcolor: '#f5f5f5',
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
                     },
                   }}
                 >
@@ -1382,8 +1457,8 @@ export default function CheckoutPage() {
                     fontWeight: 600,
                     transition: 'all 0.3s ease',
                     '&:disabled': {
-                      background: '#e0e0e0',
-                      color: '#9e9e9e',
+                      background: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                      color: theme.palette.mode === 'dark' ? '#666666' : '#9e9e9e',
                     },
                   }}
                 >

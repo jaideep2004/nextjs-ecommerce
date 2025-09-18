@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useThemeContext } from '@/theme';
 import Link from 'next/link';
 import {
   Container,
@@ -43,6 +44,7 @@ import CustomerSidebar from '@/components/customer/CustomerSidebar';
 
 // Profile Information Component
 const ProfileInfo = ({ user, onUpdate }) => {
+  const { theme } = useThemeContext();
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -110,7 +112,13 @@ const ProfileInfo = ({ user, onUpdate }) => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6" component="h2">
+        <Typography 
+          variant="h6" 
+          component="h2"
+          sx={{
+            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+          }}
+        >
           Profile Information
         </Typography>
         
@@ -172,6 +180,26 @@ const ProfileInfo = ({ user, onUpdate }) => {
               onChange={handleChange}
               disabled={!editing}
               required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
           
@@ -185,6 +213,26 @@ const ProfileInfo = ({ user, onUpdate }) => {
               onChange={handleChange}
               disabled={!editing}
               required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
           
@@ -196,6 +244,26 @@ const ProfileInfo = ({ user, onUpdate }) => {
               value={formData.phone}
               onChange={handleChange}
               disabled={!editing}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
         </Grid>
@@ -206,6 +274,7 @@ const ProfileInfo = ({ user, onUpdate }) => {
 
 // Address Component
 const AddressInfo = ({ user, onUpdate }) => {
+  const { theme } = useThemeContext();
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     street: '',
@@ -289,7 +358,13 @@ const AddressInfo = ({ user, onUpdate }) => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6" component="h2">
+        <Typography 
+          variant="h6" 
+          component="h2"
+          sx={{
+            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+          }}
+        >
           Address Information
         </Typography>
         
@@ -360,6 +435,26 @@ const AddressInfo = ({ user, onUpdate }) => {
                 onChange={handleChange}
                 disabled={!editing}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                    '& fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                }}
               />
             </Grid>
             
@@ -372,6 +467,26 @@ const AddressInfo = ({ user, onUpdate }) => {
                 onChange={handleChange}
                 disabled={!editing}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                    '& fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                }}
               />
             </Grid>
             
@@ -386,6 +501,26 @@ const AddressInfo = ({ user, onUpdate }) => {
                 required
                 select
                 SelectProps={{ native: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                    '& fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                }}
               >
                 <option value=""></option>
                 {states.map((state) => (
@@ -405,6 +540,26 @@ const AddressInfo = ({ user, onUpdate }) => {
                 onChange={handleChange}
                 disabled={!editing}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                    '& fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                }}
               />
             </Grid>
             
@@ -419,6 +574,26 @@ const AddressInfo = ({ user, onUpdate }) => {
                 required
                 select
                 SelectProps={{ native: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                    '& fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                }}
               >
                 <option value=""></option>
                 {countries.map((country) => (
@@ -437,6 +612,7 @@ const AddressInfo = ({ user, onUpdate }) => {
 
 // Password Change Component
 const PasswordChange = () => {
+  const { theme } = useThemeContext();
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -503,7 +679,14 @@ const PasswordChange = () => {
   
   return (
     <Box>
-      <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+      <Typography 
+        variant="h6" 
+        component="h2" 
+        sx={{ 
+          mb: 3,
+          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+        }}
+      >
         Change Password
       </Typography>
       
@@ -530,6 +713,26 @@ const PasswordChange = () => {
               value={formData.currentPassword}
               onChange={handleChange}
               required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
           
@@ -542,6 +745,26 @@ const PasswordChange = () => {
               value={formData.newPassword}
               onChange={handleChange}
               required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
           
@@ -554,6 +777,26 @@ const PasswordChange = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                  '& fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                },
+              }}
             />
           </Grid>
           
@@ -578,6 +821,7 @@ const PasswordChange = () => {
 
 // Recent Orders Component
 const RecentOrders = () => {
+  const { theme } = useThemeContext();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -667,31 +911,95 @@ const RecentOrders = () => {
   
   return (
     <Box>
-      <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+      <Typography 
+        variant="h6" 
+        component="h2" 
+        sx={{ 
+          mb: 3,
+          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+        }}
+      >
         Recent Orders
       </Typography>
       
-      <TableContainer component={Paper} sx={{ mb: 3 }}>
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          mb: 3,
+          bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+          boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+        }}
+      >
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead sx={{ 
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' 
+          }}>
             <TableRow>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">Total</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                }}
+              >
+                Order ID
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                }}
+              >
+                Date
+              </TableCell>
+              <TableCell 
+                align="right" 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                }}
+              >
+                Total
+              </TableCell>
+              <TableCell 
+                align="center" 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                }}
+              >
+                Status
+              </TableCell>
+              <TableCell 
+                align="right" 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                }}
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {orders.map((order) => (
               <TableRow key={order._id}>
-                <TableCell component="th" scope="row">
+                <TableCell 
+                  component="th" 
+                  scope="row"
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
                   #{order._id.substring(0, 8)}
                 </TableCell>
-                <TableCell>
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit' 
+                  }}
+                >
                   {new Date(order.createdAt).toLocaleDateString()}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell 
+                  align="right" 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
                   ${order.totalPrice.toFixed(2)}
                 </TableCell>
                 <TableCell align="center">
@@ -706,6 +1014,9 @@ const RecentOrders = () => {
                     component={Link} 
                     href={`/customer/orders/${order._id}`}
                     size="small"
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#a29278' : 'primary.main',
+                    }}
                   >
                     View
                   </Button>
@@ -729,19 +1040,44 @@ const RecentOrders = () => {
 
 // Dashboard Stat Card Component for Customer
 const CustomerStatCard = ({ title, value, icon, color, description }) => {
+  const { theme } = useThemeContext();
+  
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card sx={{ 
+      height: '100%',
+      bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+    }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            <Typography 
+              variant="subtitle2" 
+              gutterBottom
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+              }}
+            >
               {title}
             </Typography>
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography 
+              variant="h4" 
+              component="div" 
+              sx={{ 
+                fontWeight: 'bold', 
+                mb: 1,
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+              }}
+            >
               {value}
             </Typography>
             {description && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+                }}
+              >
                 {description}
               </Typography>
             )}
@@ -750,8 +1086,8 @@ const CustomerStatCard = ({ title, value, icon, color, description }) => {
             sx={{ 
               p: 1.5, 
               borderRadius: '50%', 
-              bgcolor: `${color}.light`,
-              color: `${color}.main`,
+              bgcolor: theme.palette.mode === 'dark' ? `${color}.dark` : `${color}.light`,
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : `${color}.main`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -767,7 +1103,8 @@ const CustomerStatCard = ({ title, value, icon, color, description }) => {
 
 export default function CustomerDashboard() {
   const router = useRouter();
-  const { user, loading: authLoading, logout, updateUserData } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { theme } = useThemeContext();
   const [activeTab, setActiveTab] = useState('profile');
   const [dashboardStats, setDashboardStats] = useState({
     totalOrders: 0,
@@ -788,7 +1125,13 @@ export default function CustomerDashboard() {
   }, []);
   
   useEffect(() => {
-    if (!initialLoad && !authLoading && !user && typeof window !== 'undefined') {
+    // Check if we're still loading authentication state
+    if (authLoading || initialLoad) {
+      return;
+    }
+    
+    // If no user after loading is complete, redirect to login
+    if (!user && typeof window !== 'undefined') {
       router.push('/login?redirect=/customer/dashboard');
     }
   }, [user, authLoading, router, initialLoad]);
@@ -858,17 +1201,24 @@ export default function CustomerDashboard() {
         sx={{
           flexGrow: 1,
           p: 3,
-          bgcolor: '#f5f5f5',
+          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5',
           minHeight: '100vh',
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
+          <Paper 
+            sx={{ 
+              p: 2, 
+              mb: 3,
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+              boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+            }}
+          >
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
               <Link href="/" passHref>
                 <Typography 
-                  color="inherit" 
                   sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
                     cursor: 'pointer',
@@ -877,7 +1227,13 @@ export default function CustomerDashboard() {
                   Home
                 </Typography>
               </Link>
-              <Typography color="text.primary">My Account</Typography>
+              <Typography 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' 
+                }}
+              >
+                My Account
+              </Typography>
             </Breadcrumbs>
           </Paper>
 
@@ -890,13 +1246,18 @@ export default function CustomerDashboard() {
                   variant="h4" 
                   sx={{ 
                     fontWeight: 700,
-                    color: '#2c3e50',
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                     mb: 1,
                   }}
                 >
                   Welcome back, {user?.name?.split(' ')[0] || 'Customer'}!
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+                  }}
+                >
                   Manage your account, orders, and preferences
                 </Typography>
               </Box>
@@ -944,8 +1305,22 @@ export default function CustomerDashboard() {
               <Grid container spacing={4}>
                 {/* Quick Actions */}
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50', mb: 3 }}>
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      borderRadius: 2, 
+                      boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                      bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 600, 
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50', 
+                        mb: 3 
+                      }}
+                    >
                       Quick Actions
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -994,9 +1369,22 @@ export default function CustomerDashboard() {
 
                 {/* Recent Orders Summary */}
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      borderRadius: 2, 
+                      boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                      bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                    }}
+                  >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          fontWeight: 600, 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' 
+                        }}
+                      >
                         Recent Orders
                       </Typography>
                       <Button 
@@ -1017,7 +1405,14 @@ export default function CustomerDashboard() {
           {/* Tab Content - Only show for non-profile tabs */}
           {activeTab !== 'profile' && (
             <Box sx={{ mt: 4 }}>
-              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                }}
+              >
                 {activeTab === 'orders' && (
                   <RecentOrders /> 
                 )}

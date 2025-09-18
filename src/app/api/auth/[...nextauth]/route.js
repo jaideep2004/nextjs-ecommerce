@@ -62,7 +62,7 @@ export const authOptions = {
           const dbUser = await User.findOne({ email: user.email });
           if (dbUser) {
             token.isAdmin = dbUser.isAdmin;
-            token.userId = dbUser._id;
+            token.userId = dbUser._id.toString(); // Ensure it's a string
             console.log('JWT callback: Added user data to token for', user.email);
           }
         } catch (error) {
@@ -73,7 +73,7 @@ export const authOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.isAdmin = token.isAdmin;
+        session.user.isAdmin = token.isAdmin || false;
         session.user.userId = token.userId;
         console.log('Session callback: User session created for', session.user.email);
       }

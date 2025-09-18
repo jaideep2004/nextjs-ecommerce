@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useThemeContext } from '@/theme';
 import axios from 'axios';
 import Link from 'next/link';
 import {
@@ -46,27 +47,63 @@ import {
 
 // Dashboard Stat Card Component
 const StatCard = ({ title, value, icon, color, percentChange, changeType }) => {
+  const { theme } = useThemeContext();
+  
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card sx={{ 
+      height: '100%',
+      bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+    }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            <Typography 
+              variant="subtitle2" 
+              gutterBottom
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+              }}
+            >
               {title}
             </Typography>
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography 
+              variant="h4" 
+              component="div" 
+              sx={{ 
+                fontWeight: 'bold', 
+                mb: 1,
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+              }}
+            >
               {value}
             </Typography>
             {percentChange !== undefined && (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 {changeType === 'increase' ? (
-                  <ArrowUpward fontSize="small" sx={{ color: 'success.main', mr: 0.5 }} />
+                  <ArrowUpward 
+                    fontSize="small" 
+                    sx={{ 
+                      color: theme.palette.mode === 'dark' ? '#4caf50' : 'success.main', 
+                      mr: 0.5 
+                    }} 
+                  />
                 ) : (
-                  <ArrowDownward fontSize="small" sx={{ color: 'error.main', mr: 0.5 }} />
+                  <ArrowDownward 
+                    fontSize="small" 
+                    sx={{ 
+                      color: theme.palette.mode === 'dark' ? '#f44336' : 'error.main', 
+                      mr: 0.5 
+                    }} 
+                  />
                 )}
                 <Typography 
                   variant="body2" 
-                  color={changeType === 'increase' ? 'success.main' : 'error.main'}
+                  sx={{ 
+                    color: changeType === 'increase' 
+                      ? (theme.palette.mode === 'dark' ? '#4caf50' : 'success.main') 
+                      : (theme.palette.mode === 'dark' ? '#f44336' : 'error.main')
+                  }}
                 >
                   {percentChange}% from last month
                 </Typography>
@@ -77,8 +114,8 @@ const StatCard = ({ title, value, icon, color, percentChange, changeType }) => {
             sx={{ 
               p: 1.5, 
               borderRadius: '50%', 
-              bgcolor: `${color}.light`,
-              color: `${color}.main`,
+              bgcolor: theme.palette.mode === 'dark' ? `${color}.dark` : `${color}.light`,
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : `${color}.main`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -126,10 +163,17 @@ const RecentOrders = ({ orders }) => {
     return order.orderStatus || 'Pending';
   };
   
+  const { theme } = useThemeContext();
+  
   if (!orders || orders.length === 0) {
     return (
       <Box sx={{ py: 2, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+          }}
+        >
           No recent orders found
         </Typography>
       </Box>
@@ -137,15 +181,56 @@ const RecentOrders = ({ orders }) => {
   }
   
   return (
-    <TableContainer>
+    <TableContainer 
+      sx={{ 
+        bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+        boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+      }}
+    >
       <Table size="small">
         <TableHead>
-          <TableRow>
-            <TableCell>Order ID</TableCell>
-            <TableCell>Customer</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell align="right">Amount</TableCell>
-            <TableCell align="center">Status</TableCell>
+          <TableRow 
+            sx={{ 
+              bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' 
+            }}
+          >
+            <TableCell 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Order ID
+            </TableCell>
+            <TableCell 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Customer
+            </TableCell>
+            <TableCell 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Date
+            </TableCell>
+            <TableCell 
+              align="right" 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Amount
+            </TableCell>
+            <TableCell 
+              align="center" 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Status
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -154,12 +239,24 @@ const RecentOrders = ({ orders }) => {
             const userName = order.user?.name || order.user?.email || 'Unknown';
             
             return (
-              <TableRow key={order._id} hover>
-                <TableCell>
+              <TableRow 
+                key={order._id} 
+                hover
+                sx={{
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'rgba(0, 0, 0, 0.04)',
+                  },
+                }}
+              >
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
                   <Link href={`/admin/orders/${order._id}`} passHref>
                     <Typography 
                       sx={{ 
-                        color: 'primary.main',
+                        color: theme.palette.mode === 'dark' ? '#a29278' : 'primary.main',
                         textDecoration: 'none',
                         '&:hover': { textDecoration: 'underline' },
                       }}
@@ -168,9 +265,28 @@ const RecentOrders = ({ orders }) => {
                     </Typography>
                   </Link>
                 </TableCell>
-                <TableCell>{userName}</TableCell>
-                <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell align="right">${order.totalPrice.toFixed(2)}</TableCell>
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
+                  {userName}
+                </TableCell>
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit' 
+                  }}
+                >
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell 
+                  align="right" 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
+                  ${order.totalPrice.toFixed(2)}
+                </TableCell>
                 <TableCell align="center">
                   <Chip 
                     label={orderStatus} 
@@ -189,10 +305,17 @@ const RecentOrders = ({ orders }) => {
 
 // Low Stock Products Component
 const LowStockProducts = ({ products }) => {
+  const { theme } = useThemeContext();
+  
   if (!products || products.length === 0) {
     return (
       <Box sx={{ py: 2, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+          }}
+        >
           No low stock products found
         </Typography>
       </Box>
@@ -200,14 +323,49 @@ const LowStockProducts = ({ products }) => {
   }
   
   return (
-    <TableContainer>
+    <TableContainer 
+      sx={{ 
+        bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+        boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+      }}
+    >
       <Table size="small">
         <TableHead>
-          <TableRow>
-            <TableCell>Product</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Stock</TableCell>
+          <TableRow 
+            sx={{ 
+              bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' 
+            }}
+          >
+            <TableCell 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Product
+            </TableCell>
+            <TableCell 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Category
+            </TableCell>
+            <TableCell 
+              align="right" 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Price
+            </TableCell>
+            <TableCell 
+              align="right" 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+              }}
+            >
+              Stock
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -218,13 +376,25 @@ const LowStockProducts = ({ products }) => {
               : product.category || 'Uncategorized';
               
             return (
-              <TableRow key={product._id} hover>
-                <TableCell>
+              <TableRow 
+                key={product._id} 
+                hover
+                sx={{
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'rgba(0, 0, 0, 0.04)',
+                  },
+                }}
+              >
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
                   <Typography 
                     component={Link}
                     href={`/admin/products/${product._id}`}
                     sx={{ 
-                      color: 'primary.main',
+                      color: theme.palette.mode === 'dark' ? '#a29278' : 'primary.main',
                       textDecoration: 'none',
                       '&:hover': { textDecoration: 'underline' },
                     }}
@@ -232,12 +402,29 @@ const LowStockProducts = ({ products }) => {
                     {product.name}
                   </Typography>
                 </TableCell>
-                <TableCell>{categoryName}</TableCell>
-                <TableCell align="right">${product.price.toFixed(2)}</TableCell>
+                <TableCell 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
+                  {categoryName}
+                </TableCell>
+                <TableCell 
+                  align="right" 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                  }}
+                >
+                  ${product.price.toFixed(2)}
+                </TableCell>
                 <TableCell align="right">
                   <Typography 
-                    color={product.countInStock <= 5 ? 'error.main' : 'text.primary'}
-                    fontWeight={product.countInStock <= 5 ? 'bold' : 'normal'}
+                    sx={{ 
+                      color: product.countInStock <= 5 
+                        ? (theme.palette.mode === 'dark' ? '#f44336' : 'error.main') 
+                        : (theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary'),
+                      fontWeight: product.countInStock <= 5 ? 'bold' : 'normal'
+                    }}
                   >
                     {product.countInStock}
                   </Typography>
@@ -254,6 +441,7 @@ const LowStockProducts = ({ products }) => {
 export default function AdminDashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { theme } = useThemeContext();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -357,13 +545,18 @@ export default function AdminDashboard() {
           variant="h4" 
           sx={{ 
             fontWeight: 700,
-            color: '#2c3e50',
+            color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
             mb: 1,
           }}
         >
           Dashboard Overview
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+          }}
+        >
           Monitor your store's performance and key metrics
         </Typography>
         
@@ -443,9 +636,24 @@ export default function AdminDashboard() {
           <Grid container spacing={4}>
             {/* Recent Orders */}
             <Grid item xs={12} lg={8}>
-              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 4px 20px rgba(0,0,0,0.3)' 
+                    : '0 4px 20px rgba(0,0,0,0.1)',
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                }}
+              >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600, 
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' 
+                    }}
+                  >
                     Recent Orders
                   </Typography>
                   <Button 
@@ -463,9 +671,24 @@ export default function AdminDashboard() {
             
             {/* Low Stock Products */}
             <Grid item xs={12} lg={4}>
-              <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 4px 20px rgba(0,0,0,0.3)' 
+                    : '0 4px 20px rgba(0,0,0,0.1)',
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                }}
+              >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600, 
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' 
+                    }}
+                  >
                     Low Stock Alert
                   </Typography>
                   <Button 

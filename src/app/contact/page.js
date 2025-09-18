@@ -129,7 +129,7 @@ export default function ContactPage() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box
+      {/* <Box
         sx={{
           background: 'linear-gradient(135deg, #5D4037 0%, #3E2723 100%)',
           color: 'white',
@@ -179,14 +179,14 @@ export default function ContactPage() {
             </Typography>
           </Box>
         </Container>
-      </Box>
+      </Box> */}
 
       {/* Contact Section */}
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
 
         <Grid container spacing={{ xs: 3, md: 4 }} sx={{ alignItems: 'stretch', minHeight: { xs: 'auto', md: '600px' }, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
           {/* Contact Information */}
-          <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }}>
+          <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }} style={{flex:'1'}}>
             <Box sx={{ 
               pr: { md: 2 }, 
               pt: { xs: 2, md: 0 },
@@ -472,7 +472,7 @@ export default function ContactPage() {
           </Grid>
 
           {/* Contact Form */}
-          <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }}>
+          <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }} style={{flex:'1'}}>
             <Paper 
               elevation={0}
               sx={{ 
@@ -646,7 +646,7 @@ export default function ContactPage() {
           >
             <Box sx={{ height: { xs: 350, md: 500 }, width: '100%', position: 'relative' }}>
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215256349542!2d-73.99830082346288!3d40.75097623440235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9aeb1c6b5%3A0x35b1cfbc89a6097f!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1690214215440!5m2!1sen!2sus"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110180.69773653465!2d76.32665220262716!3d30.34677746323181!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391028935a3313df%3A0xd5bc56ad3b90bc7f!2sPatiala%2C%20Punjab!5e0!3m2!1sen!2sin!4v1758196441712!5m2!1sen!2sin"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -655,6 +655,7 @@ export default function ContactPage() {
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Store Location"
               />
+              
             </Box>
           </Paper>
 

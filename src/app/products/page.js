@@ -62,10 +62,13 @@ import {
 	BrandingWatermark,
 	Email,
 	Notifications,
+	Sort,
+	ArrowDropDown,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { styled, keyframes } from "@mui/material/styles";
 import ProductGrid from "@/components/products/ProductGrid";
+
 
 // Enhanced animations for 4th dimensional feel
 const shimmer = keyframes`
@@ -205,6 +208,60 @@ const NewsletterSection = styled(Box)(({ theme }) => ({
 	},
 }));
 
+// Add new styled components for enhanced sidebar
+const SidebarSection = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(4),
+  padding: theme.spacing(2),
+  borderRadius: '16px',
+  background: theme.palette.mode === 'dark' 
+    ? 'rgba(255, 255, 255, 0.05)' 
+    : 'rgba(0, 0, 0, 0.03)',
+  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: theme.palette.mode === 'dark' 
+      ? 'rgba(255, 255, 255, 0.08)' 
+      : 'rgba(0, 0, 0, 0.05)',
+    transform: 'translateY(-2px)',
+    boxShadow: theme.palette.mode === 'dark' 
+      ? '0 4px 20px rgba(0, 0, 0, 0.3)' 
+      : '0 4px 20px rgba(0, 0, 0, 0.1)',
+  },
+}));
+
+const SidebarTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  marginBottom: theme.spacing(2),
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  paddingBottom: theme.spacing(1),
+  borderBottom: `2px solid ${theme.palette.primary.main}`,
+  color: theme.palette.mode === 'dark' ? '#FFFFFF' : theme.palette.primary.main,
+}));
+
+const FilterChip = styled(Chip)(({ theme, selected }) => ({
+  margin: '4px',
+  borderRadius: '20px',
+  transition: 'all 0.3s ease',
+  background: selected
+    ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
+    : theme.palette.mode === 'dark'
+    ? 'rgba(255, 255, 255, 0.1)'
+    : 'rgba(0, 0, 0, 0.05)',
+  color: selected ? 'white' : theme.palette.text.primary,
+  border: selected ? 'none' : `1px solid ${theme.palette.divider}`,
+  fontWeight: selected ? 600 : 400,
+  '&:hover': {
+    transform: 'translateY(-2px) scale(1.05)',
+    boxShadow: selected
+      ? `0 4px 15px ${theme.palette.primary.main}40`
+      : theme.palette.mode === 'dark'
+      ? '0 4px 15px rgba(255, 255, 255, 0.1)'
+      : '0 4px 15px rgba(0, 0, 0, 0.1)',
+  },
+}));
+
 export default function ProductsPage() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -236,7 +293,7 @@ export default function ProductsPage() {
 	// State for mobile filter drawer and view mode
 	const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 	const [viewMode, setViewMode] = useState("grid");
-	const [newsletterEmail, setNewsletterEmail] = useState("");
+	const [newsletterEmail, setNewsletterEmail] = "";
 
 	// Dynamic filters from products data
 	const [dynamicFilters, setDynamicFilters] = useState({
@@ -399,21 +456,18 @@ export default function ProductsPage() {
 					}
 					
 					const res = await axios.get("/api/wishlist", { headers });
-					const items = res.data.data?.wishlist || res.data.wishlist || [];
-					setWishlistItems(
-						items.map((item) => item.product || { _id: item.productId })
-					);
-				} catch (error) {
-					console.error("Error fetching wishlist:", error);
-					if (error.response?.status === 401) {
-						router.push("/login?redirect=/products");
-					}
+					const wishlistData = res.data.data?.wishlist || res.data.wishlist || [];
+					setWishlistItems(wishlistData.map(item => item._id));
+				} catch (err) {
+					console.error("Error fetching wishlist:", err);
+					// Don't show error to user for wishlist, just clear the items
+					setWishlistItems([]);
 				}
 			}
 		};
 
 		fetchWishlist();
-	}, [user, router]);
+	}, [user]);
 
 	// Handle filter changes
 	const handleFilterChange = (name, value) => {
@@ -547,48 +601,69 @@ export default function ProductsPage() {
 			<Container maxWidth='xl' sx={{ py: 4 }}>
 				{/* Enhanced Header Section */}
 				<Box sx={{ mb: 4 }}>
-					<Breadcrumbs
+					{/* <Breadcrumbs
 						separator={<NavigateNext fontSize='small' />}
 						aria-label='breadcrumb'
 						sx={{ mb: 2 }}>
 						<Link href='/' passHref>
 							<Typography
 								color='inherit'
-								sx={{ "&:hover": { textDecoration: "underline" } }}>
+								sx={{ 
+                                  "&:hover": { 
+                                    textDecoration: "underline",
+                                    color: theme.palette.primary.main
+                                  } 
+                                }}>
 								Home
 							</Typography>
 						</Link>
 						<Typography color='text.primary' sx={{ fontWeight: 600 }}>
 							Products
 						</Typography>
-					</Breadcrumbs>
+					</Breadcrumbs> */}
 
 					<Box
 						sx={{
 							display: "flex",
-							justifyContent: "space-between",
+							justifyContent: "center",
 							alignItems: "center",
 							mb: 3,
+							flexDirection: { xs: 'column', md: 'row' },
+							gap: 2,
+							textAlign: { xs: 'center', md: 'left' }
 						}}>
-						<Typography
-							variant='h3'
-							component='h1'
-							sx={{
-								fontWeight: 700,
-								background:
-									theme.palette.mode === "dark"
+						<Box>
+							<Typography
+								variant='h1'
+								component='h1'
+								sx={{
+									fontWeight: 800,
+									background: theme.palette.mode === "dark"
 										? "linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)"
-										: "linear-gradient(135deg, #5D4037 0%, #8D6E63 100%)",
-								webkitBackgroundClip: "text",
-								webkitTextFillColor: "transparent",
-								backgroundClip: "text",
-								mb: 1,
-								fontSize: { xs: '2.4rem', md: '2.5rem' },
-							}}>
-							Discover Amazing Products
-						</Typography>
+										: "#a29278",
+									WebkitBackgroundClip: "text",
+									WebkitTextFillColor: "transparent",
+									backgroundClip: "text",
+									mb: 1,
+									fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3rem' },
+									lineHeight: 1.2,
+									textAlign: 'center',
+								}}>
+								Discover Amazing Products
+							</Typography>
+							<Typography
+								variant='h6'
+								sx={{
+									fontWeight: 400,
+									color: theme.palette.mode === "dark" ? "#CCCCCC" : "black",
+									// maxWidth: { md: '70%' },
+									textAlign: 'center',
+								}}>
+								Explore our curated collection of premium items designed to elevate your lifestyle
+							</Typography>
+						</Box>
 
-						{!isMobile && (
+						{/* {!isMobile && (
 							<ToggleButtonGroup
 								value={viewMode}
 								exclusive
@@ -596,29 +671,81 @@ export default function ProductsPage() {
 								size='small'
 								sx={{
 									background: theme.palette.background.paper,
-									borderRadius: "12px",
-									boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+									borderRadius: "16px",
+									boxShadow: theme.palette.mode === "dark" 
+										? "0 4px 20px rgba(0, 0, 0, 0.3)" 
+										: "0 4px 20px rgba(0, 0, 0, 0.1)",
+									alignSelf: { xs: 'center', md: 'flex-start' }
 								}}>
-								<ToggleButton value='grid' sx={{ borderRadius: "12px" }}>
-									<ViewModule />
+								<ToggleButton value='grid' sx={{ 
+									borderRadius: "16px",
+									px: 2,
+									'&.Mui-selected': {
+										background: theme.palette.primary.main,
+										color: 'white'
+									}
+								}}>
+									<ViewModule sx={{ mr: 1 }} /> Grid
 								</ToggleButton>
-								<ToggleButton value='list' sx={{ borderRadius: "12px" }}>
-									<ViewList />
+								<ToggleButton value='list' sx={{ 
+									borderRadius: "16px",
+									px: 2,
+									'&.Mui-selected': {
+										background: theme.palette.primary.main,
+										color: 'white'
+									}
+								}}>
+									<ViewList sx={{ mr: 1 }} /> List
 								</ToggleButton>
 							</ToggleButtonGroup>
-						)}
+						)} */} 
 					</Box>
 
-					<Typography
-						variant='h6'
-						color='text.secondary'
-						sx={{ fontWeight: 400, mb: 2 }}>
-						Showing{" "}
-						{!loading
-							? `01-${Math.min(products.length, 16)} of ${pagination.total}`
-							: "..."}{" "}
-						Results
-					</Typography>
+					<Box sx={{ 
+						display: 'flex', 
+						justifyContent: 'space-between', 
+						alignItems: 'center',
+						mt: 2,
+						flexDirection: { xs: 'column', sm: 'row' },
+						gap: 2
+					}}>
+						<Typography
+							variant='body1'
+							sx={{ 
+								fontWeight: 500,
+								display: 'flex',
+								alignItems: 'center',
+								gap: 1
+							}}>
+							<TrendingUp color='primary' />
+							Showing{" "}
+							{!loading
+								? `${(pagination.page - 1) * 12 + 1}-${Math.min(pagination.page * 12, pagination.total)} of ${pagination.total}`
+								: "..."}{" "}
+							Results
+						</Typography>
+						
+						{filters.category || filters.brands.length > 0 || filters.minPrice > 0 || filters.search ? (
+							<Button
+								size='small'
+								onClick={clearFilters}
+								startIcon={<Clear />}
+								sx={{
+									borderRadius: "20px",
+									textTransform: "none",
+									fontWeight: 600,
+									background: theme.palette.mode === "dark" 
+										? "rgba(255, 255, 255, 0.1)" 
+										: "rgba(0, 0, 0, 0.05)",
+									'&:hover': {
+										background: theme.palette.error.main,
+										color: 'white'
+									}
+								}}>
+								Clear All Filters
+							</Button>
+						) : null}
+					</Box>
 				</Box>
 
 				<Grid
@@ -630,215 +757,196 @@ export default function ProductsPage() {
 						<Grid
 							item
 							xs={12}
-							md={2.5}
-							sx={{ minWidth: { md: "280px" }, maxWidth: { md: "320px" } }}>
+							md={3}
+							sx={{ minWidth: { md: "280px" }, maxWidth: { md: "320px" }}}>
 							<FilterSidebar sx={{ p: 3 }}>
-							{/* Filter Header */}
-							<Box
-								sx={{
-									display: "flex",
-									justifyContent: "space-between",
-									alignItems: "center",
-									mb: 3,
-								}}>
-								<Typography
-									variant='h5'
-									sx={{
-										fontWeight: 700,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
-									<Tune color='primary' />
-									Product Categories
-								</Typography>
-								<Button
-									size='small'
-									onClick={clearFilters}
-									startIcon={<Clear />}
-									sx={{
-										borderRadius: "20px",
-										textTransform: "none",
-										fontWeight: 600,
-									}}>
-									Clear All
-								</Button>
-							</Box>
-
-							{/* Product Categories */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
-									<Category fontSize='small' />
-									Categories
-								</Typography>
-								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-									{dynamicFilters.categories.map((category) => (
-										<CategoryChip
-											key={category.name}
-											label={`${category.name} (${category.count})`}
-											selected={filters.category === category.name}
-											onClick={() =>
-												handleFilterChange(
-													"category",
-													filters.category === category.name
-														? ""
-														: category.name
-												)
-											}
-											size='small'
-											variant={
-												filters.category === category.name
-													? "filled"
-													: "outlined"
-											}
-										/>
-									))}
-								</Box>
-							</Box>
-
-							{/* Brands */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
-									<BrandingWatermark fontSize='small' />
-									Brands
-								</Typography>
-								<FormGroup>
-									{dynamicFilters.brands.map((brand) => (
-										<FormControlLabel
-											key={brand.name}
-											control={<Checkbox size='small' />}
-											label={
-												<Box
-													sx={{
-														display: "flex",
-														justifyContent: "space-between",
-														width: "100%",
-													}}>
-													<Typography variant='body2'>{brand.name}</Typography>
-													<Typography variant='body2' color='text.secondary'>
-														({brand.count})
-													</Typography>
-												</Box>
-											}
-											sx={{ m: 0, mb: 0.5, width: "100%" }}
-										/>
-									))}
-								</FormGroup>
-							</Box>
-
-							{/* Color Filter */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
-									<ColorLens fontSize='small' />
-									Color
-								</Typography>
-								{dynamicFilters.colors.length > 0 && (
-									<Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-										{dynamicFilters.colors.map((color) => (
-											<Chip
-												key={color.name}
-												label={color.name}
-												size='small'
-												variant='outlined'
-												sx={{
-													borderRadius: "16px",
-													transition: "all 0.2s ease",
-													"&:hover": {
-														transform: "scale(1.05)",
-														borderColor: theme.palette.primary.main,
-													},
-													mb: 1,
-												}}
-											/>
-										))}
-									</Stack>
-								)}
-							</Box>
-
-							{/* Price Range Filter */}
-							<Box sx={{ mb: 3 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
-									<AttachMoney fontSize='small' />
-									Price Filter
-								</Typography>
-								<Slider
-									value={[filters.minPrice, filters.maxPrice]}
-									onChange={handlePriceChange}
-									valueLabelDisplay='auto'
-									min={0}
-									max={1000}
-									sx={{
-										color: theme.palette.primary.main,
-										height: 8,
-										"& .MuiSlider-track": {
-											border: "none",
-											background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-										},
-										"& .MuiSlider-thumb": {
-											height: 20,
-											width: 20,
-											backgroundColor: "#fff",
-											border: `2px solid ${theme.palette.primary.main}`,
-											"&:hover, &.Mui-focusVisible": {
-												boxShadow: `0px 0px 0px 8px ${theme.palette.primary.main}16`,
-											},
-										},
-									}}
-								/>
+								{/* Filter Header */}
 								<Box
 									sx={{
 										display: "flex",
 										justifyContent: "space-between",
-										mt: 1,
+										alignItems: "center",
+										mb: 3,
 									}}>
-									<Typography variant='body2' sx={{ fontWeight: 600 }}>
-										${filters.minPrice}
+									<Typography
+										variant='h5'
+										sx={{
+											fontWeight: 700,
+											display: "flex",
+											alignItems: "center",
+											gap: 1,
+										}}>
+										<Tune color='primary' />
+										Filters
 									</Typography>
-									<Typography variant='body2' sx={{ fontWeight: 600 }}>
-										${filters.maxPrice}
-									</Typography>
+									<Button
+										size='small'
+										onClick={clearFilters}
+										startIcon={<Clear />}
+										sx={{
+											borderRadius: "20px",
+											textTransform: "none",
+											fontWeight: 600,
+										}}>
+										Reset
+									</Button>
 								</Box>
-							</Box>
-						</FilterSidebar>
+
+								{/* Product Categories */}
+								<SidebarSection>
+									<SidebarTitle>
+										<Category fontSize='small' />
+										Categories
+									</SidebarTitle>
+									<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+										{dynamicFilters.categories.map((category) => (
+											<FilterChip
+												key={category.id}
+												label={`${category.name} (${category.count})`}
+												selected={filters.category === category.name}
+												onClick={() =>
+													handleFilterChange(
+														"category",
+														filters.category === category.name
+															? ""
+															: category.name
+													)
+												}
+												size='small'
+												variant={
+													filters.category === category.name
+														? "filled"
+														: "outlined"
+												}
+											/>
+										))}
+									</Box>
+								</SidebarSection>
+
+								{/* Brands */}
+								<SidebarSection>
+									<SidebarTitle>
+										<BrandingWatermark fontSize='small' />
+										Brands
+									</SidebarTitle>
+									<FormGroup>
+										{dynamicFilters.brands.map((brand) => (
+											<FormControlLabel
+												key={brand.name}
+												control={
+													<Checkbox 
+														size='small' 
+														checked={filters.brands.includes(brand.name)}
+														onChange={(e) => {
+															const newBrands = e.target.checked
+																? [...filters.brands, brand.name]
+																: filters.brands.filter(b => b !== brand.name);
+															handleFilterChange("brands", newBrands);
+														}}
+													/>
+												}
+												label={
+													<Box
+														sx={{
+															display: "flex",
+															justifyContent: "space-between",
+															width: "100%",
+														}}>
+														<Typography variant='body2'>{brand.name}</Typography>
+														<Typography variant='body2' color='text.secondary'>
+															({brand.count})
+														</Typography>
+													</Box>
+												}
+												sx={{ m: 0, mb: 0.5, width: "100%" }}
+											/>
+										))}
+									</FormGroup>
+								</SidebarSection>
+
+								{/* Color Filter */}
+								<SidebarSection>
+									<SidebarTitle>
+										<ColorLens fontSize='small' />
+										Colors
+									</SidebarTitle>
+									{dynamicFilters.colors.length > 0 && (
+										<Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+											{dynamicFilters.colors.map((color) => (
+												<Chip
+													key={color.name}
+													label={color.name}
+													size='small'
+													variant='outlined'
+													sx={{
+														borderRadius: "16px",
+														transition: "all 0.2s ease",
+														"&:hover": {
+															transform: "scale(1.05)",
+															borderColor: theme.palette.primary.main,
+														},
+														mb: 1,
+													}}
+												/>
+											))}
+										</Stack>
+									)}
+								</SidebarSection>
+
+								{/* Price Range Filter */}
+								<SidebarSection>
+									<SidebarTitle>
+										<AttachMoney fontSize='small' />
+										Price Range
+									</SidebarTitle>
+									<Box sx={{ px: 1 }}>
+										<Slider
+											value={[filters.minPrice, filters.maxPrice]}
+											onChange={handlePriceChange}
+											valueLabelDisplay='auto'
+											min={0}
+											max={1000}
+											sx={{
+												color: theme.palette.primary.main,
+												height: 8,
+												"& .MuiSlider-track": {
+													border: "none",
+													background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+												},
+												"& .MuiSlider-thumb": {
+													height: 20,
+													width: 20,
+													backgroundColor: "#fff",
+													border: `2px solid ${theme.palette.primary.main}`,
+													"&:hover, &.Mui-focusVisible": {
+														boxShadow: `0px 0px 0px 8px ${theme.palette.primary.main}16`,
+													},
+												},
+											}}
+										/>
+										<Box
+											sx={{
+												display: "flex",
+												justifyContent: "space-between",
+												mt: 1,
+											}}>
+											<Typography variant='body2' sx={{ fontWeight: 600 }}>
+												${filters.minPrice}
+											</Typography>
+											<Typography variant='body2' sx={{ fontWeight: 600 }}>
+												${filters.maxPrice}
+											</Typography>
+										</Box>
+									</Box>
+								</SidebarSection>
+							</FilterSidebar>
 						</Grid>
 					)}
 
 					{/* Enhanced Products Grid */}
-					<Grid item xs={12} md={9.5}>
+					<Grid item xs={12} md={9}>
 						{/* Enhanced Search and Sort Bar */}
-						<StyledPaper sx={{ p: 3, mb: 4 }}>
+						<StyledPaper sx={{ p: 3, mb: 4, borderRadius: '20px' }}>
 							<Grid container spacing={3} alignItems='center'>
 								<Grid item xs={12} md={8}>
 									<form onSubmit={handleSearch}>
@@ -858,13 +966,52 @@ export default function ProductsPage() {
 														<Search color='primary' />
 													</InputAdornment>
 												),
+												endAdornment: filters.search && (
+													<InputAdornment position='end'>
+														<IconButton 
+															size='small' 
+															onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
+														>
+															<Clear fontSize='small' />
+														</IconButton>
+													</InputAdornment>
+												)
+											}}
+											sx={{
+												"& .MuiOutlinedInput-root": {
+													borderRadius: "25px",
+													background:
+														theme.palette.mode === "dark"
+															? "rgba(255, 255, 255, 0.05)"
+															: "rgba(255, 255, 255, 0.8)",
+													backdropFilter: "blur(10px)",
+													transition: "all 0.3s ease",
+													"&:hover": {
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(255, 255, 255, 0.08)"
+																: "rgba(255, 255, 255, 0.95)",
+														transform: "translateY(-1px)",
+														boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+													},
+													"&.Mui-focused": {
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(255, 255, 255, 0.1)"
+																: "rgba(255, 255, 255, 1)",
+														boxShadow: `0 0 0 2px ${theme.palette.primary.main}40`,
+													},
+												},
 											}}
 										/>
 									</form>
 								</Grid>
 								<Grid item xs={12} md={4}>
 									<FormControl fullWidth>
-										<InputLabel id='sort-select-label'>Sort By</InputLabel>
+										<InputLabel id='sort-select-label'>
+											<Sort sx={{ mr: 1, fontSize: '1rem' }} /> 
+											Sort By
+										</InputLabel>
 										<Select
 											labelId='sort-select-label'
 											value={filters.sort}
@@ -874,16 +1021,33 @@ export default function ProductsPage() {
 											}
 											sx={{
 												"& .MuiOutlinedInput-root": {
-													borderRadius: "15px",
+													borderRadius: "16px",
 													background:
 														theme.palette.mode === "dark"
 															? "rgba(255, 255, 255, 0.05)"
 															: "rgba(255, 255, 255, 0.8)",
+													"&:hover": {
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor: theme.palette.primary.main,
+														}
+													},
+													"&.Mui-focused": {
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor: theme.palette.primary.main,
+															borderWidth: '2px',
+														}
+													}
 												},
-											}}>
+											}}
+											IconComponent={ArrowDropDown}>
 											{sortOptions.map((option) => (
 												<MenuItem key={option.value} value={option.value}>
-													{option.label}
+													<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+														{option.value.includes('price') && <AttachMoney fontSize="small" />}
+														{option.value.includes('rating') && <Star fontSize="small" />}
+														{option.value.includes('createdAt') && <NewReleases fontSize="small" />}
+														{option.label}
+													</Box>
 												</MenuItem>
 											))}
 										</Select>
@@ -894,7 +1058,16 @@ export default function ProductsPage() {
 
 						{/* Results Count */}
 						{!loading && !error && (
-							<Typography variant='body2' sx={{ mb: 2 }}>
+							<Typography 
+								variant='body1' 
+								sx={{ 
+									mb: 3,
+									display: 'flex',
+									alignItems: 'center',
+									gap: 1,
+									fontWeight: 500
+								}}>
+								<LocalOffer color='primary' />
 								Showing {products.length} of {pagination.total} products
 							</Typography>
 						)}
@@ -946,38 +1119,76 @@ export default function ProductsPage() {
 						)}
 
 						{/* Newsletter Subscription Section */}
-						<NewsletterSection>
+						<NewsletterSection sx={{ 
+							borderRadius: '24px',
+							mt: 8,
+							mb: 4,
+							p: { xs: 4, md: 6 },
+							background: theme.palette.mode === "dark"
+								? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
+								: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+							boxShadow: theme.palette.mode === "dark"
+								? "0 12px 30px rgba(0, 0, 0, 0.4)"
+								: "0 12px 30px rgba(0, 0, 0, 0.1)",
+							position: "relative",
+							overflow: "hidden",
+							"&::before": {
+								content: '""',
+								position: "absolute",
+								top: 0,
+								left: 0,
+								right: 0,
+								bottom: 0,
+								background: `linear-gradient(45deg, 
+									${theme.palette.primary.main}20 0%, 
+									transparent 25%, 
+									transparent 75%, 
+									${theme.palette.secondary.main}20 100%
+								)`,
+								zIndex: 1,
+							},
+						}}>
 							<Grid
 								container
 								spacing={4}
 								alignItems='center'
 								sx={{ 
 									flexWrap: { xs: 'wrap', md: 'nowrap' },
-									textAlign: { xs: 'center', md: 'left' }
+									textAlign: { xs: 'center', md: 'left' },
+									position: 'relative',
+									zIndex: 2
 								}}>
 								<Grid item xs={12} md={6}>
-									<Typography variant='h4' sx={{ 
-										fontWeight: 700, 
+									<Typography variant='h3' sx={{ 
+										fontWeight: 800, 
 										mb: 2,
-										fontSize: { xs: '1.8rem', md: '2.125rem' }
+										background: theme.palette.mode === "dark"
+											? "linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)"
+											: "linear-gradient(135deg, #5D4037 0%, #8D6E63 100%)",
+										WebkitBackgroundClip: "text",
+										WebkitTextFillColor: "transparent",
+										backgroundClip: "text",
+										fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
 									}}>
-										Get Weekly Update. Sign Up And Get Up To{" "}
+										Stay Updated With Our Latest Offers
+									</Typography>
+									<Typography
+										variant='h6'
+										sx={{ 
+											mb: 3,
+											color: theme.palette.mode === "dark" ? "#CCCCCC" : "#5D4037",
+											fontWeight: 400
+										}}>
+										Subscribe to our newsletter and get{" "}
 										<Typography
 											component='span'
 											sx={{
 												color: theme.palette.secondary.main,
-												fontWeight: 800,
+												fontWeight: 700,
 											}}>
-											20% Off
+											20% off
 										</Typography>{" "}
-										Your First Purchase
-									</Typography>
-									<Typography
-										variant='body1'
-										color='text.secondary'
-										sx={{ mb: 3 }}>
-										Stay updated with our latest products, exclusive deals, and
-										fashion trends.
+										on your first purchase
 									</Typography>
 									<Box
 										component='form'
@@ -989,13 +1200,28 @@ export default function ProductsPage() {
 										}}>
 										<TextField
 											fullWidth
-											placeholder='Write your Email Address'
+											placeholder='Enter your email address'
 											value={newsletterEmail}
 											onChange={(e) => setNewsletterEmail(e.target.value)}
+											InputProps={{
+												startAdornment: (
+													<InputAdornment position="start">
+														<Email color="primary" />
+													</InputAdornment>
+												),
+											}}
 											sx={{
 												"& .MuiOutlinedInput-root": {
 													borderRadius: "25px",
 													background: theme.palette.background.paper,
+													boxShadow: theme.palette.mode === "dark"
+														? "0 4px 20px rgba(0, 0, 0, 0.3)"
+														: "0 4px 20px rgba(0, 0, 0, 0.1)",
+													"&:hover": {
+														boxShadow: theme.palette.mode === "dark"
+															? "0 6px 25px rgba(0, 0, 0, 0.4)"
+															: "0 6px 25px rgba(0, 0, 0, 0.15)",
+													},
 												},
 											}}
 										/>
@@ -1010,9 +1236,10 @@ export default function ProductsPage() {
 												fontWeight: 600,
 												textTransform: "none",
 												background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+												boxShadow: `0 4px 20px ${theme.palette.primary.main}40`,
 												"&:hover": {
 													transform: "translateY(-2px)",
-													boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+													boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
 												},
 											}}>
 											Subscribe
@@ -1038,9 +1265,11 @@ export default function ProductsPage() {
 											background: `url("/images/abt3.png")`,
 											backgroundSize: "cover",
 											backgroundPosition: "center",
+											boxShadow: theme.palette.mode === "dark"
+												? "0 12px 30px rgba(0, 0, 0, 0.4)"
+												: "0 12px 30px rgba(0, 0, 0, 0.2)",
+											border: `8px solid ${theme.palette.background.paper}`,
 										}}>
-										{/* <Box sx={{ fontSize: '4rem' }}>👫</Box> */}
-										{/* <img src="/images/abt3.png" alt="About Us" /> */}
 									</Box>
 								</Grid>
 							</Grid>
@@ -1060,10 +1289,13 @@ export default function ProductsPage() {
 							background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
 							"&:hover": {
 								transform: "scale(1.1)",
+								boxShadow: "0 6px 20px rgba(0,0,0,0.3)",
 							},
+							width: 60,
+							height: 60,
 						}}
 						onClick={() => setMobileFiltersOpen(true)}>
-						<FilterList />
+						<FilterList sx={{ fontSize: '1.8rem' }} />
 					</Fab>
 				)}
 
@@ -1074,20 +1306,24 @@ export default function ProductsPage() {
 					onClose={() => setMobileFiltersOpen(false)}
 					sx={{
 						"& .MuiDrawer-paper": {
-							width: "80%",
-							maxWidth: 350,
+							width: "85%",
+							maxWidth: 380,
 							background: theme.palette.background.default,
+							p: 2,
 						},
 					}}>
-					<Box sx={{ p: 2 }}>
+					<Box>
 						<Box
 							sx={{
 								display: "flex",
 								justifyContent: "space-between",
 								alignItems: "center",
-								mb: 2,
+								mb: 3,
+								pb: 2,
+								borderBottom: `1px solid ${theme.palette.divider}`,
 							}}>
-							<Typography variant='h6' sx={{ fontWeight: 700 }}>
+							<Typography variant='h5' sx={{ fontWeight: 700 }}>
+								<Tune sx={{ mr: 1, color: theme.palette.primary.main }} />
 								Filters
 							</Typography>
 							<IconButton onClick={() => setMobileFiltersOpen(false)}>
@@ -1095,7 +1331,7 @@ export default function ProductsPage() {
 							</IconButton>
 						</Box>
 		 				{/* Mobile filter content - reuse desktop sidebar markup */}
-						<FilterSidebar sx={{ p: 2 }}>
+						<Box sx={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
 							{/* Filter Header */}
 							<Box
 								sx={{
@@ -1105,7 +1341,7 @@ export default function ProductsPage() {
 									mb: 3,
 								}}>
 								<Typography
-									variant='h5'
+									variant='h6'
 									sx={{
 										fontWeight: 700,
 										display: "flex",
@@ -1124,38 +1360,30 @@ export default function ProductsPage() {
 										textTransform: "none",
 										fontWeight: 600,
 									}}>
-									Clear All
+									Reset
 								</Button>
 							</Box>
 
 							{/* Product Categories */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
+							<SidebarSection>
+								<SidebarTitle>
 									<Category fontSize='small' />
 									Categories
-								</Typography>
+								</SidebarTitle>
 								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
 									{dynamicFilters.categories.map((category) => (
-										<CategoryChip
-											key={category.name}
+										<FilterChip
+											key={category.id}
 											label={`${category.name} (${category.count})`}
 											selected={filters.category === category.name}
 											onClick={() =>
-											handleFilterChange(
-												"category",
-												filters.category === category.name
-													? ""
-													: category.name
-											)
-										}
+												handleFilterChange(
+													"category",
+													filters.category === category.name
+														? ""
+														: category.name
+												)
+											}
 											size='small'
 											variant={
 												filters.category === category.name
@@ -1165,27 +1393,30 @@ export default function ProductsPage() {
 										/>
 									))}
 								</Box>
-							</Box>
+							</SidebarSection>
 
 							{/* Brands */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
+							<SidebarSection>
+								<SidebarTitle>
 									<BrandingWatermark fontSize='small' />
 									Brands
-								</Typography>
+								</SidebarTitle>
 								<FormGroup>
 									{dynamicFilters.brands.map((brand) => (
 										<FormControlLabel
 											key={brand.name}
-											control={<Checkbox size='small' />}
+											control={
+												<Checkbox 
+													size='small' 
+													checked={filters.brands.includes(brand.name)}
+													onChange={(e) => {
+														const newBrands = e.target.checked
+															? [...filters.brands, brand.name]
+															: filters.brands.filter(b => b !== brand.name);
+														handleFilterChange("brands", newBrands);
+													}}
+												/>
+											}
 											label={
 												<Box
 													sx={{
@@ -1203,22 +1434,14 @@ export default function ProductsPage() {
 										/>
 									))}
 								</FormGroup>
-							</Box>
+							</SidebarSection>
 
 							{/* Color Filter */}
-							<Box sx={{ mb: 4 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
+							<SidebarSection>
+								<SidebarTitle>
 									<ColorLens fontSize='small' />
-									Color
-								</Typography>
+									Colors
+								</SidebarTitle>
 								{dynamicFilters.colors.length > 0 && (
 									<Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
 										{dynamicFilters.colors.map((color) => (
@@ -1240,61 +1463,73 @@ export default function ProductsPage() {
 										))}
 									</Stack>
 								)}
-							</Box>
+							</SidebarSection>
 
 							{/* Price Range Filter */}
-							<Box sx={{ mb: 3 }}>
-								<Typography
-									variant='h6'
-									sx={{
-										mb: 2,
-										fontWeight: 600,
-										display: "flex",
-										alignItems: "center",
-										gap: 1,
-									}}>
+							<SidebarSection>
+								<SidebarTitle>
 									<AttachMoney fontSize='small' />
-									Price Filter
-								</Typography>
-								<Slider
-									value={[filters.minPrice, filters.maxPrice]}
-									onChange={handlePriceChange}
-									valueLabelDisplay='auto'
-									min={0}
-									max={1000}
-									sx={{
-										color: theme.palette.primary.main,
-										height: 8,
-										"& .MuiSlider-track": {
-											border: "none",
-											background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-										},
-										"& .MuiSlider-thumb": {
-											height: 20,
-											width: 20,
-											backgroundColor: "#fff",
-											border: `2px solid ${theme.palette.primary.main}`,
-											"&:hover, &.Mui-focusVisible": {
-												boxShadow: `0px 0px 0px 8px ${theme.palette.primary.main}16`,
+									Price Range
+								</SidebarTitle>
+								<Box sx={{ px: 1 }}>
+									<Slider
+										value={[filters.minPrice, filters.maxPrice]}
+										onChange={handlePriceChange}
+										valueLabelDisplay='auto'
+										min={0}
+										max={1000}
+										sx={{
+											color: theme.palette.primary.main,
+											height: 8,
+											"& .MuiSlider-track": {
+												border: "none",
+												background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
 											},
-										},
-									}}
-								/>
-								<Box
-									sx={{
-										display: "flex",
-										justifyContent: "space-between",
-										mt: 1,
-									}}>
-									<Typography variant='body2' sx={{ fontWeight: 600 }}>
-										${filters.minPrice}
-									</Typography>
-									<Typography variant='body2' sx={{ fontWeight: 600 }}>
-										${filters.maxPrice}
-									</Typography>
+											"& .MuiSlider-thumb": {
+												height: 20,
+												width: 20,
+												backgroundColor: "#fff",
+												border: `2px solid ${theme.palette.primary.main}`,
+												"&:hover, &.Mui-focusVisible": {
+													boxShadow: `0px 0px 0px 8px ${theme.palette.primary.main}16`,
+												},
+											},
+										}}
+									/>
+									<Box
+										sx={{
+											display: "flex",
+											justifyContent: "space-between",
+											mt: 1,
+										}}>
+										<Typography variant='body2' sx={{ fontWeight: 600 }}>
+											${filters.minPrice}
+										</Typography>
+										<Typography variant='body2' sx={{ fontWeight: 600 }}>
+											${filters.maxPrice}
+										</Typography>
+									</Box>
 								</Box>
-							</Box>
-						</FilterSidebar>
+							</SidebarSection>
+							
+							<Button
+								variant="contained"
+								fullWidth
+								onClick={() => setMobileFiltersOpen(false)}
+								sx={{
+									mt: 3,
+									py: 1.5,
+									borderRadius: "16px",
+									fontWeight: 600,
+									background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+									"&:hover": {
+										transform: "translateY(-2px)",
+										boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+									},
+								}}>
+								Apply Filters
+							</Button>
+						</Box>
 					</Box>
 				</Drawer>
 			</Container>

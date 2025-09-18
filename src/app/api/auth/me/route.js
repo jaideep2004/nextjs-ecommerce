@@ -58,6 +58,9 @@ export async function GET(req) {
     
     // If both authentication methods fail
     console.log('Both authentication methods failed');
-    throw new Error('Not authenticated');
+    return Response.json(
+      apiResponse(401, null, 'Not authenticated'),
+      { status: 401 }
+    );
   });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -26,6 +26,7 @@ import {
   Card,
   CardContent,
   Chip,
+  useTheme,
 } from '@mui/material';
 import {
   Add,
@@ -40,9 +41,10 @@ import {
 export default function CartPage() {
   const { cart, updateCartItemQuantity, removeFromCart, clearCart, cartTotal } = useCart();
   const { user } = useAuth();
+  const theme = useTheme();
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponDiscount, setCouponDiscount] = useState('');
   
   // Shipping cost calculation (simplified for demo)
   const shippingCost = cartTotal > 100 ? 0 : 10;
@@ -104,9 +106,9 @@ export default function CartPage() {
             p: 6, 
             textAlign: 'center',
             borderRadius: 3,
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: theme.palette.mode === 'dark' ? 'rgba(17, 17, 17, 0.95)' : 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+            boxShadow: theme.palette.mode === 'dark' ? '0 20px 60px rgba(0,0,0,0.5)' : '0 20px 60px rgba(0,0,0,0.2)',
           }}>
             <Box sx={{ 
               width: 120, 
@@ -124,12 +126,12 @@ export default function CartPage() {
             </Box>
             <Typography variant="h4" gutterBottom sx={{ 
               fontWeight: 700,
-              color: '#2c3e50',
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
               mb: 2,
             }}>
               Your cart is empty
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 400, mx: 'auto' }}>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 400, mx: 'auto', color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
               Discover amazing products and start building your perfect collection today.
             </Typography>
             <Button 
@@ -164,7 +166,7 @@ export default function CartPage() {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      bgcolor: '#f8f9fa',
+      bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f8f9fa',
     }}>
       {/* Hero Header */}
       <Box sx={{ 
@@ -243,7 +245,8 @@ export default function CartPage() {
               mb: { xs: 4, lg: 0 },
               borderRadius: 3,
               overflow: 'hidden',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+              boxShadow: theme.palette.mode === 'dark' ? '0 10px 40px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.1)',
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'background.paper',
             }}>
               <Box sx={{
                 background: 'linear-gradient(135deg, #a29278 0%, #8b7d65 100%)',
@@ -257,11 +260,11 @@ export default function CartPage() {
               <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table>
                   <TableHead sx={{ 
-                    bgcolor: '#f8f9fa',
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     '& .MuiTableCell-head': {
                       fontWeight: 600,
-                      color: '#2c3e50',
-                      borderBottom: '2px solid #e9ecef',
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
+                      borderBottom: theme.palette.mode === 'dark' ? '2px solid #333333' : '2px solid #e9ecef',
                       fontSize: { xs: '0.875rem', md: '1rem' },
                       whiteSpace: 'nowrap',
                     }
@@ -280,7 +283,7 @@ export default function CartPage() {
                         key={`${item._id}-${item.color}-${item.size}`}
                         sx={{
                           '&:hover': {
-                            bgcolor: '#f8f9fa',
+                            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                           },
                           borderLeft: index % 2 === 0 ? '4px solid #a29278' : '4px solid #8b7d65',
                         }}
@@ -308,7 +311,7 @@ export default function CartPage() {
                               <Typography variant="h6" component="h3" sx={{ 
                                 fontWeight: 600,
                                 mb: 1,
-                                color: '#2c3e50',
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                               }}>
                                 <Link href={`/product/${item.slug}`} passHref>
                                   <Box component="span" sx={{ 
@@ -329,8 +332,8 @@ export default function CartPage() {
                                       label={`Color: ${item.color}`}
                                       size="small"
                                       sx={{ 
-                                        bgcolor: '#f1f3f4',
-                                        color: '#5f6368',
+                                        bgcolor: theme.palette.mode === 'dark' ? '#333333' : '#f1f3f4',
+                                        color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368',
                                         fontSize: '0.75rem',
                                       }}
                                     />
@@ -340,8 +343,8 @@ export default function CartPage() {
                                       label={`Size: ${item.size}`}
                                       size="small"
                                       sx={{ 
-                                        bgcolor: '#f1f3f4',
-                                        color: '#5f6368',
+                                        bgcolor: theme.palette.mode === 'dark' ? '#333333' : '#f1f3f4',
+                                        color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368',
                                         fontSize: '0.75rem',
                                       }}
                                     />
@@ -364,7 +367,7 @@ export default function CartPage() {
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center',
-                            bgcolor: '#f8f9fa',
+                            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                             borderRadius: 2,
                             p: 0.5,
                             width: 'fit-content',
@@ -376,7 +379,7 @@ export default function CartPage() {
                               disabled={item.quantity <= 1}
                               sx={{
                                 bgcolor: item.quantity <= 1 ? 'transparent' : '#a29278',
-                                color: item.quantity <= 1 ? 'text.disabled' : 'white',
+                                color: item.quantity <= 1 ? (theme.palette.mode === 'dark' ? '#666666' : 'text.disabled') : 'white',
                                 '&:hover': {
                                   bgcolor: item.quantity <= 1 ? 'transparent' : '#8b7d65',
                                 },
@@ -393,7 +396,7 @@ export default function CartPage() {
                                 minWidth: 24,
                                 textAlign: 'center',
                                 fontWeight: 700,
-                                color: '#2c3e50',
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                               }}
                             >
                               {item.quantity}
@@ -418,7 +421,7 @@ export default function CartPage() {
                         <TableCell align="right">
                           <Typography variant="h6" sx={{ 
                             fontWeight: 800,
-                            color: '#2c3e50',
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                             fontSize: '1.1rem',
                           }}>
                             ${(item.price * item.quantity).toFixed(2)}
@@ -428,10 +431,10 @@ export default function CartPage() {
                           <IconButton 
                             onClick={() => removeFromCart(item._id)}
                             sx={{
-                              bgcolor: '#fee',
+                              bgcolor: theme.palette.mode === 'dark' ? '#442222' : '#fee',
                               color: '#d32f2f',
                               '&:hover': {
-                                bgcolor: '#ffcdd2',
+                                bgcolor: theme.palette.mode === 'dark' ? '#663333' : '#ffcdd2',
                                 transform: 'scale(1.1)',
                               },
                               transition: 'all 0.2s ease',
@@ -486,7 +489,7 @@ export default function CartPage() {
                   borderColor: '#d32f2f',
                   color: '#d32f2f',
                   '&:hover': {
-                    bgcolor: '#ffebee',
+                    bgcolor: theme.palette.mode === 'dark' ? '#331111' : '#ffebee',
                     borderColor: '#c62828',
                     transform: 'translateY(-2px)',
                     boxShadow: '0 6px 20px rgba(211, 47, 47, 0.2)',
@@ -508,9 +511,10 @@ export default function CartPage() {
             <Card sx={{
               borderRadius: 3,
               overflow: 'hidden',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+              boxShadow: theme.palette.mode === 'dark' ? '0 10px 40px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.1)',
               position: 'sticky',
               top: 20,
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'background.paper',
             }}>
               <Box sx={{
                 background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
@@ -532,11 +536,11 @@ export default function CartPage() {
                     justifyContent: 'space-between', 
                     mb: 2,
                     p: 2,
-                    bgcolor: '#f8f9fa',
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     borderRadius: 2,
                   }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>Subtotal</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Subtotal</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                       ${cartTotal.toFixed(2)}
                     </Typography>
                   </Box>
@@ -547,10 +551,10 @@ export default function CartPage() {
                       justifyContent: 'space-between', 
                       mb: 2,
                       p: 2,
-                      bgcolor: '#e8f5e8',
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a2a1a' : '#e8f5e8',
                       borderRadius: 2,
                     }}>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>Discount</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Discount</Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50' }}>
                         -${couponDiscount.toFixed(2)}
                       </Typography>
@@ -562,11 +566,11 @@ export default function CartPage() {
                     justifyContent: 'space-between', 
                     mb: 2,
                     p: 2,
-                    bgcolor: '#f8f9fa',
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     borderRadius: 2,
                   }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>Shipping</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: shippingCost === 0 ? '#4caf50' : '#2c3e50' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Shipping</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: shippingCost === 0 ? '#4caf50' : (theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50') }}>
                       {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                     </Typography>
                   </Box>
@@ -576,16 +580,16 @@ export default function CartPage() {
                     justifyContent: 'space-between', 
                     mb: 3,
                     p: 2,
-                    bgcolor: '#f8f9fa',
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     borderRadius: 2,
                   }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>Tax (7%)</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Tax (7%)</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                       ${taxAmount.toFixed(2)}
                     </Typography>
                   </Box>
                   
-                  <Divider sx={{ my: 3 }} />
+                  <Divider sx={{ my: 3, borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0,0,0,0.1)' }} />
                   
                   <Box sx={{ 
                     display: 'flex', 
@@ -604,7 +608,7 @@ export default function CartPage() {
               
                 {/* Coupon Code */}
                 <Box sx={{ mb: 4 }}>
-                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: '#2c3e50' }}>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                     Promo Code
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -619,7 +623,26 @@ export default function CartPage() {
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
-                        }
+                          bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                          '&.Mui-focused': {
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#a29278',
+                              borderWidth: 2,
+                            },
+                          },
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                          },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#a29278',
+                        },
+                        '& .MuiFormHelperText-root': {
+                          color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
+                        },
                       }}
                     />
                     <Button 
@@ -671,10 +694,11 @@ export default function CartPage() {
                     sx={{ 
                       mt: 3,
                       borderRadius: 2,
-                      bgcolor: '#e3f2fd',
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a2a3a' : '#e3f2fd',
                       '& .MuiAlert-icon': {
-                        color: '#1976d2',
+                        color: theme.palette.mode === 'dark' ? '#64b5f6' : '#1976d2',
                       },
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit',
                     }}
                   >
                     Add <strong>${(100 - cartTotal).toFixed(2)} more</strong> to qualify for FREE shipping!

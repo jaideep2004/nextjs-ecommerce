@@ -23,6 +23,7 @@ import {
   Step,
   StepLabel,
   StepContent,
+  useTheme,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -30,6 +31,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import MoneyOffIcon from '@mui/icons-material/MoneyOff';
 
 export default function ReturnsPage() {
+  const theme = useTheme();
   // Last updated date
   const lastUpdated = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -97,8 +99,8 @@ export default function ReturnsPage() {
           <Typography paragraph>
             Under UK law, you have specific rights when shopping online:
           </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={3} style={{flexWrap: 'nowrap'}}>
+            <Grid item xs={12} md={4} >
               <Card sx={{ height: '100%' }}>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <VerifiedUserIcon color="primary" sx={{ fontSize: 40, mb: 2 }} />
@@ -392,7 +394,7 @@ export default function ReturnsPage() {
         </Box>
 
         {/* Contact Information */}
-        <Box sx={{ my: 4, p: 3, bgcolor: 'grey.50', borderRadius: 2 }}>
+        <Box sx={{ my: 4, p: 3, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'grey.50', borderRadius: 2, border: theme.palette.mode === 'dark' ? '1px solid rgba(162, 146, 120, 0.3)' : 'none' }}>
           <Typography variant="h6" gutterBottom>
             Returns Contact Information
           </Typography>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { signIn, getSession } from "next-auth/react";
@@ -41,6 +41,15 @@ export default function RegisterPage() {
 	const { register } = useAuth();
 	const router = useRouter();
 	const theme = useTheme();
+
+	// Update background based on theme mode
+	useEffect(() => {
+		document.body.style.backgroundColor =
+			theme.palette.mode === "dark" ? "#000000" : "#ffffff";
+		return () => {
+			document.body.style.backgroundColor = "";
+		};
+	}, [theme.palette.mode]);
 
 	const [formData, setFormData] = useState({
 		name: "",
@@ -176,7 +185,7 @@ export default function RegisterPage() {
 		<Box
 			sx={{
 				minHeight: "100vh",
-				background: "white",
+				background: theme.palette.mode === "dark" ? "#000000" : "white",
 				position: "relative",
 				overflow: "hidden",
 			}}>
@@ -373,9 +382,15 @@ export default function RegisterPage() {
 							sx={{
 								maxWidth: 500,
 								mx: "auto",
-								backgroundColor: "rgba(255, 255, 255, 0.95)",
+								backgroundColor:
+									theme.palette.mode === "dark"
+										? "rgba(17, 17, 17, 0.95)"
+										: "rgba(255, 255, 255, 0.95)",
 								backdropFilter: "blur(20px)",
-								border: "1px solid rgba(162, 146, 120, 0.1)",
+								border:
+									theme.palette.mode === "dark"
+										? "1px solid rgba(162, 146, 120, 0.3)"
+										: "1px solid rgba(162, 146, 120, 0.1)",
 								borderRadius: 3,
 								overflow: "visible",
 								position: "relative",
@@ -430,21 +445,34 @@ export default function RegisterPage() {
 									sx={{
 										mb: 3,
 										py: 1.5,
-										border: "2px solid #e0e0e0",
-										color: "#333",
+										border:
+											theme.palette.mode === "dark"
+												? "2px solid rgba(162, 146, 120, 0.5)"
+												: "2px solid #e0e0e0",
+										color: theme.palette.mode === "dark" ? "#FFFFFF" : "#333",
 										fontSize: "1rem",
 										fontWeight: 500,
 										textTransform: "none",
 										borderRadius: 2,
 										transition: "all 0.3s ease",
+										backgroundColor:
+											theme.palette.mode === "dark"
+												? "rgba(26, 26, 26, 0.7)"
+												: "transparent",
 										"&:hover": {
 											border: "2px solid #a29278",
-											backgroundColor: "rgba(162, 146, 120, 0.04)",
+											backgroundColor:
+												theme.palette.mode === "dark"
+													? "rgba(162, 146, 120, 0.2)"
+													: "rgba(162, 146, 120, 0.04)",
 											transform: "translateY(-1px)",
 											boxShadow: "0 4px 12px rgba(162, 146, 120, 0.15)",
 										},
 										"&:disabled": {
-											backgroundColor: "rgba(0, 0, 0, 0.04)",
+											backgroundColor:
+												theme.palette.mode === "dark"
+													? "rgba(26, 26, 26, 0.5)"
+													: "rgba(0, 0, 0, 0.04)",
 										},
 									}}>
 									{googleLoading ? (
@@ -453,11 +481,26 @@ export default function RegisterPage() {
 											sx={{ mr: 1, color: "#a29278" }}
 										/>
 									) : (
-										<GoogleIcon sx={{ mr: 1.5, color: "#db4437" }} />
+										<>
+											<GoogleIcon
+												sx={{
+													mr: 1.5,
+													color:
+														theme.palette.mode === "dark"
+															? "#db4437"
+															: "#db4437",
+												}}
+											/>
+											<span
+												style={{
+													color:
+														theme.palette.mode === "dark" ? "#FFFFFF" : "#333",
+													fontWeight: 500,
+												}}>
+												Continue with Google
+											</span>
+										</>
 									)}
-									{googleLoading
-										? "Creating Account..."
-										: "Continue with Google"}
 								</Button>
 
 								<Divider
@@ -480,85 +523,120 @@ export default function RegisterPage() {
 
 								<form onSubmit={handleSubmit}>
 									<Grid container spacing={2}>
-										<div
-											style={{
-												display: "flex",
-												alignItems: "center",
-												gap: "10px",
-											}}>
-											<Grid item xs={12}>
-												<TextField
-													fullWidth
-													label='Full Name'
-													name='name'
-													value={formData.name}
-													onChange={handleChange}
-													error={!!errors.name}
-													helperText={errors.name}
-													required
-													InputProps={{
-														startAdornment: (
-															<InputAdornment position='start'>
-																<BadgeOutlined sx={{ color: "#a29278" }} />
-															</InputAdornment>
-														),
-													}}
-													sx={{
-														"& .MuiOutlinedInput-root": {
-															borderRadius: 2,
-															transition: "all 0.3s ease",
-															"&:hover .MuiOutlinedInput-notchedOutline": {
-																borderColor: "#a29278",
-															},
-															"&.Mui-focused .MuiOutlinedInput-notchedOutline":
-																{
-																	borderColor: "#a29278",
-																},
+										<Grid item xs={12}>
+											<TextField
+												fullWidth
+												label='Full Name'
+												name='name'
+												value={formData.name}
+												onChange={handleChange}
+												error={!!errors.name}
+												helperText={errors.name}
+												required
+												InputProps={{
+													startAdornment: (
+														<InputAdornment position='start'>
+															<BadgeOutlined sx={{ color: "#a29278" }} />
+														</InputAdornment>
+													),
+												}}
+												sx={{
+													"& .MuiOutlinedInput-root": {
+														borderRadius: 2,
+														transition: "all 0.3s ease",
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(26, 26, 26, 0.7)"
+																: "rgba(248, 248, 248, 0.7)",
+														"&:hover .MuiOutlinedInput-notchedOutline": {
+															borderColor: "#a29278",
 														},
-														"& .MuiInputLabel-root.Mui-focused": {
-															color: "#a29278",
+														"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+															borderColor: "#a29278",
 														},
-													}}
-												/>
-											</Grid>
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor:
+																theme.palette.mode === "dark"
+																	? "rgba(162, 146, 120, 0.5)"
+																	: "rgba(0, 0, 0, 0.23)",
+														},
+													},
+													"& .MuiInputLabel-root.Mui-focused": {
+														color: "#a29278",
+													},
+													"& .MuiInputLabel-root": {
+														color:
+															theme.palette.mode === "dark"
+																? "#CCCCCC"
+																: "rgba(0, 0, 0, 0.6)",
+													},
+													"& .MuiInputBase-input": {
+														color:
+															theme.palette.mode === "dark"
+																? "#FFFFFF"
+																: "#000000",
+													},
+												}}
+											/>
+										</Grid>
 
-											<Grid item xs={12} md={6}>
-												<TextField
-													fullWidth
-													label='Phone Number (optional)'
-													name='phone'
-													value={formData.phone}
-													onChange={handleChange}
-													error={!!errors.phone}
-													helperText={errors.phone}
-													InputProps={{
-														startAdornment: (
-															<InputAdornment position='start'>
-																<PhoneOutlined sx={{ color: "#a29278" }} />
-															</InputAdornment>
-														),
-													}}
-													sx={{
-														"& .MuiOutlinedInput-root": {
-															borderRadius: 2,
-															transition: "all 0.3s ease",
-															"&:hover .MuiOutlinedInput-notchedOutline": {
-																borderColor: "#a29278",
-															},
-															"&.Mui-focused .MuiOutlinedInput-notchedOutline":
-																{
-																	borderColor: "#a29278",
-																},
+										<Grid item xs={12} md={6}>
+											<TextField
+												fullWidth
+												label='Phone Number (optional)'
+												name='phone'
+												value={formData.phone}
+												onChange={handleChange}
+												error={!!errors.phone}
+												helperText={errors.phone}
+												InputProps={{
+													startAdornment: (
+														<InputAdornment position='start'>
+															<PhoneOutlined sx={{ color: "#a29278" }} />
+														</InputAdornment>
+													),
+												}}
+												sx={{
+													"& .MuiOutlinedInput-root": {
+														borderRadius: 2,
+														transition: "all 0.3s ease",
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(26, 26, 26, 0.7)"
+																: "rgba(248, 248, 248, 0.7)",
+														"&:hover .MuiOutlinedInput-notchedOutline": {
+															borderColor: "#a29278",
 														},
-														"& .MuiInputLabel-root.Mui-focused": {
-															color: "#a29278",
+														"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+															borderColor: "#a29278",
 														},
-													}}
-												/>
-											</Grid>
-										</div>
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor:
+																theme.palette.mode === "dark"
+																	? "rgba(162, 146, 120, 0.5)"
+																	: "rgba(0, 0, 0, 0.23)",
+														},
+													},
+													"& .MuiInputLabel-root.Mui-focused": {
+														color: "#a29278",
+													},
+													"& .MuiInputLabel-root": {
+														color:
+															theme.palette.mode === "dark"
+																? "#CCCCCC"
+																: "rgba(0, 0, 0, 0.6)",
+													},
+													"& .MuiInputBase-input": {
+														color:
+															theme.palette.mode === "dark"
+																? "#FFFFFF"
+																: "#000000",
+													},
+												}}
+											/>
+										</Grid>
 
-										<Grid item xs={12} md={6} style={{ width: '100%' }}>
+										<Grid item xs={12} md={6}>
 											<TextField
 												fullWidth
 												label='Email'
@@ -580,27 +658,42 @@ export default function RegisterPage() {
 													"& .MuiOutlinedInput-root": {
 														borderRadius: 2,
 														transition: "all 0.3s ease",
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(26, 26, 26, 0.7)"
+																: "rgba(248, 248, 248, 0.7)",
 														"&:hover .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
 														"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor:
+																theme.palette.mode === "dark"
+																	? "rgba(162, 146, 120, 0.5)"
+																	: "rgba(0, 0, 0, 0.23)",
+														},
 													},
 													"& .MuiInputLabel-root.Mui-focused": {
 														color: "#a29278",
+													},
+													"& .MuiInputLabel-root": {
+														color:
+															theme.palette.mode === "dark"
+																? "#CCCCCC"
+																: "rgba(0, 0, 0, 0.6)",
+													},
+													"& .MuiInputBase-input": {
+														color:
+															theme.palette.mode === "dark"
+																? "#FFFFFF"
+																: "#000000",
 													},
 												}}
 											/>
 										</Grid>
 
-                    
-                    <div
-											style={{
-												display: "flex",
-												alignItems: "center",
-												gap: "10px",
-											}}>
 										<Grid item xs={12} md={6}>
 											<TextField
 												fullWidth
@@ -632,15 +725,37 @@ export default function RegisterPage() {
 													"& .MuiOutlinedInput-root": {
 														borderRadius: 2,
 														transition: "all 0.3s ease",
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(26, 26, 26, 0.7)"
+																: "rgba(248, 248, 248, 0.7)",
 														"&:hover .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
 														"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor:
+																theme.palette.mode === "dark"
+																	? "rgba(162, 146, 120, 0.5)"
+																	: "rgba(0, 0, 0, 0.23)",
+														},
 													},
 													"& .MuiInputLabel-root.Mui-focused": {
 														color: "#a29278",
+													},
+													"& .MuiInputLabel-root": {
+														color:
+															theme.palette.mode === "dark"
+																? "#CCCCCC"
+																: "rgba(0, 0, 0, 0.6)",
+													},
+													"& .MuiInputBase-input": {
+														color:
+															theme.palette.mode === "dark"
+																? "#FFFFFF"
+																: "#000000",
 													},
 												}}
 											/>
@@ -677,21 +792,41 @@ export default function RegisterPage() {
 													"& .MuiOutlinedInput-root": {
 														borderRadius: 2,
 														transition: "all 0.3s ease",
+														background:
+															theme.palette.mode === "dark"
+																? "rgba(26, 26, 26, 0.7)"
+																: "rgba(248, 248, 248, 0.7)",
 														"&:hover .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
 														"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
 															borderColor: "#a29278",
 														},
+														"& .MuiOutlinedInput-notchedOutline": {
+															borderColor:
+																theme.palette.mode === "dark"
+																	? "rgba(162, 146, 120, 0.5)"
+																	: "rgba(0, 0, 0, 0.23)",
+														},
 													},
 													"& .MuiInputLabel-root.Mui-focused": {
 														color: "#a29278",
 													},
+													"& .MuiInputLabel-root": {
+														color:
+															theme.palette.mode === "dark"
+																? "#CCCCCC"
+																: "rgba(0, 0, 0, 0.6)",
+													},
+													"& .MuiInputBase-input": {
+														color:
+															theme.palette.mode === "dark"
+																? "#FFFFFF"
+																: "#000000",
+													},
 												}}
 											/>
-                      </Grid>
-                    </div>
-                    
+										</Grid>
 									</Grid>
 
 									<Button

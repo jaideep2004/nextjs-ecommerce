@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useThemeContext } from '@/theme';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import {
   Box,
@@ -18,6 +19,7 @@ const DRAWER_WIDTH = 280;
 export default function AdminLayout({ children }) {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { theme } = useThemeContext();
 
   useEffect(() => {
     if (!loading) {
@@ -37,7 +39,7 @@ export default function AdminLayout({ children }) {
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
-          bgcolor: '#f5f5f5',
+          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5',
         }}
       >
         <CircularProgress sx={{ color: '#8D6E63' }} />
@@ -63,7 +65,7 @@ export default function AdminLayout({ children }) {
           flexGrow: 1,
           width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
           minHeight: '100vh',
-          bgcolor: '#f8f9fa',
+          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f8f9fa',
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -71,9 +73,9 @@ export default function AdminLayout({ children }) {
         {/* Admin Header */}
         <Box
           sx={{
-            bgcolor: 'white',
-            borderBottom: '1px solid #e0e0e0',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+            borderBottom: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
+            boxShadow: theme.palette.mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)',
             zIndex: 1,
             position: 'sticky',
             top: 0,
@@ -86,13 +88,18 @@ export default function AdminLayout({ children }) {
                   variant="h5" 
                   sx={{ 
                     fontWeight: 700,
-                    color: '#2c3e50',
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                     mb: 0.5,
                   }}
                 >
                   Admin Dashboard
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+                  }}
+                >
                   Welcome back, {user?.name}
                 </Typography>
               </Box>

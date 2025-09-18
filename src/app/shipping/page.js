@@ -18,6 +18,7 @@ import {
   Grid,
   Card,
   CardContent,
+  useTheme,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -25,6 +26,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PublicIcon from '@mui/icons-material/Public';
 
 export default function ShippingPage() {
+  const theme = useTheme();
   // Last updated date
   const lastUpdated = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -238,7 +240,7 @@ export default function ShippingPage() {
         </Box>
 
         {/* Contact Information */}
-        <Box sx={{ my: 4, p: 3, bgcolor: 'grey.50', borderRadius: 2 }}>
+        <Box sx={{ my: 4, p: 3, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'grey.50', borderRadius: 2, border: theme.palette.mode === 'dark' ? '1px solid rgba(162, 146, 120, 0.3)' : 'none' }}>
           <Typography variant="h6" gutterBottom>
             Need Help with Your Delivery?
           </Typography>

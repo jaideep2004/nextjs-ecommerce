@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useThemeContext } from '@/theme';
 import axios from 'axios';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,6 +39,7 @@ export default function Wishlist() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { addToCart } = useCart();
+  const { theme } = useThemeContext();
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -166,17 +168,22 @@ export default function Wishlist() {
         sx={{
           flexGrow: 1,
           p: 3,
-          bgcolor: '#f5f5f5',
+          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5',
           minHeight: '100vh',
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
+          <Paper sx={{ 
+            p: 2, 
+            mb: 3,
+            bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+            boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+          }}>
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
               <Link href="/" passHref>
                 <Typography 
-                  color="inherit" 
                   sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
                     cursor: 'pointer',
@@ -187,8 +194,8 @@ export default function Wishlist() {
               </Link>
               <Link href="/customer/dashboard" passHref>
                 <Typography 
-                  color="inherit" 
                   sx={{ 
+                    color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
                     cursor: 'pointer',
@@ -197,7 +204,13 @@ export default function Wishlist() {
                   My Account
                 </Typography>
               </Link>
-              <Typography color="text.primary">Wishlist</Typography>
+              <Typography 
+                sx={{ 
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' 
+                }}
+              >
+                Wishlist
+              </Typography>
             </Breadcrumbs>
           </Paper>
 
@@ -207,18 +220,28 @@ export default function Wishlist() {
               variant="h4" 
               sx={{ 
                 fontWeight: 700,
-                color: '#2c3e50',
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                 mb: 1,
               }}
             >
               My Wishlist
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' 
+              }}
+            >
               Items you've saved for later
             </Typography>
           </Box>
 
-          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <Paper sx={{ 
+            p: 3, 
+            borderRadius: 2, 
+            bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+            boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)' 
+          }}>
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                 <CircularProgress sx={{ color: '#2196f3' }} />
@@ -229,11 +252,27 @@ export default function Wishlist() {
               </Alert>
             ) : wishlist.length === 0 ? (
               <Box sx={{ py: 4, textAlign: 'center' }}>
-                <Favorite sx={{ fontSize: 60, color: '#D1C4E9', mb: 2 }} />
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Favorite sx={{ 
+                  fontSize: 60, 
+                  color: theme.palette.mode === 'dark' ? '#7e57c2' : '#D1C4E9', 
+                  mb: 2 
+                }} />
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  }}
+                >
                   Your wishlist is empty
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    mb: 3,
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                  }}
+                >
                   Add items to your wishlist to save them for later.
                 </Typography>
                 <Button 
@@ -257,10 +296,11 @@ export default function Wishlist() {
                         height: '100%', 
                         display: 'flex', 
                         flexDirection: 'column',
+                        bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
                         transition: 'transform 0.3s, box-shadow 0.3s',
                         '&:hover': {
                           transform: 'translateY(-5px)',
-                          boxShadow: 3,
+                          boxShadow: theme.palette.mode === 'dark' ? 6 : 3,
                         },
                       }}
                     >
@@ -294,8 +334,8 @@ export default function Wishlist() {
                               display: '-webkit-box',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
-                              color: 'text.primary',
-                              '&:hover': { color: '#2196f3' },
+                              color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary',
+                              '&:hover': { color: theme.palette.mode === 'dark' ? '#64b5f6' : '#2196f3' },
                             }}
                           >
                             {product.name}
@@ -304,13 +344,26 @@ export default function Wishlist() {
                         
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           <Rating value={product.rating} precision={0.5} readOnly size="small" />
-                          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary', 
+                              ml: 1 
+                            }}
+                          >
                             ({product.numReviews})
                           </Typography>
                         </Box>
                         
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography variant="h6" component="span" sx={{ fontWeight: 'bold' }}>
+                          <Typography 
+                            variant="h6" 
+                            component="span" 
+                            sx={{ 
+                              fontWeight: 'bold',
+                              color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                            }}
+                          >
                             ${product.price.toFixed(2)}
                           </Typography>
                           
@@ -320,7 +373,7 @@ export default function Wishlist() {
                               component="span" 
                               sx={{ 
                                 textDecoration: 'line-through', 
-                                color: 'text.secondary',
+                                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
                                 ml: 1,
                               }}
                             >
@@ -330,7 +383,11 @@ export default function Wishlist() {
                         </Box>
                       </CardContent>
                       
-                      <Divider />
+                      <Divider 
+                        sx={{ 
+                          bgcolor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.12)' 
+                        }} 
+                      />
                       
                       <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
                         <Button
@@ -355,7 +412,9 @@ export default function Wishlist() {
                         </Button>
                         
                         <IconButton 
-                          color="error" 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#f44336' : 'error.main' 
+                          }}
                           onClick={() => handleRemoveFromWishlist(product._id)}
                           disabled={actionLoading[product._id]}
                         >

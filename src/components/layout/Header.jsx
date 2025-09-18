@@ -38,6 +38,7 @@ import {
   TextField,
   DialogActions,
   CircularProgress,
+  useTheme,
 } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 import {
@@ -219,6 +220,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
       `,
   position: 'sticky',
   top: 0,
+  zIndex: 1100,
   zIndex: 1100,
   '&::before': {
     content: '""',
@@ -425,42 +427,17 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 
 
-// Hide on scroll up, show on scroll down
+// Always show header (sticky)
 function HideOnScrollUp(props) {
   const { children } = props;
-  const [prevScrollY, setPrevScrollY] = useState(0);
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Show header when at top of page
-      if (currentScrollY < 10) {
-        setVisible(true);
-      }
-      // Hide when scrolling up, show when scrolling down
-      else if (prevScrollY > currentScrollY && currentScrollY > 100) {
-        setVisible(false);
-      } else if (prevScrollY < currentScrollY) {
-        setVisible(true);
-      }
-      
-      setPrevScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [prevScrollY]);
 
   return (
-    <Slide appear={false} direction="down" in={visible}>
-      {children}
-    </Slide>
+    <>{children}</>
   );
 }
 
 export default function Header() {
+  const theme = useTheme();
   const pathname = usePathname();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -722,12 +699,13 @@ export default function Header() {
                 }}
               >
                 <img 
-                  src="/images/ll2.jpg" 
+                  src={mode === 'dark' ? "/images/indidark.png" : "/images/ll2.jpg"} 
                   alt="Punjabi Attire Logo" 
                   style={{
                     width: '65px',
                     height: '65px',
                     objectFit: 'cover',
+                    borderRadius: '0px !important',
                   }}
                 />
                 <Box sx={{ ml: 2 }}>
@@ -785,12 +763,13 @@ export default function Header() {
                 }}
               >
                 <img 
-                  src="/images/lp3.png" 
+                  src={mode === 'dark' ? "/images/indidark.png" : "/images/ll2.jpg"} 
                   alt="Punjabi Attire Logo" 
                   style={{
                     width: '50px',
                     height: '50px',
                     objectFit: 'cover',
+                    borderRadius: '0px !important',
                   }}
                 />
                 <Box sx={{ ml: 1 }}>
@@ -992,16 +971,22 @@ export default function Header() {
                       mt: '45px',
                       '& .MuiPaper-root': {
                         borderRadius: '16px',
-                        background: `linear-gradient(135deg, 
-                          rgba(255, 255, 255, 0.95) 0%, 
-                          rgba(250, 250, 250, 0.9) 100%
-                        )`,
+                        background: theme.palette.mode === 'dark' 
+                          ? `linear-gradient(135deg, 
+                              rgba(17, 17, 17, 0.95) 0%, 
+                              rgba(26, 26, 26, 0.9) 100%
+                            )`
+                          : `linear-gradient(135deg, 
+                              rgba(255, 255, 255, 0.95) 0%, 
+                              rgba(250, 250, 250, 0.9) 100%
+                            )`,
                         backdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(162, 146, 120, 0.1)',
-                        boxShadow: `
-                          0 20px 60px rgba(0, 0, 0, 0.15),
-                          0 0 40px rgba(162, 146, 120, 0.1)
-                        `,
+                        border: theme.palette.mode === 'dark' 
+                          ? '1px solid rgba(162, 146, 120, 0.3)'
+                          : '1px solid rgba(162, 146, 120, 0.1)',
+                        boxShadow: theme.palette.mode === 'dark'
+                          ? `0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(162, 146, 120, 0.2)`
+                          : `0 20px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(162, 146, 120, 0.1)`,
                       },
                     }}
                     id="menu-appbar"

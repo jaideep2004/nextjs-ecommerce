@@ -34,15 +34,17 @@ import {
   Store as StoreIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
+import { useThemeContext } from '@/theme';
 
 const drawerWidth = 280;
 
 export default function AdminSidebar() {
-  const theme = useTheme();
+  const muiTheme = useTheme();
+  const { theme } = useThemeContext();
   const router = useRouter();
   const pathname = usePathname();
   const { logout, user } = useAuth();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const [open, setOpen] = useState(!isMobile);
 
   const handleDrawerToggle = () => {
@@ -72,8 +74,8 @@ export default function AdminSidebar() {
           p: 3, 
           display: 'flex', 
           alignItems: 'center', 
-          borderBottom: '1px solid #e0e0e0',
-          bgcolor: '#f8f9fa',
+          borderBottom: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
+          bgcolor: theme.palette.mode === 'dark' ? '#111111' : '#f8f9fa',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -92,7 +94,7 @@ export default function AdminSidebar() {
               variant="h6" 
               sx={{ 
                 fontWeight: 700,
-                color: '#2c3e50',
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                 fontSize: '1.1rem',
                 lineHeight: 1.2,
               }}
@@ -102,7 +104,7 @@ export default function AdminSidebar() {
             <Typography 
               variant="caption" 
               sx={{ 
-                color: '#7f8c8d',
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#7f8c8d',
                 fontSize: '0.75rem',
                 fontWeight: 500,
               }}
@@ -119,7 +121,7 @@ export default function AdminSidebar() {
       </Box>
 
       {/* User Info */}
-      <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+      <Box sx={{ p: 2, borderBottom: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Avatar 
             sx={{ 
@@ -137,7 +139,7 @@ export default function AdminSidebar() {
               variant="subtitle2" 
               sx={{ 
                 fontWeight: 600,
-                color: '#2c3e50',
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                 fontSize: '0.85rem',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -153,8 +155,8 @@ export default function AdminSidebar() {
                 height: '18px',
                 fontSize: '0.65rem',
                 fontWeight: 600,
-                bgcolor: '#e8f5e8',
-                color: '#2e7d32',
+                bgcolor: theme.palette.mode === 'dark' ? '#1a2e1a' : '#e8f5e8',
+                color: theme.palette.mode === 'dark' ? '#66bb6a' : '#2e7d32',
                 '& .MuiChip-label': { px: 1 },
               }}
             />
@@ -179,21 +181,21 @@ export default function AdminSidebar() {
                     py: 1.5,
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      bgcolor: '#f0f7ff',
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a232d' : '#f0f7ff',
                       transform: 'translateX(4px)',
                     },
                     '&.Mui-selected': {
-                      bgcolor: '#e3f2fd',
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a232d' : '#e3f2fd',
                       borderLeft: '3px solid #2196f3',
                       '&:hover': {
-                        bgcolor: '#e3f2fd',
+                        bgcolor: theme.palette.mode === 'dark' ? '#1a232d' : '#e3f2fd',
                       },
                     },
                   }}
                 >
                   <ListItemIcon
                     sx={{
-                      color: isActive ? '#2196f3' : '#6c757d',
+                      color: isActive ? '#2196f3' : (theme.palette.mode === 'dark' ? '#CCCCCC' : '#6c757d'),
                       minWidth: 40,
                       transition: 'color 0.2s ease',
                     }}
@@ -205,7 +207,7 @@ export default function AdminSidebar() {
                     sx={{
                       '& .MuiTypography-root': {
                         fontWeight: isActive ? 600 : 500,
-                        color: isActive ? '#2196f3' : '#2c3e50',
+                        color: isActive ? '#2196f3' : (theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50'),
                         fontSize: '0.9rem',
                       },
                     }}
@@ -218,7 +220,7 @@ export default function AdminSidebar() {
       </Box>
 
       {/* Bottom Actions */}
-      <Box sx={{ borderTop: '1px solid #e0e0e0', p: 1 }}>
+      <Box sx={{ borderTop: theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0', p: 1 }}>
         <List>
           <ListItem disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
@@ -230,12 +232,12 @@ export default function AdminSidebar() {
                 py: 1.5,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  bgcolor: '#f8f9fa',
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                   transform: 'translateX(4px)',
                 },
               }}
             >
-              <ListItemIcon sx={{ color: '#6c757d', minWidth: 40 }}>
+              <ListItemIcon sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#6c757d', minWidth: 40 }}>
                 <StoreIcon />
               </ListItemIcon>
               <ListItemText
@@ -244,7 +246,7 @@ export default function AdminSidebar() {
                   '& .MuiTypography-root': {
                     fontSize: '0.9rem',
                     fontWeight: 500,
-                    color: '#2c3e50',
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                   },
                 }}
               />
@@ -259,7 +261,7 @@ export default function AdminSidebar() {
                 py: 1.5,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  bgcolor: '#ffeaa7',
+                  bgcolor: theme.palette.mode === 'dark' ? '#332a1a' : '#ffeaa7',
                   transform: 'translateX(4px)',
                 },
               }}
@@ -273,7 +275,7 @@ export default function AdminSidebar() {
                   '& .MuiTypography-root': {
                     fontSize: '0.9rem',
                     fontWeight: 500,
-                    color: '#f39c12',
+                    color: theme.palette.mode === 'dark' ? '#f39c12' : '#f39c12',
                   },
                 }}
               />
@@ -297,14 +299,14 @@ export default function AdminSidebar() {
             top: 16, 
             left: 16, 
             zIndex: 1300, 
-            bgcolor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+            boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.15)',
             '&:hover': {
-              bgcolor: '#f5f5f5',
+              bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
             },
           }}
         >
-          <MenuIcon sx={{ color: '#2c3e50' }} />
+          <MenuIcon sx={{ color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }} />
         </IconButton>
       )}
       <Box
@@ -329,7 +331,7 @@ export default function AdminSidebar() {
                 boxSizing: 'border-box', 
                 width: drawerWidth,
                 border: 'none',
-                boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
+                boxShadow: theme.palette.mode === 'dark' ? '2px 0 10px rgba(0,0,0,0.3)' : '2px 0 10px rgba(0,0,0,0.1)',
               },
             }}
           >
@@ -343,8 +345,8 @@ export default function AdminSidebar() {
                 boxSizing: 'border-box', 
                 width: drawerWidth,
                 border: 'none',
-                boxShadow: '2px 0 10px rgba(0,0,0,0.05)',
-                bgcolor: '#ffffff',
+                boxShadow: theme.palette.mode === 'dark' ? '2px 0 10px rgba(0,0,0,0.3)' : '2px 0 10px rgba(0,0,0,0.05)',
+                bgcolor: theme.palette.mode === 'dark' ? '#111111' : '#ffffff',
               },
             }}
             open

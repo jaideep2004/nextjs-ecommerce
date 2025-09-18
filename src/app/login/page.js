@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
@@ -36,9 +36,28 @@ import {
 import FormField from '@/components/ui/FormField';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
   const router = useRouter();
   const theme = useTheme();
+  
+  // Update background based on theme mode
+  useEffect(() => {
+    document.body.style.backgroundColor = theme.palette.mode === 'dark' ? '#000000' : '#ffffff';
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [theme.palette.mode]);
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.isAdmin) {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/customer/dashboard');
+      }
+    }
+  }, [user, authLoading, router]);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -107,20 +126,21 @@ export default function LoginPage() {
       setGoogleLoading(true);
       setError('');
       
+      // Get redirect URL from query parameters if it exists
+      let redirectUrl = '';
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        redirectUrl = urlParams.get('redirect') || '';
+      }
+      
       // Use NextAuth signIn with Google provider
       const result = await signIn('google', {
-        callbackUrl: typeof window !== 'undefined' ? 
-          new URLSearchParams(window.location.search).get('redirect') || '/customer/dashboard' 
-          : '/customer/dashboard',
-        redirect: false,
+        callbackUrl: redirectUrl || '/customer/dashboard',
+        redirect: true, // Let NextAuth handle the redirect
       });
       
       if (result?.error) {
         setError('Google Sign-In failed. Please try again.');
-      } else if (result?.ok) {
-        // Instead of immediately redirecting, let NextAuth handle the session
-        // The AuthContext will detect the session and redirect appropriately
-        console.log('Google Sign-In successful, waiting for session sync...');
       }
     } catch (err) {
       console.error('Google Sign-In error:', err);
@@ -137,7 +157,7 @@ export default function LoginPage() {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'white',
+      background: theme.palette.mode === 'dark' ? '#000000' : 'white',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -217,7 +237,7 @@ export default function LoginPage() {
           <Grid item xs={12} lg={6} style={{ flex: '1' }}>
             <Box sx={{ 
               textAlign: { xs: 'center', lg: 'left' },
-              color: '#2c3e50',
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
               pr: { lg: 4 },
               
             }}>
@@ -229,7 +249,7 @@ export default function LoginPage() {
                   fontSize: { xs: '2.5rem', md: '3.5rem', lg: '3.5rem' },
                   lineHeight: 1.2,
                   mb: 3,
-                  color: '#2c3e50',
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                   textAlign: 'center',
                 }}
               >
@@ -242,7 +262,7 @@ export default function LoginPage() {
                   fontSize: { xs: '1.1rem', md: '1.3rem' },
                   lineHeight: 1.6,
                   mb: 4,
-                  color: '#5f6368',
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368',
                   // maxWidth: { lg: '500px' }
                 }}
               >
@@ -267,8 +287,8 @@ export default function LoginPage() {
                       }}>
                         <LockOutlined sx={{ fontSize: 28, color: '#a29278' }} />
                       </Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#2c3e50' }}>Secure Login</Typography>
-                      <Typography variant="body2" sx={{ color: '#5f6368' }}>Your data is protected with enterprise-grade security</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>Secure Login</Typography>
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368' }}>Your data is protected with enterprise-grade security</Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={6} style={{flex: '1'}}>
@@ -286,8 +306,8 @@ export default function LoginPage() {
                       }}>
                         <GoogleIcon sx={{ fontSize: 28, color: '#a29278' }} />
                       </Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#2c3e50' }}>Quick Access</Typography>
-                      <Typography variant="body2" sx={{ color: '#5f6368' }}>Sign in with Google or your email account</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>Quick Access</Typography>
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#5f6368' }}>Sign in with Google or your email account</Typography>
                     </Box>
                   </Grid>
                 </Grid>
@@ -307,9 +327,13 @@ export default function LoginPage() {
                 width: '100%',
                 maxWidth: 480,
                 borderRadius: 3,
-                boxShadow: '0 4px 20px rgba(162, 146, 120, 0.15)',
-                background: 'white',
-                border: '1px solid rgba(162, 146, 120, 0.1)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 4px 20px rgba(162, 146, 120, 0.3)' 
+                  : '0 4px 20px rgba(162, 146, 120, 0.15)',
+                background: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                border: theme.palette.mode === 'dark' 
+                  ? '1px solid rgba(162, 146, 120, 0.3)' 
+                  : '1px solid rgba(162, 146, 120, 0.1)',
               }}>
                 <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
                   {/* Logo/Header */}
@@ -367,24 +391,31 @@ export default function LoginPage() {
                       mb: 3,
                       py: 1.8,
                       borderRadius: 2,
-                      borderColor: '#dadce0',
-                      color: '#5f6368',
+                      borderColor: theme.palette.mode === 'dark' ? 'rgba(162, 146, 120, 0.5)' : '#dadce0',
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#5f6368',
                       textTransform: 'none',
                       fontSize: '1rem',
                       fontWeight: 500,
-                      background: 'white',
+                      background: theme.palette.mode === 'dark' ? 'rgba(26, 26, 26, 0.7)' : 'white',
                       '&:hover': {
-                        background: '#f8f9fa',
-                        borderColor: '#dadce0',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        background: theme.palette.mode === 'dark' ? 'rgba(162, 146, 120, 0.2)' : '#f8f9fa',
+                        borderColor: '#a29278',
+                        boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                       },
                       '&:disabled': {
-                        background: '#f8f9fa',
-                        color: '#9aa0a6',
+                        background: theme.palette.mode === 'dark' ? 'rgba(26, 26, 26, 0.5)' : '#f8f9fa',
+                        color: theme.palette.mode === 'dark' ? '#CCCCCC' : '#9aa0a6',
                       }
                     }}
                   >
-                    {googleLoading ? 'Signing in...' : 'Continue with Google'}
+                    {googleLoading ? 'Signing in...' : 
+                      <span style={{ 
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#5f6368',
+                        fontWeight: 500
+                      }}>
+                        Continue with Google
+                      </span>
+                    }
                   </Button>
                   
                   <Divider sx={{ 
@@ -423,7 +454,9 @@ export default function LoginPage() {
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
-                          background: 'rgba(248, 248, 248, 0.7)',
+                          background: theme.palette.mode === 'dark' 
+                            ? 'rgba(26, 26, 26, 0.7)' 
+                            : 'rgba(248, 248, 248, 0.7)',
                           '&:hover .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#a29278',
                           },
@@ -431,9 +464,24 @@ export default function LoginPage() {
                             borderColor: '#a29278',
                             borderWidth: 2,
                           },
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.mode === 'dark' 
+                              ? 'rgba(162, 146, 120, 0.5)' 
+                              : 'rgba(0, 0, 0, 0.23)',
+                          },
                         },
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#a29278',
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: theme.palette.mode === 'dark' 
+                            ? '#CCCCCC' 
+                            : 'rgba(0, 0, 0, 0.6)',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: theme.palette.mode === 'dark' 
+                            ? '#FFFFFF' 
+                            : '#000000',
                         },
                       }}
                     />
@@ -472,7 +520,9 @@ export default function LoginPage() {
                         mb: 1,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
-                          background: 'rgba(248, 248, 248, 0.7)',
+                          background: theme.palette.mode === 'dark' 
+                            ? 'rgba(26, 26, 26, 0.7)' 
+                            : 'rgba(248, 248, 248, 0.7)',
                           '&:hover .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#a29278',
                           },
@@ -480,9 +530,24 @@ export default function LoginPage() {
                             borderColor: '#a29278',
                             borderWidth: 2,
                           },
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.mode === 'dark' 
+                              ? 'rgba(162, 146, 120, 0.5)' 
+                              : 'rgba(0, 0, 0, 0.23)',
+                          },
                         },
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#a29278',
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: theme.palette.mode === 'dark' 
+                            ? '#CCCCCC' 
+                            : 'rgba(0, 0, 0, 0.6)',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: theme.palette.mode === 'dark' 
+                            ? '#FFFFFF' 
+                            : '#000000',
                         },
                       }}
                     />
