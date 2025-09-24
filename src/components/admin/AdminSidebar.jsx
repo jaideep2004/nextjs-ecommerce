@@ -32,6 +32,7 @@ import {
   Logout as LogoutIcon,
   BarChart as AnalyticsIcon,
   Store as StoreIcon,
+  LocalOffer as CouponsIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useThemeContext } from '@/theme';
@@ -61,6 +62,7 @@ export default function AdminSidebar() {
     { text: 'Analytics', icon: <AnalyticsIcon />, path: '/admin/analytics' },
     { text: 'Products', icon: <ProductsIcon />, path: '/admin/products' },
     { text: 'Categories', icon: <CategoriesIcon />, path: '/admin/categories' },
+    { text: 'Coupons', icon: <CouponsIcon />, path: '/admin/coupons' },
     { text: 'Orders', icon: <OrdersIcon />, path: '/admin/orders' },
     { text: 'Customers', icon: <CustomersIcon />, path: '/admin/customers' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/admin/settings' },

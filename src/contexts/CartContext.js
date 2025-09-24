@@ -44,7 +44,16 @@ export function CartProvider({ children }) {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem('cart', JSON.stringify(cartItems));
+      try {
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Failed to save cart to localStorage:', error);
+        // If localStorage fails due to quota, we'll keep the cart in memory
+        // but won't persist it until items are removed
+        if (error.name === 'QuotaExceededError') {
+          toast.error('Cart is too large. Please remove some items.');
+        }
+      }
     }
   }, [cartItems, loading]);
 
@@ -56,6 +65,20 @@ export function CartProvider({ children }) {
     }
     
     setCartItems((prevItems) => {
+      // Create a minimal product object to store in cart
+      const minimalProduct = {
+        _id: product._id,
+        name: product.name,
+        slug: product.slug,
+        image: product.image,
+        price: product.price,
+        countInStock: product.countInStock,
+        discount: product.discount,
+        // Only include colors and sizes if they exist
+        ...(product.colors && { colors: product.colors }),
+        ...(product.sizes && { sizes: product.sizes }),
+      };
+      
       // Check if item already exists in cart
       const existingItemIndex = prevItems.findIndex(
         (item) => 
@@ -78,11 +101,11 @@ export function CartProvider({ children }) {
           toast.success('Item quantity updated in cart');
         }
       } else {
-        // Add new item to cart
+        // Add new item to cart with minimal product data
         newItems = [
           ...prevItems,
           {
-            ...product,
+            ...minimalProduct,
             quantity,
             color,
             size,

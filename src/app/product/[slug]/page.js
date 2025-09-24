@@ -282,7 +282,7 @@ export default function ProductPage() {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Grid container spacing={8} sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
         {/* Product Gallery */}
-        <Grid item xs={12} md={6} sx={{ minWidth: { xs: 'auto', md: '450px' }, width: '100%' }}>
+        <Grid item xs={12} md={6} sx={{ minWidth: { xs: 'auto', md: '450px' }, width: '100%', flex:{xs:'none', md:'1'} }}>
           <Paper elevation={2} sx={{ position: 'relative', height: { xs: 360, md: 520 }, overflow: 'hidden', borderRadius: 2 }}>
             {product.discount > 0 && (
               <Chip 
@@ -347,7 +347,7 @@ export default function ProductPage() {
         </Grid>
         
         {/* Product Details */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6}  sx={{flex:{xs:'none', md:'1'}}}>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 1 }}>
             {product.name}
           </Typography>

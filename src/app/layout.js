@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { ThemeContextProvider } from "@/theme";
 import AppContent from "@/components/AppContent";
-import { SessionProvider } from "@/components/providers/SessionProvider";
+import { SessionProvider, SettingsProvider } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans", 
@@ -28,9 +28,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SessionProvider>
-          <ThemeContextProvider>
-            <AppContent>{children}</AppContent>
-          </ThemeContextProvider>
+          <SettingsProvider>
+            <ThemeContextProvider>
+              <AppContent>{children}</AppContent>
+            </ThemeContextProvider>
+          </SettingsProvider>
         </SessionProvider>
       </body>
     </html>

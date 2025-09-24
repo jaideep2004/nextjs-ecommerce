@@ -48,6 +48,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { clearSettingsCache } from '@/utils/settings';
 
 export default function AdminSettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -145,8 +146,8 @@ export default function AdminSettingsPage() {
       const data = await response.json();
       console.log('Fetched settings data:', data); // Debug log
       
-      // The API response might be wrapped in apiResponse, so check for data.data
-      const settings = data.data || data;
+      // The API response wraps settings in 'status' or 'data', so check accordingly
+      const settings = data?.status || data?.data || data || {};
       
       // Update state with fetched settings, preserving existing values if new data is incomplete
       if (settings.general) {
@@ -315,6 +316,12 @@ export default function AdminSettingsPage() {
       
       const result = await response.json();
       console.log('Settings saved successfully:', result); // Debug log
+      
+      // Clear settings cache to ensure fresh data is fetched
+      clearSettingsCache();
+      
+      // Also clear any browser cache by sending a cache-busting request
+      await fetch('/api/settings?cacheBust=' + Date.now());
       
       setSnackbar({
         open: true,

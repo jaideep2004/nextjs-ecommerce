@@ -21,6 +21,18 @@ export const apiError = (status, message) => {
   };
 };
 
+// Helper function to create standard API responses
+export const createResponse = (status, data = null, message = '') => {
+  const responseBody = {
+    status,
+    data,
+    message,
+    timestamp: new Date().toISOString(),
+  };
+  
+  return Response.json(responseBody, { status });
+};
+
 // Helper function to handle API requests
 export const handleApiRequest = async (req, handler) => {
   try {

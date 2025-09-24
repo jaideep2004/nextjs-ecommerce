@@ -9,6 +9,8 @@ import Image from 'next/image';
 import axios from 'axios';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import PayPalButton from '@/components/payment/PayPalButton';
+import { useSettings } from '@/contexts/SettingsContext';
+import { getSettings, calculateTax, getAvailablePaymentMethods } from '@/utils/settings';
 import {
   Container,
   Typography,
@@ -562,9 +564,17 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
   );
 };
 
-const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading }) => {
-  const [paymentMethod, setPaymentMethod] = useState('paypal');
+const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading, availablePaymentMethods }) => {
+  const [paymentMethod, setPaymentMethod] = useState(availablePaymentMethods.length > 0 ? availablePaymentMethods[0].id : 'paypal');
   const theme = useTheme();
+  
+  // Update payment method when available methods change
+  useEffect(() => {
+    if (availablePaymentMethods.length > 0 && !availablePaymentMethods.find(method => method.id === paymentMethod)) {
+      setPaymentMethod(availablePaymentMethods[0].id);
+      setFormData(prev => ({ ...prev, paymentMethod: availablePaymentMethods[0].id }));
+    }
+  }, [availablePaymentMethods, paymentMethod, setFormData]);
   
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
@@ -705,41 +715,31 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                 value={paymentMethod}
                 onChange={handlePaymentChange}
               >
-                <Box sx={{ 
-                  mb: 2, 
-                  p: 2,
-                  borderRadius: 2,
-                  border: paymentMethod === 'paypal' ? '2px solid #a29278' : (theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0'),
-                  transition: 'all 0.3s ease',
-                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'inherit',
-                }}>
-                  <FormControlLabel 
-                    value="paypal" 
-                    control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography sx={{ mr: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>PayPal</Typography>
-                        <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
-                          (Credit/Debit Cards)
-                        </Typography>
-                      </Box>
-                    } 
-                  />
-                </Box>
-                
-                <Box sx={{ 
-                  p: 2,
-                  borderRadius: 2,
-                  border: paymentMethod === 'cod' ? '2px solid #a29278' : (theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0'),
-                  transition: 'all 0.3s ease',
-                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'inherit',
-                }}>
-                  <FormControlLabel 
-                    value="cod" 
-                    control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
-                    label={<Typography sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Cash on Delivery</Typography>} 
-                  />
-                </Box>
+                {availablePaymentMethods.map((method) => (
+                  <Box key={method.id} sx={{ 
+                    mb: 2, 
+                    p: 2,
+                    borderRadius: 2,
+                    border: paymentMethod === method.id ? '2px solid #a29278' : (theme.palette.mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0'),
+                    transition: 'all 0.3s ease',
+                    bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'inherit',
+                  }}>
+                    <FormControlLabel 
+                      value={method.id} 
+                      control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />} 
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Typography sx={{ mr: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
+                            {method.name}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                            {method.description}
+                          </Typography>
+                        </Box>
+                      } 
+                    />
+                  </Box>
+                ))}
               </RadioGroup>
             </FormControl>
           </Paper>
@@ -766,7 +766,9 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
               </Box>
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Tax (7%)</Typography>
+                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                  Tax ({Math.round(taxAmount / cartTotal * 100) || 5}%)
+                </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                   ${taxAmount.toFixed(2)}
                 </Typography>
@@ -945,6 +947,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
+  const { settings, loading: settingsLoading } = useSettings();
   const theme = useTheme();
   
   const [activeStep, setActiveStep] = useState(0);
@@ -955,6 +958,8 @@ export default function CheckoutPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   // State for PayPal client ID
   const [paypalClientId, setPaypalClientId] = useState('test');
+  // Add state for available payment methods
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState([]);
   // Form validation errors
   const [errors, setErrors] = useState({});
   
@@ -986,22 +991,26 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Fetch PayPal client ID from settings
+  // Update PayPal client ID and payment methods when settings change
   useEffect(() => {
-    const fetchPaypalSettings = async () => {
-      try {
-        const response = await axios.get('/api/settings');
-        if (response.data?.data?.payment?.paypalClientId) {
-          setPaypalClientId(response.data.data.payment.paypalClientId);
-        }
-      } catch (err) {
-        console.error('Error fetching PayPal settings:', err);
-        // Continue with default test client ID
+    if (!settingsLoading && settings) {
+      if (settings?.payment?.paypalClientId) {
+        setPaypalClientId(settings.payment.paypalClientId);
       }
-    };
-
-    fetchPaypalSettings();
-  }, []);
+      
+      // Set available payment methods based on settings
+      const methods = getAvailablePaymentMethods(settings);
+      setAvailablePaymentMethods(methods);
+      
+      // Set default payment method based on available methods
+      if (methods.length > 0 && !formData.paymentMethod) {
+        setFormData(prev => ({
+          ...prev,
+          paymentMethod: methods[0].id
+        }));
+      }
+    }
+  }, [settings, settingsLoading, formData.paymentMethod]);
 
   // Handle PayPal payment success
   const handlePayPalSuccess = (data) => {
@@ -1026,12 +1035,13 @@ export default function CheckoutPage() {
     }
   }, [orderComplete, completedOrderId]); // Removed clearCart from dependencies to prevent infinite loop
   
-  // Shipping cost calculation (simplified for demo)
-  const shippingCost = cartTotal > 100 ? 0 : 10;
+  // Shipping cost calculation based on settings
+  const shippingCost = settings?.shipping?.enableFreeShipping && cartTotal > (settings?.shipping?.freeShippingThreshold || 100) 
+    ? 0 
+    : (settings?.shipping?.flatRateShipping || 10);
   
-  // Tax calculation (simplified for demo)
-  const taxRate = 0.07; // 7%
-  const taxAmount = cartTotal * taxRate;
+  // Tax calculation based on settings
+  const taxAmount = calculateTax(cartTotal, settings);
   
   // Final total
   const finalTotal = cartTotal + shippingCost + taxAmount;
@@ -1196,6 +1206,7 @@ export default function CheckoutPage() {
             onPayPalError={handlePayPalError}
             onPlaceOrder={handlePlaceOrder}
             loading={loading}
+            availablePaymentMethods={availablePaymentMethods}
           />
         );
       default:

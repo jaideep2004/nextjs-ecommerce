@@ -4,10 +4,26 @@ import { useState, useEffect } from 'react';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import axios from 'axios';
+import { getSettings } from '@/utils/settings';
 
 export default function PayPalButton({ amount, cart, shippingData, formData, onSuccess, onError }) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState('');
+  const [settings, setSettings] = useState(null);
+
+  // Fetch settings to ensure we have the latest
+  useEffect(() => {
+    const fetchSettingsData = async () => {
+      try {
+        const settingsData = await getSettings();
+        setSettings(settingsData);
+      } catch (err) {
+        console.error('Error fetching settings in PayPalButton:', err);
+      }
+    };
+
+    fetchSettingsData();
+  }, []);
 
   const createOrder = async (data, actions) => {
     try {
@@ -56,6 +72,19 @@ export default function PayPalButton({ amount, cart, shippingData, formData, onS
         headers['Authorization'] = `Bearer ${token}`;
       }
       
+      // Calculate tax based on settings
+      const taxRate = settings?.payment?.taxRate || 5;
+      const taxAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0) * (taxRate / 100);
+      
+      // Calculate shipping based on settings
+      let shippingPrice = settings?.shipping?.flatRateShipping || 10;
+      if (settings?.shipping?.enableFreeShipping) {
+        const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        if (total >= (settings?.shipping?.freeShippingThreshold || 100)) {
+          shippingPrice = 0;
+        }
+      }
+      
       // Prepare order data
       const orderData = {
         orderItems: cart.map(item => ({
@@ -79,9 +108,9 @@ export default function PayPalButton({ amount, cart, shippingData, formData, onS
         },
         paymentMethod: 'paypal',
         itemsPrice: cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        shippingPrice: amount > 100 ? 0 : 10, // Same logic as checkout
-        taxPrice: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) * 0.07,
-        totalPrice: amount,
+        shippingPrice: shippingPrice,
+        taxPrice: taxAmount,
+        totalPrice: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) + shippingPrice + taxAmount,
         isPaid: true,
         paidAt: new Date(),
         paymentResult,

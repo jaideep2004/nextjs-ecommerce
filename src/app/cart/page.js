@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import Link from 'next/link';
 import Image from 'next/image';
+import { calculateTax } from '@/utils/settings';
 import {
   Container,
   Typography,
@@ -27,6 +29,11 @@ import {
   CardContent,
   Chip,
   useTheme,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel,
 } from '@mui/material';
 import {
   Add,
@@ -36,25 +43,57 @@ import {
   NavigateNext,
   ShoppingBag,
   Inventory2,
+  LocalShipping,
 } from '@mui/icons-material';
 
 export default function CartPage() {
   const { cart, updateCartItemQuantity, removeFromCart, clearCart, cartTotal } = useCart();
   const { user } = useAuth();
+  const { settings, loading: loadingSettings } = useSettings();
   const theme = useTheme();
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponFreeShipping, setCouponFreeShipping] = useState(false);
+  const [selectedShipping, setSelectedShipping] = useState(null);
   
-  // Shipping cost calculation (simplified for demo)
-  const shippingCost = cartTotal > 100 ? 0 : 10;
+  // Get the actual settings data from the nested structure
+  const settingsData = settings?.status || settings;
   
-  // Tax calculation (simplified for demo)
-  const taxRate = 0.07; // 7%
-  const taxAmount = (cartTotal - couponDiscount) * taxRate;
+  // Get available shipping options
+  const shippingOptions = settingsData?.shipping?.shippingOptions || [
+    { name: 'Standard Shipping', price: 10, estimatedDays: '3-5' }
+  ];
+  
+  // Auto-select first shipping option if none selected
+  const currentShipping = selectedShipping || shippingOptions[0];
+  
+  // Shipping cost calculation based on settings and coupon
+  const baseShippingCost = settingsData?.shipping?.enableFreeShipping && cartTotal >= (settingsData?.shipping?.freeShippingThreshold || 100)
+    ? 0 
+    : (currentShipping?.price || 10);
+  
+  const shippingCost = couponFreeShipping ? 0 : baseShippingCost;
+  
+  // Tax calculation using settings
+  const taxAmount = calculateTax(cartTotal - couponDiscount, settingsData);
   
   // Final total
   const finalTotal = cartTotal - couponDiscount + shippingCost + taxAmount;
+  
+  // Debug logging
+  console.log('Cart Settings Debug:', {
+    settings: settings,
+    settingsData: settingsData,
+    cartTotal,
+    taxRate: settingsData?.payment?.taxRate,
+    taxAmount,
+    shippingCost,
+    currentShipping,
+    shippingOptions,
+    finalTotal
+  });
   
   // Handle quantity change
   const handleQuantityChange = (productId, newQuantity) => {
@@ -63,18 +102,60 @@ export default function CartPage() {
   };
   
   // Handle coupon application
-  const handleApplyCoupon = () => {
-    // This would typically validate the coupon with an API call
-    if (couponCode.toUpperCase() === 'WELCOME10') {
-      setCouponDiscount(cartTotal * 0.1); // 10% discount
-      setCouponError('');
-    } else if (couponCode.toUpperCase() === 'FREESHIP') {
-      // This would set shipping to free, but we already have free shipping over $100
-      setCouponError('This coupon is only valid for orders under $100');
-    } else {
-      setCouponDiscount(0);
-      setCouponError('Invalid coupon code');
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
     }
+
+    try {
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: couponCode,
+          orderAmount: cartTotal,
+          cartItems: cart
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.valid) {
+        setCouponDiscount(data.discount.amount);
+        setCouponFreeShipping(data.discount.freeShipping);
+        setAppliedCoupon(data.coupon);
+        setCouponError('');
+      } else {
+        setCouponDiscount(0);
+        setCouponFreeShipping(false);
+        setAppliedCoupon(null);
+        setCouponError(data.message || 'Invalid coupon code');
+      }
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+      setCouponDiscount(0);
+      setCouponFreeShipping(false);
+      setAppliedCoupon(null);
+      setCouponError('Error validating coupon. Please try again.');
+    }
+  };
+
+  // Handle coupon removal
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setCouponDiscount(0);
+    setCouponFreeShipping(false);
+    setAppliedCoupon(null);
+    setCouponError('');
+  };
+  
+  // Handle shipping option change
+  const handleShippingChange = (event) => {
+    const selectedOption = shippingOptions.find(option => option._id === event.target.value);
+    setSelectedShipping(selectedOption);
   };
   
   if (!cart || cart.length === 0) {
@@ -561,6 +642,68 @@ export default function CartPage() {
                     </Box>
                   )}
                   
+                  {/* Shipping Options */}
+                  {!couponFreeShipping && baseShippingCost > 0 && shippingOptions.length > 1 && (
+                    <Box sx={{ 
+                      mb: 2,
+                      p: 2,
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
+                      borderRadius: 2,
+                    }}>
+                      <FormControl component="fieldset" fullWidth>
+                        <FormLabel 
+                          component="legend" 
+                          sx={{ 
+                            fontWeight: 600, 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
+                            mb: 1,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LocalShipping fontSize="small" />
+                            Shipping Options
+                          </Box>
+                        </FormLabel>
+                        <RadioGroup
+                          value={currentShipping?._id || ''}
+                          onChange={handleShippingChange}
+                        >
+                          {shippingOptions.map((option) => (
+                            <FormControlLabel
+                              key={option._id || option.name}
+                              value={option._id || option.name}
+                              control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />}
+                              label={
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                                  <Box>
+                                    <Typography variant="body2" sx={{ fontWeight: 500, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
+                                      {option.name}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                                      {option.estimatedDays} days
+                                    </Typography>
+                                  </Box>
+                                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#a29278' }}>
+                                    ${option.price.toFixed(2)}
+                                  </Typography>
+                                </Box>
+                              }
+                              sx={{ 
+                                width: '100%', 
+                                m: 0, 
+                                p: 1,
+                                borderRadius: 1,
+                                '&:hover': {
+                                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                },
+                              }}
+                            />
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                    </Box>
+                  )}
+                  
                   <Box sx={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
@@ -569,7 +712,19 @@ export default function CartPage() {
                     bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     borderRadius: 2,
                   }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Shipping</Typography>
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Shipping</Typography>
+                      {couponFreeShipping && (
+                        <Typography variant="caption" sx={{ color: '#4caf50', fontWeight: 500 }}>
+                          Free shipping applied by coupon
+                        </Typography>
+                      )}
+                      {!couponFreeShipping && currentShipping && baseShippingCost > 0 && (
+                        <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary', display: 'block' }}>
+                          {currentShipping.name} - {currentShipping.estimatedDays} days
+                        </Typography>
+                      )}
+                    </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: shippingCost === 0 ? '#4caf50' : (theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50') }}>
                       {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                     </Typography>
@@ -583,7 +738,9 @@ export default function CartPage() {
                     bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                     borderRadius: 2,
                   }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>Tax (7%)</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
+                      Tax ({settingsData?.payment?.taxRate || 5}%)
+                    </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                       ${taxAmount.toFixed(2)}
                     </Typography>
@@ -611,56 +768,111 @@ export default function CartPage() {
                   <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
                     Promo Code
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <TextField
-                      size="small"
-                      placeholder="Enter coupon code"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      fullWidth
-                      error={!!couponError}
-                      helperText={couponError}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
-                          '&.Mui-focused': {
+                  
+                  {/* Applied Coupon Display */}
+                  {appliedCoupon && (
+                    <Box sx={{ 
+                      mb: 2, 
+                      p: 2, 
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a2a1a' : '#e8f5e8',
+                      borderRadius: 2,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#4caf50' }}>
+                          {appliedCoupon.code}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                          {appliedCoupon.description}
+                        </Typography>
+                        {couponFreeShipping && (
+                          <Typography variant="caption" sx={{ display: 'block', color: '#4caf50', fontWeight: 500 }}>
+                            Free shipping included
+                          </Typography>
+                        )}
+                      </Box>
+                      <Button
+                        size="small"
+                        onClick={handleRemoveCoupon}
+                        sx={{ 
+                          color: '#d32f2f',
+                          minWidth: 'auto',
+                          px: 1,
+                          '&:hover': {
+                            bgcolor: theme.palette.mode === 'dark' ? '#441111' : '#ffebee',
+                          },
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  )}
+                  
+                  {/* Coupon Input */}
+                  {!appliedCoupon && (
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <TextField
+                        size="small"
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        fullWidth
+                        error={!!couponError}
+                        helperText={couponError}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleApplyCoupon();
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                            '&.Mui-focused': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#a29278',
+                                borderWidth: 2,
+                              },
+                            },
                             '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#a29278',
-                              borderWidth: 2,
+                              borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
                             },
                           },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                          '& .MuiInputLabel-root': {
+                            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
                           },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': {
-                          color: '#a29278',
-                        },
-                        '& .MuiFormHelperText-root': {
-                          color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
-                        },
-                      }}
-                    />
-                    <Button 
-                      variant="contained" 
-                      onClick={handleApplyCoupon}
-                      sx={{ 
-                        whiteSpace: 'nowrap',
-                        background: 'linear-gradient(135deg, #a29278, #8b7d65)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
-                        },
-                        borderRadius: 2,
-                        px: 3,
-                      }}
-                    >
-                      Apply
-                    </Button>
-                  </Box>
+                          '& .MuiInputLabel-root.Mui-focused': {
+                            color: '#a29278',
+                          },
+                          '& .MuiFormHelperText-root': {
+                            color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
+                          },
+                        }}
+                      />
+                      <Button 
+                        variant="contained" 
+                        onClick={handleApplyCoupon}
+                        disabled={!couponCode.trim()}
+                        sx={{ 
+                          whiteSpace: 'nowrap',
+                          background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
+                          },
+                          '&:disabled': {
+                            background: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                            color: theme.palette.mode === 'dark' ? '#666666' : 'rgba(0, 0, 0, 0.26)',
+                          },
+                          borderRadius: 2,
+                          px: 3,
+                        }}
+                      >
+                        Apply
+                      </Button>
+                    </Box>
+                  )}
                 </Box>
               
                 {/* Checkout Button */}
@@ -688,7 +900,7 @@ export default function CartPage() {
                 </Button>
                 
                 {/* Free Shipping Notice */}
-                {cartTotal < 100 && (
+                {settingsData?.shipping?.enableFreeShipping && cartTotal < (settingsData?.shipping?.freeShippingThreshold || 100) && (
                   <Alert 
                     severity="info" 
                     sx={{ 
@@ -701,7 +913,7 @@ export default function CartPage() {
                       color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit',
                     }}
                   >
-                    Add <strong>${(100 - cartTotal).toFixed(2)} more</strong> to qualify for FREE shipping!
+                    Add <strong>${((settingsData?.shipping?.freeShippingThreshold || 100) - cartTotal).toFixed(2)} more</strong> to qualify for FREE shipping!
                   </Alert>
                 )}
               </CardContent>

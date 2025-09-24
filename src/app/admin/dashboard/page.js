@@ -468,19 +468,8 @@ export default function AdminDashboard() {
         const response = await axios.get('/api/admin/dashboard');
         console.log('Dashboard data received:', response.data);
         
-        // Check if response has the expected structure
-        let apiData;
-        if (response.data && response.data.data) {
-          // New API format with nested data
-          apiData = response.data.data;
-        } else if (response.data) {
-          // Old API format with direct data
-          apiData = response.data;
-        } else {
-          console.error('Unexpected API response format:', response.data);
-          setError('Received unexpected data format from server');
-          return;
-        }
+        // Extract the actual data from the response
+        const apiData = response.data.status || response.data.data || response.data;
         
         // Transform API data to match the expected format
         const formattedData = {

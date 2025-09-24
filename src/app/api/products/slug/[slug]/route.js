@@ -9,7 +9,10 @@ export async function GET(req, { params }) {
     
     const { slug } = params;
     
-    const product = await Product.findOne({ slug });
+    // Only select essential fields to reduce payload size
+    const product = await Product.findOne({ slug })
+      .select('name slug category subcategory image images price brand rating numReviews countInStock description isFeatured discount colors sizes fabric occasion style createdAt')
+      .populate('category', 'name slug');
     
     if (!product) {
       return Response.json(
