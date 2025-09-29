@@ -336,107 +336,114 @@ export default function ProductsPage() {
 
 	// Fetch products when filters or pagination change
 	useEffect(() => {
-		const fetchProducts = async () => {
-			try {
-				setLoading(true);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-				// Build query string from filters
-				const queryParams = new URLSearchParams();
-				if (filters.category) queryParams.append("category", filters.category);
-				if (filters.subcategory)
-					queryParams.append("subcategory", filters.subcategory);
-				if (filters.minPrice > 0)
-					queryParams.append("minPrice", String(filters.minPrice));
-				if (filters.maxPrice < 1000)
-					queryParams.append("maxPrice", String(filters.maxPrice));
-				if (filters.search) queryParams.append("search", filters.search);
-				if (filters.sort) queryParams.append("sort", filters.sort);
-				if (filters.brands && filters.brands.length > 0)
-					queryParams.append("brand", filters.brands.join(','));
-				queryParams.append("page", String(pagination.page));
-				queryParams.append("limit", "12"); // Products per page
+        // Build query string from filters
+        const queryParams = new URLSearchParams();
+        if (filters.category) queryParams.append("category", filters.category);
+        if (filters.subcategory)
+          queryParams.append("subcategory", filters.subcategory);
+        if (filters.minPrice > 0)
+          queryParams.append("minPrice", String(filters.minPrice));
+        if (filters.maxPrice < 1000)
+          queryParams.append("maxPrice", String(filters.maxPrice));
+        if (filters.search) queryParams.append("search", filters.search);
+        if (filters.sort) queryParams.append("sort", filters.sort);
+        if (filters.brands && filters.brands.length > 0)
+          queryParams.append("brand", filters.brands.join(','));
+        queryParams.append("page", String(pagination.page));
+        queryParams.append("limit", "12"); // Products per page
 
-				const qs = queryParams.toString();
-				console.log('Fetching /api/products with query:', qs, 'filters:', filters);
-				const res = await axios.get(`/api/products?${qs}`);
-				console.log("Products API response:", res.data);
+        const qs = queryParams.toString();
+        console.log('Fetching /api/products with query:', qs, 'filters:', filters);
+        
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const res = await axios.get(`/api/products?${qs}`, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        console.log("Products API response:", res.data);
 
-				// Handle different response structures
-				const productsData = res.data.products || res.data.data?.products || [];
-				const paginationData = res.data.pagination ||
-					res.data.data?.pagination || {
-						page: 1,
-						pages: 1,
-						total: productsData.length,
-					};
+        // Handle different response structures
+        const productsData = res.data.products || res.data.data?.products || [];
+        const paginationData = res.data.pagination || res.data.data?.pagination || {};
 
-				setProducts(productsData);
-				setPagination({
-					page: paginationData.page,
-					pages: paginationData.pages,
-					total: paginationData.total,
-				});
+        setProducts(productsData);
+        setPagination((prev) => ({
+          ...prev,
+          total: paginationData.total || 0,
+          pages: paginationData.pages || 1,
+        }));
 
-				// Extract dynamic filters from products
-				if (productsData.length > 0) {
-					// Build categories from populated category objects when available
-					const categoryMap = new Map();
-					productsData.forEach((p) => {
-						const c = p.category;
-						if (!c) return;
-						if (typeof c === 'object') {
-							const id = c._id?.toString();
-							const name = c.name || c.slug || id;
-							if (!id || !name) return;
-							categoryMap.set(id, {
-								id,
-								name,
-								slug: c.slug,
-								count: (categoryMap.get(id)?.count || 0) + 1,
-							});
-						} else if (typeof c === 'string') {
-							// Fallback when not populated (name or id string)
-							const key = c;
-							categoryMap.set(key, {
-								id: key,
-								name: c,
-								slug: undefined,
-								count: (categoryMap.get(key)?.count || 0) + 1,
-							});
-						}
-					});
-					const categories = Array.from(categoryMap.values());
+        // Extract dynamic filters from products data
+        if (productsData && productsData.length > 0) {
+          // Build category map from product data
+          const categoryMap = new Map();
+          productsData.forEach((product) => {
+            const c = product.category;
+            if (c && typeof c === 'object' && c._id) {
+              // Populated category object
+              const id = c._id.toString();
+              categoryMap.set(id, {
+                id,
+                name: c.name,
+                slug: c.slug,
+                count: (categoryMap.get(id)?.count || 0) + 1,
+              });
+            } else if (typeof c === 'string') {
+              // Fallback when not populated (name or id string)
+              const key = c;
+              categoryMap.set(key, {
+                id: key,
+                name: c,
+                slug: undefined,
+                count: (categoryMap.get(key)?.count || 0) + 1,
+              });
+            }
+          });
+          const categories = Array.from(categoryMap.values());
 
-					const brands = [
-						...new Set(productsData.map((p) => p.brand).filter(Boolean)),
-					];
-					const colors = [
-						...new Set(
-							productsData.flatMap((p) => p.colors || []).filter(Boolean)
-						),
-					];
+          const brands = [
+            ...new Set(productsData.map((p) => p.brand).filter(Boolean)),
+          ];
+          const colors = [
+            ...new Set(
+              productsData.flatMap((p) => p.colors || []).filter(Boolean)
+            ),
+          ];
 
-					setDynamicFilters({
-						categories,
-						brands: brands.map((b) => ({
-							name: b,
-							count: productsData.filter((p) => p.brand === b).length,
-						})),
-						colors: colors.map((c) => ({ name: c, value: c })),
-					});
-				} else {
-					setDynamicFilters({ categories: [], brands: [], colors: [] });
-				}
-			} catch (err) {
-				console.error(err);
-				setError(err?.response?.data?.message || 'Failed to load products');
-			} finally {
-				setLoading(false);
-			}
-		};
+          setDynamicFilters({
+            categories,
+            brands: brands.map((b) => ({
+              name: b,
+              count: productsData.filter((p) => p.brand === b).length,
+            })),
+            colors: colors.map((c) => ({ name: c, value: c })),
+          });
+        } else {
+          setDynamicFilters({ categories: [], brands: [], colors: [] });
+        }
+      } catch (err) {
+        console.error(err);
+        if (err.name === 'AbortError') {
+          setError('Request timeout. Please try again.');
+        } else {
+          setError(err?.response?.data?.message || 'Failed to load products');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-		fetchProducts();
-	}, [filters, pagination.page]);
+    fetchProducts();
+  }, [filters, pagination.page]);
 
 	// Fetch wishlist items if user is logged in
 	useEffect(() => {

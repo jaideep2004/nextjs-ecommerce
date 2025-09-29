@@ -34,6 +34,7 @@ import {
   Grid,
   Breadcrumbs,
   Link as MuiLink,
+  useTheme
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -70,6 +71,8 @@ export default function CustomersPage() {
   const [dialogAction, setDialogAction] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const theme = useTheme();
+  
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -272,7 +275,7 @@ export default function CustomersPage() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
           Customers Management
         </Typography>
         <Breadcrumbs aria-label="breadcrumb">
@@ -373,7 +376,7 @@ export default function CustomersPage() {
                 <>
                   <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
                     <Table>
-                      <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                      <TableHead >
                         <TableRow>
                           <TableCell>Name</TableCell>
                           <TableCell>Email</TableCell>
@@ -397,7 +400,7 @@ export default function CustomersPage() {
                                   <Chip 
                                     label={customer.orderCount || 0} 
                                     size="small" 
-                                    sx={{ bgcolor: '#EFEBE9' }}
+                                    
                                   />
                                 </TableCell>
                                 <TableCell>

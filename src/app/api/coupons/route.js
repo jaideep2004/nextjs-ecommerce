@@ -1,11 +1,12 @@
 import connectToDatabase from '@/lib/mongodb';
 import Coupon from '@/models/Coupon';
+import Category from '@/models/Category'; // Add this import
 import { isAuthenticated } from '@/utils/auth';
 import { handleApiRequest, createResponse } from '@/utils/api';
 
 // GET /api/coupons - Get all coupons (admin only)
 export async function GET(request) {
-  return handleApiRequest(async () => {
+  return handleApiRequest(request, async () => {
     const user = await isAuthenticated(request);
     
     if (!user.isAdmin) {
@@ -28,7 +29,6 @@ export async function GET(request) {
     if (search) {
       query.$or = [
         { code: { $regex: search, $options: 'i' } },
-        { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
     }
@@ -52,19 +52,21 @@ export async function GET(request) {
     const [coupons, total] = await Promise.all([
       Coupon.find(query)
         .populate('createdBy', 'name email')
+        .populate('applicableCategories', 'name slug')
+        .populate('excludedCategories', 'name slug')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
       Coupon.countDocuments(query)
     ]);
 
+    // Convert coupons to plain objects and handle virtual properties
+    const couponsData = coupons.map(coupon => {
+      return coupon.toObject({ virtuals: true });
+    });
+
     return createResponse(200, {
-      coupons: coupons.map(coupon => ({
-        ...coupon.toObject(),
-        isExpired: coupon.isExpired,
-        hasReachedLimit: coupon.hasReachedLimit,
-        isCurrentlyValid: coupon.isCurrentlyValid
-      })),
+      coupons: couponsData,
       pagination: {
         total,
         page,
@@ -72,12 +74,12 @@ export async function GET(request) {
         limit
       }
     });
-  }, 'GET');
+  });
 }
 
 // POST /api/coupons - Create new coupon (admin only)
 export async function POST(request) {
-  return handleApiRequest(async () => {
+  return handleApiRequest(request, async () => {
     const user = await isAuthenticated(request);
     
     if (!user.isAdmin) {
@@ -115,7 +117,7 @@ export async function POST(request) {
     // Create new coupon
     const coupon = await Coupon.create({
       code: code.toUpperCase(),
-      name,
+      name: name || code, // Use code as name if name is not provided
       description,
       type,
       value,
@@ -123,8 +125,8 @@ export async function POST(request) {
       maximumDiscountAmount: maximumDiscountAmount || null,
       usageLimit: usageLimit || null,
       userUsageLimit: userUsageLimit || 1,
-      validFrom: new Date(validFrom),
-      validUntil: new Date(validUntil),
+      validFrom: validFrom ? new Date(validFrom) : new Date(),
+      validUntil: validUntil ? new Date(validUntil) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
       isActive: isActive !== false,
       applicableCategories: applicableCategories || [],
       applicableProducts: applicableProducts || [],
@@ -134,14 +136,11 @@ export async function POST(request) {
     });
 
     await coupon.populate('createdBy', 'name email');
+    await coupon.populate('applicableCategories', 'name slug');
+    await coupon.populate('excludedCategories', 'name slug');
 
     return createResponse(201, {
-      coupon: {
-        ...coupon.toObject(),
-        isExpired: coupon.isExpired,
-        hasReachedLimit: coupon.hasReachedLimit,
-        isCurrentlyValid: coupon.isCurrentlyValid
-      }
+      coupon: coupon.toObject({ virtuals: true })
     }, 'Coupon created successfully');
-  }, 'POST');
+  });
 }

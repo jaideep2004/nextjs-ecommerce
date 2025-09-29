@@ -127,7 +127,7 @@ const couponSchema = new mongoose.Schema({
 });
 
 // Indexes
-couponSchema.index({ code: 1 });
+// code index is automatically created due to unique: true in schema
 couponSchema.index({ isActive: 1, validFrom: 1, validUntil: 1 });
 couponSchema.index({ createdBy: 1 });
 
@@ -138,13 +138,14 @@ couponSchema.virtual('isExpired').get(function() {
 
 // Virtual for checking if coupon has reached usage limit
 couponSchema.virtual('hasReachedLimit').get(function() {
-  return this.usageLimit && this.usageCount >= this.usageLimit;
+  if (!this.usageLimit) return false;
+  return this.usageCount >= this.usageLimit;
 });
 
 // Virtual for checking if coupon is currently valid
 couponSchema.virtual('isCurrentlyValid').get(function() {
   const now = new Date();
-  return this.isActive && !this.isExpired && !this.hasReachedLimit && 
+  return this.isActive && !this.isExpired && this.hasReachedLimit === false && 
          this.validFrom <= now && this.validUntil >= now;
 });
 

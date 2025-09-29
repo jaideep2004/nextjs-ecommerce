@@ -37,6 +37,11 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for better query performance
+categorySchema.index({ name: 1 });
+categorySchema.index({ slug: 1 });
+categorySchema.index({ featured: 1 });
+
 // Virtual for product count
 categorySchema.virtual('productCount', {
   ref: 'Product',

@@ -12,7 +12,32 @@ export async function GET(req, { params }) {
     
     const { id } = params;
     
-    const product = await Product.findById(id);
+    // Optimize field selection for admin product view with proper projection
+    const product = await Product.findById(id, {
+      name: 1,
+      slug: 1,
+      category: 1,
+      subcategory: 1,
+      image: 1,
+      images: 1,
+      price: 1,
+      brand: 1,
+      rating: 1,
+      numReviews: 1,
+      countInStock: 1,
+      description: 1,
+      isFeatured: 1,
+      discount: 1,
+      colors: 1,
+      sizes: 1,
+      fabric: 1,
+      occasion: 1,
+      style: 1,
+      createdAt: 1,
+      updatedAt: 1
+    })
+      .populate('category', 'name slug')
+      .lean();
     
     if (!product) {
       return Response.json(
@@ -67,8 +92,36 @@ export async function PUT(req, { params }) {
       { new: true, runValidators: true }
     );
     
+    // Return updated product with optimized field selection
+    const populatedProduct = await Product.findById(id)
+      .populate('category', 'name slug')
+      .select({
+        name: 1,
+        slug: 1,
+        category: 1,
+        subcategory: 1,
+        image: 1,
+        images: 1,
+        price: 1,
+        brand: 1,
+        rating: 1,
+        numReviews: 1,
+        countInStock: 1,
+        description: 1,
+        isFeatured: 1,
+        discount: 1,
+        colors: 1,
+        sizes: 1,
+        fabric: 1,
+        occasion: 1,
+        style: 1,
+        createdAt: 1,
+        updatedAt: 1
+      })
+      .lean();
+    
     return Response.json(
-      apiResponse(200, updatedProduct, 'Product updated successfully'),
+      apiResponse(200, populatedProduct, 'Product updated successfully'),
       { status: 200 }
     );
   });

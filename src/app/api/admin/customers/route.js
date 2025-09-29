@@ -1,5 +1,6 @@
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
+import Order from '@/models/Order'; // Add Order model
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 
@@ -71,13 +72,55 @@ export async function GET(req) {
           
         console.log(`Retrieved ${customers.length} customers from database`);
         
+        // Calculate order count and total spent for each customer
+        const customersWithStats = await Promise.all(customers.map(async (customer) => {
+          const orders = await Order.find({ user: customer._id });
+          const orderCount = orders.length;
+          const totalSpent = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+          
+          return {
+            ...customer,
+            orderCount,
+            totalSpent
+          };
+        }));
+        
+        // Apply sorting if needed (for calculated fields)
+        let sortedCustomers = customersWithStats;
+        if (sortBy === 'orderCount' || sortBy === 'totalSpent') {
+          sortedCustomers = [...customersWithStats].sort((a, b) => {
+            if (sortOrder === 'desc') {
+              return b[sortBy] - a[sortBy];
+            } else {
+              return a[sortBy] - b[sortBy];
+            }
+          });
+        }
+        
         // If no customers found but we know there are users in the database
         if (customers.length === 0) {
           console.log('No customers found with filter, trying simpler query');
           // Try a simpler query to see if there are any users at all
-          customers = await User.find({ isAdmin: false }).limit(limit).select('-password').lean();
-          console.log(`Simpler query returned ${customers.length} customers`);
+          const simpleCustomers = await User.find({ isAdmin: false }).limit(limit).select('-password').lean();
+          
+          // Calculate order count and total spent for simple customers too
+          const simpleCustomersWithStats = await Promise.all(simpleCustomers.map(async (customer) => {
+            const orders = await Order.find({ user: customer._id });
+            const orderCount = orders.length;
+            const totalSpent = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+            
+            return {
+              ...customer,
+              orderCount,
+              totalSpent
+            };
+          }));
+          
+          sortedCustomers = simpleCustomersWithStats;
+          console.log(`Simpler query returned ${sortedCustomers.length} customers`);
         }
+        
+        customers = sortedCustomers;
       } catch (err) {
         console.error('Error fetching customers:', err);
       }

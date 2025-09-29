@@ -24,6 +24,7 @@ import {
   TextField,
   FormControl,
   FormControlLabel,
+  FormLabel,
   RadioGroup,
   Radio,
   Divider,
@@ -564,9 +565,27 @@ const ShippingForm = ({ formData, setFormData, user, errors, setErrors }) => {
   );
 };
 
-const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading, availablePaymentMethods }) => {
+const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost, taxAmount, finalTotal, onPayPalSuccess, onPayPalError, onPlaceOrder, loading, availablePaymentMethods, 
+  // Add coupon props
+  couponCode, setCouponCode, couponDiscount, appliedCoupon, handleApplyCoupon, handleRemoveCoupon,
+  // Add settings prop
+  settings,
+  // Add shipping selection props
+  selectedShipping, setSelectedShipping, shippingOptions, currentShipping, baseShippingCost, couponFreeShipping
+}) => {
   const [paymentMethod, setPaymentMethod] = useState(availablePaymentMethods.length > 0 ? availablePaymentMethods[0].id : 'paypal');
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const theme = useTheme();
+  
+  // Get the actual settings data from the nested structure
+  const actualSettings = settings?.data || settings?.status || settings;
+  
+  // Handle shipping option change
+  const handleShippingChange = (event) => {
+    const selectedOption = shippingOptions.find(option => option._id === event.target.value);
+    setSelectedShipping(selectedOption);
+  };
   
   // Update payment method when available methods change
   useEffect(() => {
@@ -579,6 +598,28 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
     setFormData(prev => ({ ...prev, paymentMethod: e.target.value }));
+  };
+  
+  // Handle coupon application in UI
+  const handleApplyCouponClick = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+    
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    
+    try {
+      const result = await handleApplyCoupon(couponCode);
+      if (!result.success) {
+        setCouponError(result.message);
+      }
+    } catch (error) {
+      setCouponError('Error applying coupon. Please try again.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
   };
   
   const handlePlaceOrderClick = () => {
@@ -704,6 +745,117 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
         
         {/* Payment & Summary */}
         <Grid item xs={12} md={4} style={{ flex:1 }}>
+          {/* Coupon Code Section */}
+          <Paper sx={{ p: 3, mb: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
+              Promo Code
+            </Typography>
+            
+            {/* Applied Coupon Display */}
+            {appliedCoupon && (
+              <Box sx={{ 
+                mb: 2, 
+                p: 2, 
+                bgcolor: theme.palette.mode === 'dark' ? '#1a2a1a' : '#e8f5e8',
+                borderRadius: 2,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#4caf50' }}>
+                    {appliedCoupon.code}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                    {appliedCoupon.description}
+                  </Typography>
+                  {couponFreeShipping && (
+                    <Typography variant="caption" sx={{ display: 'block', color: '#4caf50', fontWeight: 500 }}>
+                      Free shipping included
+                    </Typography>
+                  )}
+                </Box>
+                <Button
+                  size="small"
+                  onClick={handleRemoveCoupon}
+                  sx={{ 
+                    color: '#d32f2f',
+                    minWidth: 'auto',
+                    px: 1,
+                    '&:hover': {
+                      bgcolor: theme.palette.mode === 'dark' ? '#441111' : '#ffebee',
+                    },
+                  }}
+                >
+                  Remove
+                </Button>
+              </Box>
+            )}
+            
+            {/* Coupon Input */}
+            {!appliedCoupon && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  size="small"
+                  placeholder="Enter coupon code"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value);
+                    if (couponError) setCouponError('');
+                  }}
+                  fullWidth
+                  error={!!couponError}
+                  helperText={couponError}
+                  disabled={isApplyingCoupon}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+                      '&.Mui-focused': {
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#a29278',
+                          borderWidth: 2,
+                        },
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: '#a29278',
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: theme.palette.mode === 'dark' ? '#FF6B6B' : '#d32f2f',
+                    },
+                  }}
+                />
+                <Button 
+                  variant="contained" 
+                  onClick={handleApplyCouponClick}
+                  disabled={!couponCode.trim() || isApplyingCoupon}
+                  sx={{ 
+                    whiteSpace: 'nowrap',
+                    background: 'linear-gradient(135deg, #a29278, #8b7d65)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #8b7d65, #6d5d4a)',
+                    },
+                    '&:disabled': {
+                      background: theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0',
+                      color: theme.palette.mode === 'dark' ? '#666666' : 'rgba(0, 0, 0, 0.26)',
+                    },
+                    borderRadius: 2,
+                    px: 3,
+                  }}
+                >
+                  {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                </Button>
+              </Box>
+            )}
+          </Paper>
+          
           {/* Payment Method Selection */}
           <Paper sx={{ p: 3, mb: 3, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'background.paper' }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
@@ -758,8 +910,88 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
                 </Typography>
               </Box>
               
+              {couponDiscount > 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Discount</Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#4caf50' }}>
+                    -${couponDiscount.toFixed(2)}
+                  </Typography>
+                </Box>
+              )}
+              
+              {/* Shipping Options Selection */}
+              {!couponFreeShipping && baseShippingCost > 0 && shippingOptions.length > 1 && (
+                <Box sx={{ 
+                  mb: 1,
+                  p: 2,
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
+                  borderRadius: 2,
+                }}>
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel 
+                      component="legend" 
+                      sx={{ 
+                        fontWeight: 600, 
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
+                        mb: 1,
+                      }}
+                    >
+                      Shipping Options
+                    </FormLabel>
+                    <RadioGroup
+                      value={currentShipping?._id || ''}
+                      onChange={handleShippingChange}
+                    >
+                      {shippingOptions.map((option) => (
+                        <FormControlLabel
+                          key={option._id || option.name}
+                          value={option._id || option.name}
+                          control={<Radio sx={{ color: '#a29278', '&.Mui-checked': { color: '#a29278' } }} />}
+                          label={
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 500, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
+                                  {option.name}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
+                                  {option.estimatedDays} days
+                                </Typography>
+                              </Box>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: '#a29278' }}>
+                                ${option.price.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          }
+                          sx={{ 
+                            width: '100%', 
+                            m: 0, 
+                            p: 1,
+                            borderRadius: 1,
+                            '&:hover': {
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                            },
+                          }}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
+              )}
+              
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Shipping</Typography>
+                <Box>
+                  <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>Shipping</Typography>
+                  {couponFreeShipping && (
+                    <Typography variant="caption" sx={{ color: '#4caf50', fontWeight: 500, display: 'block' }}>
+                      Free shipping applied by coupon
+                    </Typography>
+                  )}
+                  {!couponFreeShipping && currentShipping && baseShippingCost > 0 && (
+                    <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary', display: 'block' }}>
+                      {currentShipping.name} - {currentShipping.estimatedDays} days
+                    </Typography>
+                  )}
+                </Box>
                 <Typography variant="body1" sx={{ fontWeight: 600, color: shippingCost === 0 ? '#4caf50' : (theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary') }}>
                   {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                 </Typography>
@@ -767,7 +999,7 @@ const ReviewAndPayment = ({ formData, setFormData, cart, cartTotal, shippingCost
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="body1" sx={{ color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary' }}>
-                  Tax ({Math.round(taxAmount / cartTotal * 100) || 5}%)
+                  Tax ({actualSettings?.payment?.taxRate || 5}%)
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'text.primary' }}>
                   ${taxAmount.toFixed(2)}
@@ -961,7 +1193,14 @@ export default function CheckoutPage() {
   // Add state for available payment methods
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState([]);
   // Form validation errors
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState('');
+  
+  // Add missing coupon states to match cart page functionality
+  // These need to be declared before they're used in calculations
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponFreeShipping, setCouponFreeShipping] = useState(false);
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -994,12 +1233,15 @@ export default function CheckoutPage() {
   // Update PayPal client ID and payment methods when settings change
   useEffect(() => {
     if (!settingsLoading && settings) {
-      if (settings?.payment?.paypalClientId) {
-        setPaypalClientId(settings.payment.paypalClientId);
+      // Make sure we're using the actual settings data structure
+      const actualSettings = settings?.data || settings?.status || settings;
+      
+      if (actualSettings?.payment?.paypalClientId) {
+        setPaypalClientId(actualSettings.payment.paypalClientId);
       }
       
       // Set available payment methods based on settings
-      const methods = getAvailablePaymentMethods(settings);
+      const methods = getAvailablePaymentMethods(actualSettings);
       setAvailablePaymentMethods(methods);
       
       // Set default payment method based on available methods
@@ -1012,6 +1254,56 @@ export default function CheckoutPage() {
     }
   }, [settings, settingsLoading, formData.paymentMethod]);
 
+  // Handle coupon application
+  const handleApplyCoupon = async (code) => {
+    if (!code.trim()) {
+      return { success: false, message: 'Please enter a coupon code' };
+    }
+
+    try {
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: code,
+          orderAmount: cartTotal,
+          cartItems: cart
+        }),
+      });
+
+      const data = await response.json();
+
+      // Check if it's a successful response with valid coupon data
+      if (response.ok && data.data?.valid) {
+        setCouponDiscount(data.data.discount.amount);
+        setCouponFreeShipping(data.data.discount.freeShipping);
+        setAppliedCoupon(data.data.coupon);
+        return { success: true, message: 'Coupon applied successfully' };
+      } 
+      // Check if it's an error response
+      else if (data.error) {
+        return { success: false, message: data.message || 'Invalid coupon code' };
+      }
+      // Handle unexpected response format
+      else {
+        return { success: false, message: 'Invalid response format from server' };
+      }
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+      return { success: false, message: 'Error validating coupon. Please try again.' };
+    }
+  };
+
+  // Handle coupon removal
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setCouponDiscount(0);
+    setCouponFreeShipping(false);
+    setAppliedCoupon(null);
+  };
+  
   // Handle PayPal payment success
   const handlePayPalSuccess = (data) => {
     console.log('PayPal payment successful:', data);
@@ -1035,16 +1327,31 @@ export default function CheckoutPage() {
     }
   }, [orderComplete, completedOrderId]); // Removed clearCart from dependencies to prevent infinite loop
   
-  // Shipping cost calculation based on settings
-  const shippingCost = settings?.shipping?.enableFreeShipping && cartTotal > (settings?.shipping?.freeShippingThreshold || 100) 
+  // Get the actual settings data from the nested structure
+  const settingsData = settings?.status || settings;
+  
+  // Get available shipping options
+  const shippingOptions = settingsData?.shipping?.shippingOptions || [
+    { name: 'Standard Shipping', price: 10, estimatedDays: '3-5' }
+  ];
+  
+  // Auto-select first shipping option if none selected
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const currentShipping = selectedShipping || shippingOptions[0];
+  
+  // Shipping cost calculation based on settings and coupon - FIXED to match cart page logic
+  const baseShippingCost = settingsData?.shipping?.enableFreeShipping && cartTotal >= (settingsData?.shipping?.freeShippingThreshold || 100)
     ? 0 
-    : (settings?.shipping?.flatRateShipping || 10);
+    : (currentShipping?.price || 10);
   
-  // Tax calculation based on settings
-  const taxAmount = calculateTax(cartTotal, settings);
+  const shippingCost = couponFreeShipping ? 0 : baseShippingCost;
   
-  // Final total
-  const finalTotal = cartTotal + shippingCost + taxAmount;
+  // Tax calculation based on settings - FIXED to account for coupon discounts like cart page
+  const actualSettings = settings?.data || settings?.status || settings;
+  const taxAmount = calculateTax(cartTotal - couponDiscount, actualSettings);
+  
+  // Final total - FIXED to account for coupon discounts like cart page
+  const finalTotal = cartTotal - couponDiscount + shippingCost + taxAmount;
   
   // Handle next step
   const handleNext = () => {
@@ -1207,13 +1514,29 @@ export default function CheckoutPage() {
             onPlaceOrder={handlePlaceOrder}
             loading={loading}
             availablePaymentMethods={availablePaymentMethods}
+            // Coupon props
+            couponCode={couponCode}
+            setCouponCode={setCouponCode}
+            couponDiscount={couponDiscount}
+            appliedCoupon={appliedCoupon}
+            handleApplyCoupon={handleApplyCoupon}
+            handleRemoveCoupon={handleRemoveCoupon}
+            // Settings prop
+            settings={settings}
+            // Shipping selection props
+            selectedShipping={selectedShipping}
+            setSelectedShipping={setSelectedShipping}
+            shippingOptions={shippingOptions}
+            currentShipping={currentShipping}
+            baseShippingCost={baseShippingCost}
+            couponFreeShipping={couponFreeShipping}
           />
         );
       default:
         return 'Unknown step';
     }
   };
-  
+
   if (!user) {
     return (
       <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>

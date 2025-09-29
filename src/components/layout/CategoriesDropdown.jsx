@@ -16,6 +16,31 @@ import { styled, keyframes } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
+// Simple in-memory cache for categories
+const categoriesCache = {
+  data: null,
+  timestamp: null,
+  expiry: 5 * 60 * 1000, // 5 minutes
+  
+  isValid() {
+    return this.data && this.timestamp && (Date.now() - this.timestamp) < this.expiry;
+  },
+  
+  set(data) {
+    this.data = data;
+    this.timestamp = Date.now();
+  },
+  
+  get() {
+    return this.isValid() ? this.data : null;
+  },
+  
+  clear() {
+    this.data = null;
+    this.timestamp = null;
+  }
+};
+
 // 4th Dimensional Animations
 const dropdownSlide = keyframes`
   0% {
@@ -231,50 +256,37 @@ export default function CategoriesDropdown({ trigger, onCategorySelect }) {
   const dropdownRef = useRef(null);
   const router = useRouter();
 
-  // Fetch categories from products API
+  // Fetch categories directly from categories API instead of products API
   useEffect(() => {
     const fetchCategories = async () => {
       if (!open) return;
       
+      // Check cache first
+      const cachedData = categoriesCache.get();
+      if (cachedData) {
+        // Sort by product count (descending) and limit to top 10
+        const sortedCategories = cachedData
+          .sort((a, b) => (b.productCount || 0) - (a.productCount || 0))
+          .slice(0, 10);
+        setCategories(sortedCategories);
+        return;
+      }
+      
       setLoading(true);
       try {
-        const response = await axios.get('/api/products?limit=1000');
-        console.log('API Response:', response.data); // Debug log
+        // Fetch categories directly - much more efficient
+        const response = await axios.get('/api/categories');
+        const categoriesData = response.data.data?.categories || response.data.categories || [];
         
-        // Handle both direct array and nested data structure
-        const products = response.data.data?.products || response.data.products || response.data || [];
-        console.log('Products array:', products); // Debug log
+        // Cache the data
+        categoriesCache.set(categoriesData);
         
-        // Extract unique categories with counts
-        const categoryMap = new Map();
-        products.forEach(product => {
-          console.log('Product category:', product.category); // Debug log
-          if (product.category) {
-            // Handle both populated category objects and string categories
-            const categoryName = typeof product.category === 'object' 
-              ? product.category.name 
-              : product.category;
-            
-            if (categoryName) {
-              const category = categoryName.toLowerCase();
-              if (categoryMap.has(category)) {
-                categoryMap.set(category, categoryMap.get(category) + 1);
-              } else {
-                categoryMap.set(category, 1);
-              }
-            }
-          }
-        });
-
-        console.log('Category map:', categoryMap); // Debug log
-
-        // Convert to array and sort by count
-        const categoriesArray = Array.from(categoryMap.entries())
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count);
-
-        console.log('Categories array:', categoriesArray); // Debug log
-        setCategories(categoriesArray);
+        // Sort by product count (descending) and limit to top 10
+        const sortedCategories = categoriesData
+          .sort((a, b) => (b.productCount || 0) - (a.productCount || 0))
+          .slice(0, 10);
+          
+        setCategories(sortedCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);
         setCategories([]);
@@ -352,7 +364,7 @@ export default function CategoriesDropdown({ trigger, onCategorySelect }) {
                         <CategoryItem onClick={() => handleCategoryClick(category.name)}>
                           <CategoryName>{category.name}</CategoryName>
                           <CategoryCount>
-                            {category.count} {category.count === 1 ? 'product' : 'products'}
+                            {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
                           </CategoryCount>
                         </CategoryItem>
                       </Fade>

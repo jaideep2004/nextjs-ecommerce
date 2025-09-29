@@ -82,7 +82,7 @@ export default function AdminSidebar() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <img 
-            src="/images/lp3.png" 
+            src="/images/ll2.jpg" 
             alt="Admin Logo" 
             style={{
               width: '40px',

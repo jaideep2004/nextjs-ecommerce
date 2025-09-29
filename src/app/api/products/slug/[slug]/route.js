@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
   return handleApiRequest(req, async () => {
     await connectToDatabase();
     
-    const { slug } = params;
+    const { slug } = await params;
     
     // Only select essential fields to reduce payload size
     const product = await Product.findOne({ slug })

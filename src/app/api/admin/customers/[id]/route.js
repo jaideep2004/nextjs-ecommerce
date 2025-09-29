@@ -1,6 +1,6 @@
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
-import Order from '@/models/Order';
+import Order from '@/models/Order'; // Add Order model
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 
@@ -23,8 +23,20 @@ export async function GET(req, { params }) {
         return apiError(404, 'Customer not found');
       }
       
+      // Calculate order count and total spent
+      const orders = await Order.find({ user: customerId });
+      const orderCount = orders.length;
+      const totalSpent = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+      
+      // Add stats to customer object
+      const customerWithStats = {
+        ...customer,
+        orderCount,
+        totalSpent
+      };
+      
       return Response.json(
-        apiResponse(200, customer, 'Customer retrieved successfully'),
+        apiResponse(200, customerWithStats, 'Customer retrieved successfully'),
         { status: 200 }
       );
     } catch (error) {
@@ -107,4 +119,4 @@ export async function DELETE(req, { params }) {
       throw error;
     }
   });
-} 
+}

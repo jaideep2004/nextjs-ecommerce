@@ -109,6 +109,7 @@ export default function CartPage() {
     }
 
     try {
+      console.log('Applying coupon:', couponCode);
       const response = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: {
@@ -122,17 +123,33 @@ export default function CartPage() {
       });
 
       const data = await response.json();
+      console.log('Coupon validation response:', data);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
 
-      if (response.ok && data.valid) {
-        setCouponDiscount(data.discount.amount);
-        setCouponFreeShipping(data.discount.freeShipping);
-        setAppliedCoupon(data.coupon);
+      // Check if it's a successful response with valid coupon data
+      if (response.ok && data.data?.valid) {
+        console.log('Valid coupon applied:', data.data.coupon);
+        setCouponDiscount(data.data.discount.amount);
+        setCouponFreeShipping(data.data.discount.freeShipping);
+        setAppliedCoupon(data.data.coupon);
         setCouponError('');
-      } else {
+      } 
+      // Check if it's an error response
+      else if (data.error) {
+        console.log('Coupon validation error:', data.message);
         setCouponDiscount(0);
         setCouponFreeShipping(false);
         setAppliedCoupon(null);
         setCouponError(data.message || 'Invalid coupon code');
+      }
+      // Handle unexpected response format
+      else {
+        console.log('Unexpected response format:', data);
+        setCouponDiscount(0);
+        setCouponFreeShipping(false);
+        setAppliedCoupon(null);
+        setCouponError('Invalid response format from server');
       }
     } catch (error) {
       console.error('Coupon validation error:', error);

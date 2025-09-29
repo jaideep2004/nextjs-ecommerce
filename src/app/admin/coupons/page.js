@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, api } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import {
   Container,
@@ -64,6 +64,7 @@ export default function AdminCouponsPage() {
   // Form state
   const [formData, setFormData] = useState({
     code: '',
+    name: '', // Add name field
     description: '',
     type: 'percentage',
     value: '',
@@ -88,26 +89,39 @@ export default function AdminCouponsPage() {
     }
   }, [user, loading, router]);
 
-  // Fetch coupons
+  // Fetch coupons - improved logic
   useEffect(() => {
-    if (user && user.isAdmin) {
+    console.log('useEffect triggered', { user, loading });
+    console.log('User isAdmin check:', user?.isAdmin);
+    if (!loading && user && user.isAdmin) {
+      console.log('Fetching coupons...');
+      fetchCoupons();
+    }
+  }, [user, loading]);
+
+  // Add a separate useEffect to handle the case where user becomes available after initial render
+  useEffect(() => {
+    console.log('User effect triggered', { user, loading });
+    if (user && user.isAdmin && !loading && coupons.length === 0 && !loadingCoupons) {
+      console.log('Re-fetching coupons as user is now available');
       fetchCoupons();
     }
   }, [user]);
 
   const fetchCoupons = async () => {
     try {
+      console.log('fetchCoupons called');
       setLoadingCoupons(true);
-      const response = await fetch('/api/coupons', {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setCoupons(data.coupons || []);
+      const response = await api.get('/coupons');
+      console.log('API response status:', response.status);
+      console.log('API response data:', response.data);
+      if (response.status === 200) {
+        // The API response structure is { status, data: { coupons, pagination }, message, timestamp }
+        const couponsData = response.data.data?.coupons || [];
+        console.log('Setting coupons state with:', couponsData);
+        setCoupons(couponsData);
       } else {
-        setError(data.message || 'Failed to fetch coupons');
+        setError(response.data.message || 'Failed to fetch coupons');
       }
     } catch (error) {
       console.error('Error fetching coupons:', error);
@@ -117,11 +131,19 @@ export default function AdminCouponsPage() {
     }
   };
 
+  // Add a useEffect to log when coupons state changes
+  useEffect(() => {
+    console.log('Coupons state updated:', coupons);
+    console.log('Coupons length:', coupons.length);
+    console.log('Loading coupons state:', loadingCoupons);
+  }, [coupons, loadingCoupons]);
+
   const handleOpenDialog = (coupon = null) => {
     if (coupon) {
       setEditingCoupon(coupon);
       setFormData({
         code: coupon.code,
+        name: coupon.name || coupon.code, // Use code as name if name is not set
         description: coupon.description,
         type: coupon.type,
         value: coupon.value,
@@ -138,9 +160,10 @@ export default function AdminCouponsPage() {
         excludedCategories: coupon.excludedCategories || [],
       });
     } else {
-      setEditingCoupon(null);
+      setEditingCoupon(null);     
       setFormData({
         code: '',
+        name: '', // Add name field
         description: '',
         type: 'percentage',
         value: '',
@@ -179,7 +202,7 @@ export default function AdminCouponsPage() {
   const handleSubmit = async () => {
     try {
       // Validate required fields
-      if (!formData.code || !formData.description || !formData.value) {
+      if (!formData.code || !formData.name || !formData.description || !formData.value) {
         setError('Please fill in all required fields');
         return;
       }
@@ -202,7 +225,6 @@ export default function AdminCouponsPage() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`,
         },
         body: JSON.stringify(requestData),
       });
@@ -232,9 +254,6 @@ export default function AdminCouponsPage() {
     try {
       const response = await fetch(`/api/coupons/${couponId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-        },
       });
 
       if (response.ok) {
@@ -270,7 +289,7 @@ export default function AdminCouponsPage() {
       return <Chip label="Expired" color="error" size="small" />;
     }
 
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+    if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
       return <Chip label="Used Up" color="warning" size="small" />;
     }
 
@@ -296,12 +315,20 @@ export default function AdminCouponsPage() {
     );
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || !user.isAdmin) {
     return null;
   }
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Debug info */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2">
+          Debug: loading={loading ? 'true' : 'false'}, user={user ? 'present' : 'null'}, 
+          isAdmin={user?.isAdmin ? 'true' : 'false'}, coupons.length={coupons?.length || 0}
+        </Typography>
+      </Box>
+      
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -368,7 +395,7 @@ export default function AdminCouponsPage() {
                   <ShoppingCart sx={{ color: '#2196f3', fontSize: 40 }} />
                   <Box>
                     <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
-                      {coupons.reduce((sum, c) => sum + (c.usedCount || 0), 0)}
+                      {coupons.reduce((sum, c) => sum + (c.usageCount || 0), 0)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Total Usage
@@ -437,21 +464,7 @@ export default function AdminCouponsPage() {
                       <Typography>Loading coupons...</Typography>
                     </TableCell>
                   </TableRow>
-                ) : coupons.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
-                      <Typography color="text.secondary">No coupons found</Typography>
-                      <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => handleOpenDialog()}
-                        sx={{ mt: 2 }}
-                      >
-                        Create Your First Coupon
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ) : (
+                ) : coupons && coupons.length > 0 ? (
                   coupons.map((coupon) => (
                     <TableRow key={coupon._id} hover>
                       <TableCell>
@@ -482,7 +495,7 @@ export default function AdminCouponsPage() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {coupon.usedCount || 0}
+                          {coupon.usageCount || 0}
                           {coupon.usageLimit && ` / ${coupon.usageLimit}`}
                         </Typography>
                         {coupon.usageLimitPerUser && (
@@ -526,6 +539,20 @@ export default function AdminCouponsPage() {
                       </TableCell>
                     </TableRow>
                   ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                      <Typography color="text.secondary">No coupons found</Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => handleOpenDialog()}
+                        sx={{ mt: 2 }}
+                      >
+                        Create Your First Coupon
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
@@ -565,6 +592,16 @@ export default function AdminCouponsPage() {
                 value={formData.code}
                 onChange={(e) => handleInputChange('code', e.target.value.toUpperCase())}
                 placeholder="e.g., WELCOME10"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Coupon Name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="e.g., Welcome Discount"
               />
             </Grid>
             

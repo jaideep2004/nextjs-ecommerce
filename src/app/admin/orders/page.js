@@ -24,6 +24,7 @@ import {
   CircularProgress,
   Alert,
   Grid,
+  useTheme
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -77,6 +78,7 @@ export default function OrdersPage() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [searchQuery, setSearchQuery] = useState('');
+   const theme = useTheme();
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -185,11 +187,7 @@ export default function OrdersPage() {
       <Box sx={{ mb: 4 }}>
         <Typography 
           variant="h4" 
-          sx={{ 
-            fontWeight: 700,
-            color: '#2c3e50',
-            mb: 1,
-          }}
+          sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}
         >
           Orders Management
         </Typography>
@@ -293,7 +291,7 @@ export default function OrdersPage() {
           <>
             <TableContainer>
               <Table>
-                <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                <TableHead >
                   <TableRow>
                     <TableCell sx={{ fontWeight: 600 }}>Order ID</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
@@ -350,13 +348,22 @@ export default function OrdersPage() {
                             />
                           </TableCell>
                           <TableCell align="right">
-                            <IconButton
-                              onClick={() => window.location.href = `/admin/orders/${order._id}`}
-                              size="small"
-                              sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
-                            >
-                              <ViewIcon fontSize="small" />
-                            </IconButton>
+                            {order._id ? (
+                              <IconButton
+                                onClick={() => {
+                                  console.log('Navigating to order:', order._id);
+                                  router.push(`/admin/orders/${order._id}`);
+                                }}
+                                size="small"
+                                sx={{ color: '#2196f3', '&:hover': { bgcolor: '#e3f2fd' } }}
+                              >
+                                <ViewIcon fontSize="small" />
+                              </IconButton>
+                            ) : (
+                              <Typography variant="body2" color="text.secondary">
+                                No ID
+                              </Typography>
+                            )}
                           </TableCell>
                         </TableRow>
                       );

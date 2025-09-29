@@ -82,6 +82,8 @@ export default function OrderDetailPage() {
   const params = useParams();
   const orderId = params?.id;
   
+  console.log('OrderDetailPage render:', { user, authLoading, orderId });
+  
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -120,13 +122,17 @@ export default function OrderDetailPage() {
   }, [orderId]);
 
   useEffect(() => {
+    console.log('OrderDetailPage useEffect:', { user, authLoading, orderId });
+    
     // Redirect if not admin
     if (!authLoading && (!user || !user.isAdmin)) {
+      console.log('Redirecting to login because user is not admin');
       router.push(`/login?redirect=/admin/orders/${orderId}`);
       return;
     }
 
     if (user && user.isAdmin && orderId) {
+      console.log('Fetching order because user is admin and orderId exists');
       fetchOrder();
     }
   }, [user, authLoading, router, orderId, fetchOrder]);
@@ -347,7 +353,7 @@ export default function OrderDetailPage() {
 
           <Grid container spacing={3}>
             {/* Order Items */}
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={8}  sx={{flex: 1}}>
               <Paper sx={{ p: 3, height: '100%' }}>
                 <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
                   Order Items
@@ -402,7 +408,7 @@ export default function OrderDetailPage() {
             </Grid>
 
             {/* Order Summary */}
-            <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} sx={{ flex: 1 }}>
               <Paper sx={{ p: 3, mb: 3 }}>
                 <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
                   Order Summary

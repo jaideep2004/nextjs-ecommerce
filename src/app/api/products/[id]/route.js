@@ -8,9 +8,34 @@ export async function GET(req, { params }) {
   return handleApiRequest(req, async () => {
     await connectToDatabase();
     
-    const { id } = params;
+    const { id } = await params;
     
-    const product = await Product.findById(id);
+    // Optimize field selection for single product with proper projection
+    const product = await Product.findById(id, {
+      name: 1,
+      slug: 1,
+      category: 1,
+      subcategory: 1,
+      image: 1,
+      images: 1,
+      price: 1,
+      brand: 1,
+      rating: 1,
+      numReviews: 1,
+      countInStock: 1,
+      description: 1,
+      isFeatured: 1,
+      discount: 1,
+      colors: 1,
+      sizes: 1,
+      fabric: 1,
+      occasion: 1,
+      style: 1,
+      createdAt: 1,
+      updatedAt: 1
+    })
+      .populate('category', 'name slug')
+      .lean();
     
     if (!product) {
       return Response.json(
@@ -34,7 +59,7 @@ export async function PUT(req, { params }) {
     
     await connectToDatabase();
     
-    const { id } = params;
+    const { id } = await params;
     const updateData = await req.json();
     
     const product = await Product.findById(id);
@@ -53,8 +78,36 @@ export async function PUT(req, { params }) {
     
     await product.save();
     
+    // Return updated product with optimized field selection
+    const updatedProduct = await Product.findById(id)
+      .populate('category', 'name slug')
+      .select({
+        name: 1,
+        slug: 1,
+        category: 1,
+        subcategory: 1,
+        image: 1,
+        images: 1,
+        price: 1,
+        brand: 1,
+        rating: 1,
+        numReviews: 1,
+        countInStock: 1,
+        description: 1,
+        isFeatured: 1,
+        discount: 1,
+        colors: 1,
+        sizes: 1,
+        fabric: 1,
+        occasion: 1,
+        style: 1,
+        createdAt: 1,
+        updatedAt: 1
+      })
+      .lean();
+    
     return Response.json(
-      apiResponse(200, product, 'Product updated successfully'),
+      apiResponse(200, updatedProduct, 'Product updated successfully'),
       { status: 200 }
     );
   });
@@ -68,7 +121,7 @@ export async function DELETE(req, { params }) {
     
     await connectToDatabase();
     
-    const { id } = params;
+    const { id } = await params;
     
     const product = await Product.findById(id);
     

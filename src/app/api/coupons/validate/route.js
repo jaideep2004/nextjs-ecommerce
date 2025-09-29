@@ -5,26 +5,43 @@ import { handleApiRequest, createResponse } from '@/utils/api';
 
 // POST /api/coupons/validate - Validate coupon for order
 export async function POST(request) {
-  return handleApiRequest(async () => {
+  return handleApiRequest(request, async () => {
     await connectToDatabase();
 
     const { code, orderAmount, cartItems } = await request.json();
+    console.log('Coupon validation request:', { code, orderAmount, cartItems });
 
     if (!code) {
       throw new Error('Coupon code is required');
     }
+
+    // Ensure code is uppercase for consistent lookup
+    const couponCode = code.toUpperCase().trim();
+    console.log('Processing coupon code:', couponCode);
 
     if (!orderAmount || orderAmount <= 0) {
       throw new Error('Valid order amount is required');
     }
 
     // Find coupon by code
-    const coupon = await Coupon.findByCode(code);
+    const coupon = await Coupon.findByCode(couponCode);
+    console.log('Found coupon:', coupon);
+    
     if (!coupon) {
       throw new Error('Invalid coupon code');
     }
 
     // Check if coupon is currently valid
+    console.log('Coupon validity check:', {
+      isActive: coupon.isActive,
+      isExpired: coupon.isExpired,
+      hasReachedLimit: coupon.hasReachedLimit,
+      isCurrentlyValid: coupon.isCurrentlyValid,
+      validFrom: coupon.validFrom,
+      validUntil: coupon.validUntil,
+      now: new Date()
+    });
+    
     if (!coupon.isCurrentlyValid) {
       if (coupon.isExpired) {
         throw new Error('This coupon has expired');
@@ -46,7 +63,7 @@ export async function POST(request) {
     // Check if user can use this coupon (if authenticated)
     let userId = null;
     try {
-      const user = await isAuthenticated(request, false); // Don't throw error if not authenticated
+      const user = await isAuthenticated(request);
       userId = user?._id;
       
       if (userId && !coupon.canUserUse(userId)) {
@@ -57,10 +74,12 @@ export async function POST(request) {
         throw new Error(`You have already used this coupon ${usedCount}/${coupon.userUsageLimit} times`);
       }
     } catch (error) {
-      // If authentication fails, continue as guest
-      if (error.message !== 'Not authenticated, no token') {
+      // If authentication fails, continue as guest (non-authenticated user)
+      // This is expected behavior for guest users trying to apply coupons
+      if (error.message !== 'Not authenticated, no token' && error.message !== 'Authentication failed') {
         throw error;
       }
+      // For guests, userId remains null and we continue with coupon validation
     }
 
     // Calculate applicable amount for product/category restrictions
@@ -88,6 +107,7 @@ export async function POST(request) {
     return createResponse(200, {
       valid: true,
       coupon: {
+        _id: coupon._id,
         code: coupon.code,
         name: coupon.name,
         description: coupon.description,

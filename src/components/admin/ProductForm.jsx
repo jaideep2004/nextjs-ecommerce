@@ -28,6 +28,7 @@ import {
   IconButton,
   Switch,
   FormControlLabel,
+  useTheme,
 } from '@mui/material';
 import {
   Save,
@@ -49,6 +50,7 @@ const MenuProps = {
 };
 
 export default function ProductForm({ product, categories = [], isEdit = false }) {
+  const theme = useTheme();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -426,9 +428,9 @@ export default function ProductForm({ product, categories = [], isEdit = false }
             sx={{ 
               p: 3, 
               mb: 3, 
-              border: '1px solid #e0e0e0',
+              border: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
-              backgroundColor: '#fafafa'
+              backgroundColor: theme.palette.background.paper
             }}
           >
             <Typography 
@@ -436,7 +438,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               sx={{ 
                 mb: 3, 
                 fontWeight: 600, 
-                color: '#2c3e50',
+                color: theme.palette.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 '&:before': {
@@ -447,8 +449,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  backgroundColor: '#2196f3',
-                  color: 'white',
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   mr: 2,
@@ -490,7 +492,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                         <Button 
                           onClick={handleSlugGeneration}
                           size="small"
-                          sx={{ color: '#2196f3' }}
+                          sx={{ color: theme.palette.primary.main }}
                         >
                           Generate
                         </Button>
@@ -537,9 +539,9 @@ export default function ProductForm({ product, categories = [], isEdit = false }
             sx={{ 
               p: 3, 
               mb: 3, 
-              border: '1px solid #e0e0e0',
+              border: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
-              backgroundColor: '#fafafa'
+              backgroundColor: theme.palette.background.paper
             }}
           >
             <Typography 
@@ -547,7 +549,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               sx={{ 
                 mb: 3, 
                 fontWeight: 600, 
-                color: '#2c3e50',
+                color: theme.palette.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 '&:before': {
@@ -558,8 +560,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  backgroundColor: '#4caf50',
-                  color: 'white',
+                  backgroundColor: theme.palette.success.main,
+                  color: theme.palette.success.contrastText,
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   mr: 2,
@@ -638,13 +640,20 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                     value={formData.category}
                     onChange={handleChange}
                     label="Category"
+                    sx={{minWidth: 120}}
                   >
                     <MenuItem value=""><em>Select a category</em></MenuItem>
-                    {Array.isArray(categories) && categories.map((category) => (
-                      <MenuItem key={category._id} value={category._id}>
-                        {category.name}
+                    {Array.isArray(categories) && categories.length > 0 ? (
+                      categories.map((category) => (
+                        <MenuItem key={category._id} value={category._id}>
+                          {category.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem value="" disabled>
+                        <em>No categories available</em>
                       </MenuItem>
-                    ))}
+                    )}
                   </Select>
                   {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
                 </FormControl>
@@ -657,9 +666,9 @@ export default function ProductForm({ product, categories = [], isEdit = false }
             sx={{ 
               p: 3, 
               mb: 3, 
-              border: '1px solid #e0e0e0',
+              border: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
-              backgroundColor: '#fafafa'
+              backgroundColor: theme.palette.background.paper
             }}
           >
             <Typography 
@@ -667,7 +676,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               sx={{ 
                 mb: 3, 
                 fontWeight: 600, 
-                color: '#2c3e50',
+                color: theme.palette.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 '&:before': {
@@ -678,8 +687,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  backgroundColor: '#ff9800',
-                  color: 'white',
+                  backgroundColor: theme.palette.warning.main,
+                  color: theme.palette.warning.contrastText,
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   mr: 2,
@@ -693,7 +702,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               {/* Colors */}
               <Grid item xs={12} md={4}>
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: theme.palette.text.primary }}>
                     Available Colors
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, minHeight: 40 }}>
@@ -733,7 +742,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               {/* Sizes */}
               <Grid item xs={12} md={4}>
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: theme.palette.text.primary }}>
                     Available Sizes
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, minHeight: 40 }}>
@@ -773,7 +782,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               {/* Tags */}
               <Grid item xs={12} md={4}>
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: theme.palette.text.primary }}>
                     Product Tags
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, minHeight: 40 }}>
@@ -818,9 +827,9 @@ export default function ProductForm({ product, categories = [], isEdit = false }
             sx={{ 
               p: 3, 
               mb: 3, 
-              border: '1px solid #e0e0e0',
+              border: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
-              backgroundColor: '#fafafa'
+              backgroundColor: theme.palette.background.paper
             }}
           >
             <Typography 
@@ -828,7 +837,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               sx={{ 
                 mb: 3, 
                 fontWeight: 600, 
-                color: '#2c3e50',
+                color: theme.palette.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 '&:before': {
@@ -839,8 +848,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  backgroundColor: '#9c27b0',
-                  color: 'white',
+                  backgroundColor: theme.palette.secondary.main,
+                  color: theme.palette.secondary.contrastText,
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   mr: 2,
@@ -854,7 +863,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               {/* Main Product Image */}
               <Grid item xs={12} md={6}>
                 <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: theme.palette.text.primary }}>
                     Main Product Image *
                   </Typography>
                   <Box sx={{ mb: 2 }}>
@@ -884,7 +893,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                         width: '100%', 
                         minWidth: '300px',
                         height: 250, 
-                        border: '2px solid #e0e0e0',
+                        border: `2px solid ${theme.palette.divider}`,
                         borderRadius: 2,
                         overflow: 'hidden'
                       }}
@@ -900,8 +909,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                           position: 'absolute', 
                           top: 8, 
                           right: 8, 
-                          bgcolor: 'rgba(255,255,255,0.9)',
-                          '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                          '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)' }
                         }}
                         onClick={() => {
                           setImagePreview('');
@@ -917,11 +926,11 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                         width: '100%', 
                         minWidth: '300px',
                         height: 250, 
-                        border: '2px dashed #ccc', 
+                        border: `2px dashed ${theme.palette.divider}`, 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center',
-                        bgcolor: '#f9f9f9',
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
                         borderRadius: 2,
                       }}
                     >
@@ -936,7 +945,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               {/* Gallery Images */}
               <Grid item xs={12} md={6}>
                 <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: theme.palette.text.primary }}>
                     Gallery Images (Optional)
                   </Typography>
                   <Box sx={{ mb: 2 }}>
@@ -973,7 +982,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                         minWidth: '300px',
                         maxHeight: 250,
                         overflowY: 'auto',
-                        border: '1px solid #e0e0e0',
+                        border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 2,
                         p: 1
                       }}
@@ -985,7 +994,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                             position: 'relative', 
                             width: '100%', 
                             height: 80,
-                            border: '1px solid #e0e0e0',
+                            border: `1px solid ${theme.palette.divider}`,
                             borderRadius: 1,
                             overflow: 'hidden'
                           }}
@@ -1001,10 +1010,10 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                               position: 'absolute', 
                               top: 2, 
                               right: 2, 
-                              bgcolor: 'rgba(255,255,255,0.8)',
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                               width: 20,
                               height: 20,
-                              '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                              '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)' }
                             }}
                             onClick={() => handleRemoveGalleryImage(index)}
                           >
@@ -1019,11 +1028,11 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                         width: '100%', 
                         minWidth: '300px',
                         height: 120, 
-                        border: '2px dashed #ccc', 
+                        border: `2px dashed ${theme.palette.divider}`, 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center',
-                        bgcolor: '#f9f9f9',
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
                         borderRadius: 2,
                       }}
                     >
@@ -1043,9 +1052,9 @@ export default function ProductForm({ product, categories = [], isEdit = false }
             sx={{ 
               p: 3, 
               mb: 3, 
-              border: '1px solid #e0e0e0',
+              border: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
-              backgroundColor: '#fafafa'
+              backgroundColor: theme.palette.background.paper
             }}
           >
             <Typography 
@@ -1053,7 +1062,7 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               sx={{ 
                 mb: 3, 
                 fontWeight: 600, 
-                color: '#2c3e50',
+                color: theme.palette.text.primary,
                 display: 'flex',
                 alignItems: 'center',
                 '&:before': {
@@ -1064,8 +1073,8 @@ export default function ProductForm({ product, categories = [], isEdit = false }
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  backgroundColor: '#f44336',
-                  color: 'white',
+                  backgroundColor: theme.palette.error.main,
+                  color: theme.palette.error.contrastText,
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   mr: 2,
@@ -1132,10 +1141,12 @@ export default function ProductForm({ product, categories = [], isEdit = false }
               disabled={loading}
               size="large"
               sx={{ 
-                bgcolor: '#2196f3',
-                '&:hover': { bgcolor: '#1976d2' },
+                bgcolor: theme.palette.primary.main,
+                '&:hover': { bgcolor: theme.palette.primary.dark },
                 minWidth: 150,
-                boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 4px 12px rgba(255, 255, 255, 0.1)' 
+                  : '0 4px 12px rgba(0, 0, 0, 0.2)',
               }}
             >
               {loading ? 'Saving...' : (isEdit ? 'Update Product' : 'Create Product')}

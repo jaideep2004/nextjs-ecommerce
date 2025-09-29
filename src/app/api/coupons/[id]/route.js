@@ -1,11 +1,12 @@
 import connectToDatabase from '@/lib/mongodb';
 import Coupon from '@/models/Coupon';
+import Category from '@/models/Category'; // Add this import
 import { isAuthenticated } from '@/utils/auth';
 import { handleApiRequest, createResponse } from '@/utils/api';
 
 // PUT /api/coupons/[id] - Update a coupon (admin only)
 export async function PUT(request, { params }) {
-  return handleApiRequest(async () => {
+  return handleApiRequest(request, async () => {
     const user = await isAuthenticated(request);
     
     if (!user.isAdmin) {
@@ -70,6 +71,8 @@ export async function PUT(request, { params }) {
 
     await coupon.save();
     await coupon.populate('createdBy', 'name email');
+    await coupon.populate('applicableCategories', 'name slug');
+    await coupon.populate('excludedCategories', 'name slug');
 
     return createResponse(200, {
       coupon: {
@@ -79,12 +82,12 @@ export async function PUT(request, { params }) {
         isCurrentlyValid: coupon.isCurrentlyValid
       }
     }, 'Coupon updated successfully');
-  }, 'PUT');
+  });
 }
 
 // DELETE /api/coupons/[id] - Delete a coupon (admin only)
 export async function DELETE(request, { params }) {
-  return handleApiRequest(async () => {
+  return handleApiRequest(request, async () => {
     const user = await isAuthenticated(request);
     
     if (!user.isAdmin) {
@@ -102,5 +105,5 @@ export async function DELETE(request, { params }) {
     }
 
     return createResponse(200, null, 'Coupon deleted successfully');
-  }, 'DELETE');
+  });
 }

@@ -22,6 +22,8 @@ const verifyToken = (token: string): CustomJwtPayload => {
 };
 
 export async function middleware(request: NextRequest) {
+  console.log('Middleware called for:', request.nextUrl.pathname);
+  
   // Get the token from cookies (for custom auth)
   const customToken = request.cookies.get('token')?.value;
   
@@ -31,8 +33,10 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET 
   });
   
+  console.log('Tokens:', { customToken, nextAuthToken });
+  
   // Define protected routes
-  const adminRoutes = ['/admin', '/admin/dashboard', '/admin/products', '/admin/orders', '/admin/users'];
+  const adminRoutes = ['/admin', '/admin/dashboard', '/admin/products', '/admin/orders'];
   const customerRoutes = ['/customer', '/customer/dashboard', '/customer/orders', '/customer/profile'];
   
   // Check if the request is for an admin route
@@ -40,6 +44,8 @@ export async function middleware(request: NextRequest) {
   
   // Check if the request is for a customer route
   const isCustomerRoute = customerRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+  
+  console.log('Route checks:', { isAdminRoute, isCustomerRoute });
   
   // Check authentication status
   const isAuthenticated = !!(customToken || nextAuthToken);
@@ -50,17 +56,23 @@ export async function middleware(request: NextRequest) {
     try {
       const decoded = verifyToken(customToken);
       isAdmin = decoded.isAdmin || false;
+      console.log('Custom token isAdmin:', isAdmin);
     } catch (error) {
       // Custom token is invalid, continue checking NextAuth
+      console.log('Custom token invalid:', error);
     }
   }
   
   if (nextAuthToken) {
     isAdmin = (nextAuthToken.isAdmin as boolean) || false;
+    console.log('NextAuth token isAdmin:', isAdmin);
   }
+  
+  console.log('Final auth status:', { isAuthenticated, isAdmin });
   
   // If no authentication and trying to access protected route, redirect to login
   if (!isAuthenticated && (isAdminRoute || isCustomerRoute)) {
+    console.log('Redirecting to login because not authenticated');
     const url = new URL('/login', request.url);
     url.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(url);
@@ -68,9 +80,11 @@ export async function middleware(request: NextRequest) {
   
   // If authenticated but trying to access admin route without admin privileges
   if (isAuthenticated && isAdminRoute && !isAdmin) {
+    console.log('Redirecting to customer dashboard because not admin');
     return NextResponse.redirect(new URL('/customer/dashboard', request.url));
   }
   
+  console.log('Continuing with request');
   // Continue with the request
   return NextResponse.next();
 }

@@ -34,6 +34,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Chip,
+  useTheme
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -59,7 +60,9 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  
+   const theme = useTheme();
+
+
   // General settings
   const [generalSettings, setGeneralSettings] = useState({
     storeName: '',
@@ -373,7 +376,7 @@ export default function AdminSettingsPage() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
           Store Settings
         </Typography>
         <Breadcrumbs aria-label="breadcrumb">

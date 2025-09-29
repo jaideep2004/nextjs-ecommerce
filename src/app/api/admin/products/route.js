@@ -72,8 +72,29 @@ export async function GET(req) {
         sortOptions = { createdAt: -1 };
     }
     
-    // Execute query
-    const products = await Product.find(query)
+    // Optimized field projection for admin products list
+    const projection = {
+      name: 1,
+      slug: 1,
+      image: 1,
+      price: 1,
+      category: 1,
+      brand: 1,
+      countInStock: 1,
+      isFeatured: 1,
+      discount: 1,
+      rating: 1,
+      numReviews: 1,
+      createdAt: 1
+    };
+    
+    // Execute query with optimized projection and options
+    const options = {
+      lean: true,
+      populate: { path: 'category', select: 'name slug' }
+    };
+    
+    const products = await Product.find(query, projection, options)
       .sort(sortOptions)
       .skip(skip)
       .limit(limit);

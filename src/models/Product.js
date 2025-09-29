@@ -35,8 +35,16 @@ productSchema.index({ rating: -1 });
 productSchema.index({ isFeatured: 1 });
 productSchema.index({ discount: -1 });
 productSchema.index({ createdAt: -1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ countInStock: 1 });
 // Text index to speed up search on name/description
 productSchema.index({ name: 'text', description: 'text' });
+// Additional indexes for common queries
+productSchema.index({ brand: 1, price: 1 });
+productSchema.index({ isFeatured: 1, createdAt: -1 });
+productSchema.index({ discount: -1, price: 1 });
+// Index specifically for category count queries
+productSchema.index({ category: 1 });
 
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 

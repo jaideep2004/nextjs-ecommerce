@@ -25,6 +25,7 @@ import {
   Alert,
   Snackbar,
   Chip,
+  useTheme
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -47,6 +48,8 @@ export default function CategoriesPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const theme = useTheme();
+  
 
   useEffect(() => {
     fetchCategories();
@@ -254,11 +257,7 @@ export default function CategoriesPage() {
       <Box sx={{ mb: 4 }}>
         <Typography 
           variant="h4" 
-          sx={{ 
-            fontWeight: 700,
-            color: '#2c3e50',
-            mb: 1,
-          }}
+         sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}
         >
           Categories Management
         </Typography>
@@ -293,7 +292,7 @@ export default function CategoriesPage() {
         ) : (
           <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
             <Table>
-              <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+              <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Slug</TableCell>

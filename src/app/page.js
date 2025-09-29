@@ -1019,14 +1019,15 @@ export default function Home() {
 	const { user } = useAuth();
 	const router = useRouter();
 
-	// Fetch categories
+	// Fetch categories with caching
 	useEffect(() => {
 		const fetchCategories = async () => {
 			try {
 				setCategoriesLoading(true);
 				const res = await axios.get("/api/categories");
 				// Update to match the API response structure
-				setCategories(res.data.data?.categories || []);
+				const categoriesData = res.data.data?.categories || res.data.categories || [];
+				setCategories(categoriesData.slice(0, 6)); // Limit to 6 categories
 				setCategoriesError(null);
 			} catch (err) {
 				console.error("Error fetching categories:", err);
@@ -1089,18 +1090,6 @@ export default function Home() {
 			}
 		};
 
-		// Fetch categories
-		const fetchCategories = async () => {
-			try {
-				const res = await axios.get("/api/categories");
-				const categoriesData =
-					res.data.categories || res.data.data?.categories || [];
-				setCategories(categoriesData.slice(0, 6)); // Limit to 6 categories
-			} catch (err) {
-				console.error("Error fetching categories:", err);
-			}
-		};
-
 		// Fetch wishlist items if user is logged in
 		const fetchWishlist = async () => {
 			if (user) {
@@ -1129,7 +1118,6 @@ export default function Home() {
 		};
 
 		fetchProducts();
-		fetchCategories();
 		fetchWishlist();
 	}, [user]);
 

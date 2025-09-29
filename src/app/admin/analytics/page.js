@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+
 import axios from 'axios';
 import {
   Container,
@@ -13,6 +14,7 @@ import {
   Alert,
   Card,
   CardContent,
+  useTheme
 } from '@mui/material';
 import {
   TrendingUp,
@@ -129,7 +131,8 @@ export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [analyticsData, setAnalyticsData] = useState(null);
-  
+  const theme = useTheme();
+
   // Fetch analytics data from API
   useEffect(() => {
     const fetchAnalyticsData = async () => {
@@ -180,11 +183,7 @@ export default function AdminAnalytics() {
       <Box sx={{ mb: 4 }}>
         <Typography 
           variant="h4" 
-          sx={{ 
-            fontWeight: 700,
-            color: '#2c3e50',
-            mb: 1,
-          }}
+           sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}
         >
           Sales Analytics
         </Typography>
@@ -247,7 +246,7 @@ export default function AdminAnalytics() {
           
           <Grid container spacing={4}>
             {/* Recent Orders Summary */}
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={6}  sx={{flex: { xs: 1, md: 1 } }}>
               <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50', mb: 3 }}>
                   Recent Activity
@@ -279,7 +278,7 @@ export default function AdminAnalytics() {
             </Grid>
             
             {/* Low Stock Alert */}
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={6} sx={{flex: { xs: 1, md: 1 } }}>
               <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50', mb: 3 }}>
                   Inventory Alert

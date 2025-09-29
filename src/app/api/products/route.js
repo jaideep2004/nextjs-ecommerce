@@ -131,18 +131,37 @@ export async function GET(req) {
     }
     
     // Execute query with pagination and sorting
-    const projection = 'name slug image price rating numReviews discount isFeatured category brand countInStock createdAt';
+    // Optimized field projection to reduce payload size
+    const projection = {
+      name: 1,
+      slug: 1,
+      image: 1,
+      price: 1,
+      rating: 1,
+      numReviews: 1,
+      discount: 1,
+      isFeatured: 1,
+      category: 1,
+      brand: 1,
+      countInStock: 1,
+      createdAt: 1
+    };
+    
+    // Add hint for index usage
+    const options = {
+      lean: true,
+      populate: { path: 'category', select: 'name slug' }
+    };
+    
     if (process.env.NODE_ENV !== 'production') {
       console.log('[GET /api/products] filter:', JSON.stringify(filter));
     }
 
-    const products = await Product.find(filter)
-      .select(projection)
-      .populate('category', 'name slug')
+    // Use lean() for better performance and populate category with only necessary fields
+    const products = await Product.find(filter, projection, options)
       .sort({ [sortField]: sortDir })
       .skip(skip)
-      .limit(limit)
-      .lean();
+      .limit(limit);
     
     // Get total count for pagination
     const total = await Product.countDocuments(filter);

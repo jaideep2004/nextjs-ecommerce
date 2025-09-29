@@ -38,6 +38,7 @@ import {
   Select,
   Breadcrumbs,
   Tooltip,
+  useTheme
 } from '@mui/material';
 import {
   Search,
@@ -74,6 +75,7 @@ export default function AdminProducts() {
   const [actionError, setActionError] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const theme = useTheme();
   
   // Redirect if user is not admin
   useEffect(() => {
@@ -325,7 +327,7 @@ export default function AdminProducts() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#2c3e50', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50' }}>
           Products Management
         </Typography>
         <Breadcrumbs aria-label="breadcrumb">
@@ -398,8 +400,9 @@ export default function AdminProducts() {
                 value={categoryFilter}
                 onChange={handleCategoryFilterChange}
                 label="Category"
+                sx={{minWidth: 120}}
               >
-                <MenuItem value="">All Categories</MenuItem>
+                <MenuItem value="">All Categories</MenuItem> 
                 {categories.map((category) => (
                   <MenuItem key={category._id} value={category._id}>
                     {category.name}
@@ -491,7 +494,7 @@ export default function AdminProducts() {
           <>
             <TableContainer>
               <Table>
-                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                <TableHead>
                   <TableRow>
                     <TableCell>Product</TableCell>
                     <TableCell>Category</TableCell>
@@ -517,7 +520,7 @@ export default function AdminProducts() {
                           <Typography variant="body1">{product.name}</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell>{product.category}</TableCell>
+                      <TableCell>{product.category?.name || product.category}</TableCell>
                       <TableCell align="right">
                         ${product.price.toFixed(2)}
                         {product.oldPrice && product.oldPrice > product.price && (

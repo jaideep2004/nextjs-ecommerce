@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clear-cache": "node -e \"require('./src/utils/cache').default.clear(); console.log('Cache cleared');\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

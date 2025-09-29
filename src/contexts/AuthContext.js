@@ -57,6 +57,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { data: session, status } = useSession();
+  
+  console.log('AuthProvider render:', { user, loading, session, status });
 
   // Function to persist user data in localStorage
   const persistUser = (userData) => {

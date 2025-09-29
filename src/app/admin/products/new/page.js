@@ -38,10 +38,17 @@ export default function CreateProductPage() {
         console.log('Fetching categories for new product form');
         const response = await axios.get('/api/categories');
         console.log('Categories data received:', response.data);
-        setCategories(response.data.data.categories || []);
+        // Fix: correctly access categories from the API response structure
+        const categoriesData = response.data.data?.categories || [];
+        setCategories(categoriesData);
+        
+        // Log if no categories found
+        if (!categoriesData.length) {
+          console.warn('No categories found in the database');
+        }
       } catch (err) {
         console.error('Error fetching categories:', err);
-        setError('Failed to load categories. Please try again.');
+        setError(`Failed to load categories: ${err.message || err}. Please try again.`);
       } finally {
         setLoading(false);
       }
