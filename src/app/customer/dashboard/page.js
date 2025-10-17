@@ -822,6 +822,7 @@ const PasswordChange = () => {
 // Recent Orders Component
 const RecentOrders = () => {
   const { theme } = useThemeContext();
+  const { api } = useAuth(); // Get the authenticated API client
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -830,15 +831,11 @@ const RecentOrders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/orders?limit=5');
+        // Use the authenticated API client instead of fetch
+        const response = await api.get('/orders?limit=5');
         
-        if (!res.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-        
-        const data = await res.json();
         // Handle both data formats and ensure orders is always an array
-        const ordersData = data.data?.orders || data.orders || [];
+        const ordersData = response.data?.data?.orders || response.data?.orders || [];
         setOrders(ordersData);
       } catch (err) {
         console.error('Error fetching orders:', err);
@@ -849,7 +846,7 @@ const RecentOrders = () => {
     };
     
     fetchOrders();
-  }, []);
+  }, [api]); // Add api as dependency
   
   if (loading) {
     return (
@@ -1103,7 +1100,7 @@ const CustomerStatCard = ({ title, value, icon, color, description }) => {
 
 export default function CustomerDashboard() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, updateProfile, api } = useAuth(); // Add api from useAuth
   const { theme } = useThemeContext();
   const [activeTab, setActiveTab] = useState('profile');
   const [dashboardStats, setDashboardStats] = useState({
@@ -1142,40 +1139,34 @@ export default function CustomerDashboard() {
       if (!user) return;
       
       try {
-        // Fetch user orders to calculate stats
-        const ordersRes = await fetch('/api/orders');
-        if (ordersRes.ok) {
-          const ordersData = await ordersRes.json();
-          const orders = ordersData.data?.orders || [];
+        // Fetch user orders to calculate stats using authenticated API client
+        const ordersRes = await api.get('/orders');
+        const ordersData = ordersRes.data?.data?.orders || ordersRes.data?.orders || [];
           
-          const totalSpent = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-          const pendingOrders = orders.filter(order => order.orderStatus === 'Pending').length;
+        const totalSpent = ordersData.reduce((sum, order) => sum + order.totalPrice, 0);
+        const pendingOrders = ordersData.filter(order => order.orderStatus === 'Pending').length;
           
-          setDashboardStats({
-            totalOrders: orders.length,
-            totalSpent,
-            pendingOrders,
-            wishlistItems: 0, // We'll update this when we fetch wishlist
-          });
-        }
+        setDashboardStats({
+          totalOrders: ordersData.length,
+          totalSpent,
+          pendingOrders,
+          wishlistItems: 0, // We'll update this when we fetch wishlist
+        });
         
-        // Fetch wishlist items count
-        const wishlistRes = await fetch('/api/wishlist');
-        if (wishlistRes.ok) {
-          const wishlistData = await wishlistRes.json();
-          const wishlistItems = wishlistData.data?.wishlist || [];
-          setDashboardStats(prev => ({
-            ...prev,
-            wishlistItems: wishlistItems.length,
-          }));
-        }
+        // Fetch wishlist items count using authenticated API client
+        const wishlistRes = await api.get('/wishlist');
+        const wishlistData = wishlistRes.data?.data?.wishlist || wishlistRes.data?.wishlist || [];
+        setDashboardStats(prev => ({
+          ...prev,
+          wishlistItems: wishlistData.length,
+        }));
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
       }
     };
     
     fetchDashboardStats();
-  }, [user]);
+  }, [user, api]); // Add api as dependency
   
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
@@ -1413,12 +1404,16 @@ export default function CustomerDashboard() {
                   bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
                 }}
               >
-                {activeTab === 'orders' && (
-                  <RecentOrders /> 
+                {activeTab === 'profile' && (
+                  <ProfileInfo user={user} onUpdate={updateProfile} /> // Add onUpdate prop
+                )}
+
+                {activeTab === 'addresses' && (
+                  <AddressInfo user={user} onUpdate={updateProfile} />
                 )}
                 
-                {activeTab === 'addresses' && (
-                  <AddressInfo user={user} onUpdate={updateUserData} />
+                {activeTab === 'orders' && (
+                  <RecentOrders /> 
                 )}
                 
                 {activeTab === 'password' && (

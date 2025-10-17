@@ -49,7 +49,7 @@ const themeColors = {
 
 // Theme Context
 export const ThemeContext = createContext({
-  mode: 'light',
+  mode: 'dark',
   toggleTheme: () => {},
   changeThemeColors: () => {},
   theme: null,
@@ -58,7 +58,7 @@ export const ThemeContext = createContext({
 export const useThemeContext = () => useContext(ThemeContext);
 
 export function ThemeContextProvider({ children }) {
-  const [mode, setMode] = useState('light');
+  const [mode, setMode] = useState('dark');
   const [customColors, setCustomColors] = useState(themeColors);
 
   useEffect(() => {
@@ -186,5 +186,5 @@ export function ThemeContextProvider({ children }) {
 
 export default function useTheme() {
   const context = useContext(ThemeContext);
-  return context.theme || createTheme({ palette: { ...themeColors.light } });
+  return context.theme || createTheme({ palette: { ...themeColors.dark } });
 }

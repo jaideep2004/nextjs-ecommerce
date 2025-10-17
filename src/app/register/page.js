@@ -522,7 +522,7 @@ export default function RegisterPage() {
 								</Divider>
 
 								<form onSubmit={handleSubmit}>
-									<Grid container spacing={2}>
+									<Grid container spacing={2} sx={{flexDirection: "column"}}>
 										<Grid item xs={12}>
 											<TextField
 												fullWidth

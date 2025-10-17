@@ -225,7 +225,7 @@ export default function AboutPage() {
 				"Competitive pricing with flexible payment options to suit every budget.",
 		},
 		{
-			title: "All products is imported",
+			title: "All products are imported",
 			icon: <CheckCircleIcon sx={{ fontSize: 24, color: "success.main" }} />,
 			description:
 				"Premium international products sourced from trusted global suppliers.",
@@ -290,7 +290,7 @@ export default function AboutPage() {
 						position: "relative",
 						zIndex: 1,
 					}}
-					style={{ padding: { xs: "30px 0px", md: "30px 0px" } }}>
+					style={{ padding: { xs: "30px 0px", md: "30px 0px" }}}>
 					{/* Left Side - Images Section */}
 					<Grid item xs={12} md={6} sx={{ minWidth: { md: "550px" } }} style={{paddingBottom: { xs: "20px", md: "0px" }}}>
 						<Box
@@ -572,7 +572,7 @@ export default function AboutPage() {
 										<Typography
 											variant='body2'
 											color='text.secondary'
-											sx={{ fontSize: { xs: "0.8rem", md: "0.875rem" } }}>
+											sx={{ fontSize: { xs: "0.8rem", md: "0.875rem" }}}>
 											CEO
 										</Typography>
 									</Box>
@@ -600,7 +600,7 @@ export default function AboutPage() {
 			</Box>
 
 			{/* Our Achievements Section */}
-			<Box sx={{ mb: 10 }}>
+			{/* <Box sx={{ mb: 10 }}>
 				<Typography
 					variant='h4'
 					align='center'
@@ -626,7 +626,6 @@ export default function AboutPage() {
 						position: "relative",
 						overflow: "hidden",
 					}}>
-					{/* Background Pattern */}
 					<Box
 						sx={{
 							position: "absolute",
@@ -665,7 +664,6 @@ export default function AboutPage() {
 												boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
 											},
 										}}>
-										{/* Icon Container */}
 										<Box
 											sx={{
 												width: { xs: 60, md: 80 },
@@ -682,7 +680,6 @@ export default function AboutPage() {
 											{React.cloneElement(stat.icon, { sx: { fontSize: { xs: 28, md: 36 } } })}
 										</Box>
 
-										{/* Count */}
 										<Typography
 											variant='h3'
 											sx={{
@@ -695,7 +692,6 @@ export default function AboutPage() {
 											{stat.suffix}
 										</Typography>
 
-										{/* Label */}
 										<Typography
 											variant='body1'
 											sx={{
@@ -711,11 +707,10 @@ export default function AboutPage() {
 						})}
 					</Grid>
 				</Paper>
-			</Box>
+			</Box> */}
 
 			{/* Testimonials Section */}
-			<Box sx={{ mb: 10, position: "relative" }}>
-				{/* Header */}
+			{/* <Box sx={{ mb: 10, position: "relative" }}>
 				<Box
 					sx={{
 						display: "flex",
@@ -736,7 +731,6 @@ export default function AboutPage() {
 						What Our Clients Say About Us
 					</Typography>
 
-					{/* Navigation Controls */}
 					<Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
 						<IconButton
 							onClick={() => handleTestimonialChange("prev")}
@@ -781,7 +775,6 @@ export default function AboutPage() {
 					</Box>
 				</Box>
 
-				{/* Testimonials Container */}
 				<Box
 					sx={{
 						position: "relative",
@@ -790,7 +783,6 @@ export default function AboutPage() {
 						borderRadius: 3,
 						padding: { xs: "10px 0px", md: "20px 0px" },
 					}}>
-					{/* Testimonials Slider */}
 					<Box
 						sx={{
 							display: { xs: "block", md: "flex" },
@@ -801,7 +793,6 @@ export default function AboutPage() {
 							width: { xs: "100%", md: "200%" },
 							height: "100%",
 						}}>
-						{/* Slide 1: Testimonials 0 & 1 */}
 						<Box
 							sx={{
 								width: { xs: "100%", md: "50%" },
@@ -810,7 +801,6 @@ export default function AboutPage() {
 								flexDirection: { xs: "column", md: "row" },
 								gap: { xs: 2, md: 3 },
 							}}>
-							{/* First Card */}
 							<Paper
 								sx={{
 									flex: 1,
@@ -828,7 +818,6 @@ export default function AboutPage() {
 										boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
 									},
 								}}>
-								{/* Quote Icon */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -851,7 +840,6 @@ export default function AboutPage() {
 									/>
 								</Box>
 
-								{/* Content */}
 								<Typography
 									variant='body1'
 									sx={{
@@ -864,7 +852,6 @@ export default function AboutPage() {
 									{testimonials[0].text}
 								</Typography>
 
-								{/* User Info */}
 								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[0].image}
@@ -903,7 +890,6 @@ export default function AboutPage() {
 								</Box>
 							</Paper>
 
-							{/* Second Card */}
 							<Paper
 								sx={{
 									flex: 1,
@@ -921,7 +907,6 @@ export default function AboutPage() {
 										boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
 									},
 								}}>
-								{/* Quote Icon */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -944,7 +929,6 @@ export default function AboutPage() {
 									/>
 								</Box>
 
-								{/* Content */}
 								<Typography
 									variant='body1'
 									sx={{
@@ -957,7 +941,6 @@ export default function AboutPage() {
 									{testimonials[1].text}
 								</Typography>
 
-								{/* User Info */}
 								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[1].image}
@@ -997,7 +980,6 @@ export default function AboutPage() {
 							</Paper>
 						</Box>
 
-						{/* Slide 2: Testimonial 2 centered */}
 						<Box
 							sx={{
 								width: { xs: "100%", md: "50%" },
@@ -1023,7 +1005,6 @@ export default function AboutPage() {
 										boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
 									},
 								}}>
-								{/* Quote Icon */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -1046,7 +1027,6 @@ export default function AboutPage() {
 									/>
 								</Box>
 
-								{/* Content */}
 								<Typography
 									variant='body1'
 									sx={{
@@ -1059,7 +1039,6 @@ export default function AboutPage() {
 									{testimonials[2].text}
 								</Typography>
 
-								{/* User Info */}
 								<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
 									<Avatar
 										src={testimonials[2].image}
@@ -1099,7 +1078,6 @@ export default function AboutPage() {
 							</Paper>
 						</Box>
 					
-						{/* Mobile-only: Fourth testimonial card */}
 						<Box
 							sx={{
 								display: { xs: currentTestimonial === 3 ? "block" : "none", md: "none" },
@@ -1121,7 +1099,6 @@ export default function AboutPage() {
 										boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
 									},
 								}}>
-								{/* Quote Icon */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -1144,7 +1121,6 @@ export default function AboutPage() {
 									/>
 								</Box>
 					
-								{/* Content */}
 								<Typography
 									variant='body1'
 									sx={{
@@ -1157,7 +1133,6 @@ export default function AboutPage() {
 									{testimonials[3].text}
 								</Typography>
 					
-								{/* User Info */}
 								<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 									<Avatar
 										src={testimonials[3].image}
@@ -1199,9 +1174,7 @@ export default function AboutPage() {
 					</Box>
 				</Box>
 
-				{/* Dots Indicator */}
 				<Box sx={{ display: "flex", justifyContent: "center", mt: { xs: 3, md: 4 }, gap: 1 }}>
-					{/* Mobile: Show 4 dots for individual cards */}
 					<Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
 						{[0, 1, 2, 3].map((slideIndex) => (
 							<Box
@@ -1236,7 +1209,6 @@ export default function AboutPage() {
 						))}
 					</Box>
 					
-					{/* Desktop: Show 2 dots for slide pairs */}
 					<Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
 						{[0, 1].map((slideIndex) => (
 							<Box
@@ -1271,10 +1243,10 @@ export default function AboutPage() {
 						))}
 					</Box>
 				</Box>
-			</Box>
+			</Box> */}
 
 			{/* Hero Section */}
-			<Box sx={{ mb: 10, position: "relative", overflow: "hidden" }}>
+			{/* <Box sx={{ mb: 10, position: "relative", overflow: "hidden" }}>
 				<Box sx={{ textAlign: "center", mb: 8 }}>
 					<Chip
 						label='Work Processing'
@@ -1315,9 +1287,7 @@ export default function AboutPage() {
 					</Typography>
 				</Box>
 
-				{/* Process Steps Container */}
 				<Box sx={{ position: "relative", maxWidth: 1200, mx: "auto", px: { xs: 2, md: 0 } }}>
-					{/* Connecting Line */}
 					<Box
 						sx={{
 							position: "absolute",
@@ -1332,7 +1302,6 @@ export default function AboutPage() {
 						}}
 					/>
 
-					{/* Animated Progress Line */}
 					<Box
 						sx={{
 							position: "absolute",
@@ -1389,7 +1358,6 @@ export default function AboutPage() {
 											},
 										},
 									}}>
-									{/* Main Card */}
 									<Paper
 										className='step-card'
 										sx={{
@@ -1422,7 +1390,6 @@ export default function AboutPage() {
 												transform: "scaleX(1)",
 											},
 										}}>
-										{/* Step Number Badge */}
 										<Box
 											className='step-number'
 											sx={{
@@ -1446,7 +1413,6 @@ export default function AboutPage() {
 											{step.step}
 										</Box>
 
-										{/* Icon Container */}
 										<Box
 											className='step-icon'
 											sx={{
@@ -1482,7 +1448,6 @@ export default function AboutPage() {
 											})}
 										</Box>
 
-										{/* Content */}
 										<Box
 											sx={{
 												flex: 1,
@@ -1512,7 +1477,6 @@ export default function AboutPage() {
 											</Typography>
 										</Box>
 
-										{/* Floating Elements */}
 										<Box
 											sx={{
 												position: "absolute",
@@ -1532,7 +1496,6 @@ export default function AboutPage() {
 										/>
 									</Paper>
 
-									{/* Connection Dot for Mobile */}
 									{index < processSteps.length - 1 && (
 										<Box
 											sx={{
@@ -1564,11 +1527,10 @@ export default function AboutPage() {
 						))}
 					</Grid>
 				</Box>
-			</Box>
+			</Box> */}
 
 			{/* Our Achievements */}
-			<Box sx={{ mb: 10, position: "relative" }}>
-				{/* Section Header */}
+			{/* <Box sx={{ mb: 10, position: "relative" }}>
 				<Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
 					<Chip
 						label='Our Team'
@@ -1610,7 +1572,6 @@ export default function AboutPage() {
 					</Typography>
 				</Box>
 
-				{/* Team Members */}
 				<Grid
 					container
 					spacing={{ xs: 3, sm: 4, md: 6 }}
@@ -1668,7 +1629,6 @@ export default function AboutPage() {
 										transform: "scaleX(1)",
 									},
 								}}>
-								{/* Decorative Background */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -1682,7 +1642,6 @@ export default function AboutPage() {
 									}}
 								/>
 
-								{/* Avatar */}
 								<Avatar
 									className='team-avatar'
 									sx={{
@@ -1702,7 +1661,6 @@ export default function AboutPage() {
 									{member.name.charAt(0)}
 								</Avatar>
 
-								{/* Member Info */}
 								<Box sx={{ flex: 1, zIndex: 1 }}>
 									<Typography
 										className='team-name'
@@ -1743,7 +1701,6 @@ export default function AboutPage() {
 										{member.bio}
 									</Typography>
 
-									{/* Experience Badge */}
 									<Box
 										sx={{
 											mt: "auto",
@@ -1777,7 +1734,6 @@ export default function AboutPage() {
 									</Box>
 								</Box>
 
-								{/* Floating Decoration */}
 								<Box
 									sx={{
 										position: "absolute",
@@ -1800,8 +1756,7 @@ export default function AboutPage() {
 					))}
 				</Grid>
 
-				{/* Team Stats */}
-			</Box>
+			</Box> */}
 
 			{/* Animated CTA Section */}
 			<Box
@@ -1944,48 +1899,54 @@ export default function AboutPage() {
 										justifyContent: { xs: "center", md: "flex-start" },
 										flexWrap: "wrap",
 									}}>
-									<Button
-										variant='contained'
-										size='large'
-										sx={{
-											bgcolor: "white",
-											color: "primary.main",
-											fontWeight: 700,
-											fontSize: "1.1rem",
-											px: 4,
-											py: 1.5,
-											borderRadius: 3,
-											boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-											transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-											"&:hover": {
+									<Link href="/products" passHref>
+										<Button
+											variant='contained'
+											size='large'
+											component="a"
+											sx={{
 												bgcolor: "white",
-												transform: "translateY(-4px)",
-												boxShadow: "0 12px 32px rgba(0,0,0,0.2)",
-											},
-										}}>
-										Shop Now
-									</Button>
-									<Button
-										variant='outlined'
-										size='large'
-										sx={{
-											color: "white",
-											borderColor: "white",
-											fontWeight: 600,
-											fontSize: "1.1rem",
-											px: 4,
-											py: 1.5,
-											borderRadius: 3,
-											borderWidth: 2,
-											transition: "all 0.3s ease",
-											"&:hover": {
-												bgcolor: alpha(theme.palette.common.white, 0.1),
+												color: "primary.main",
+												fontWeight: 700,
+												fontSize: "1.1rem",
+												px: 4,
+												py: 1.5,
+												borderRadius: 3,
+												boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+												transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+												"&:hover": {
+													bgcolor: "white",
+													transform: "translateY(-4px)",
+													boxShadow: "0 12px 32px rgba(0,0,0,0.2)",
+												},
+											}}>
+											Shop Now
+										</Button>
+									</Link>
+									<Link href="/products" passHref>
+										<Button
+											variant='outlined'
+											size='large'
+											component="a"
+											sx={{
+												color: "white",
 												borderColor: "white",
-												transform: "translateY(-2px)",
-											},
-										}}>
-										View Catalog
-									</Button>
+												fontWeight: 600,
+												fontSize: "1.1rem",
+												px: 4,
+												py: 1.5,
+												borderRadius: 3,
+												borderWidth: 2,
+												transition: "all 0.3s ease",
+												"&:hover": {
+													bgcolor: alpha(theme.palette.common.white, 0.1),
+													borderColor: "white",
+													transform: "translateY(-2px)",
+												},
+											}}>
+											View Catalog
+										</Button>
+									</Link>
 								</Box>
 							</Box>
 
