@@ -7,7 +7,7 @@ const createTransporter = () => {
     service: 'gmail',
     auth: {
       user: 'jaisidhu2004@gmail.com',
-      pass: 'yean skbg ccgk ysrd'
+      pass: 'ggpy nlwn izas qlrw'
     },
   });
 };

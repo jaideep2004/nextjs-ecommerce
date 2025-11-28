@@ -1,21 +1,21 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useThemeContext } from '@/theme';
-import Link from 'next/link';
 import {
+  Box,
+  Breadcrumbs,
   Container,
   Typography,
-  Box,
   Grid,
   Paper,
   Button,
   TextField,
-  CircularProgress,
   Alert,
-  Breadcrumbs,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -829,6 +829,13 @@ const RecentOrders = () => {
   
   useEffect(() => {
     const fetchOrders = async () => {
+      // Check if api is available before making requests
+      if (!api) {
+        setError('Authentication service not available');
+        setLoading(false);
+        return;
+      }
+      
       try {
         setLoading(true);
         // Use the authenticated API client instead of fetch
@@ -1137,6 +1144,12 @@ export default function CustomerDashboard() {
   useEffect(() => {
     const fetchDashboardStats = async () => {
       if (!user) return;
+      
+      // Check if api is available before making requests
+      if (!api) {
+        console.error('Authentication service not available for dashboard stats');
+        return;
+      }
       
       try {
         // Fetch user orders to calculate stats using authenticated API client

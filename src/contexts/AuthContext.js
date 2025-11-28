@@ -293,6 +293,7 @@ export function AuthProvider({ children }) {
         updateProfile,
         isAuthenticated: !!user,
         isAdmin: user?.isAdmin || false,
+        api, // Add the api instance to the context value
       }}
     >
       {children}
