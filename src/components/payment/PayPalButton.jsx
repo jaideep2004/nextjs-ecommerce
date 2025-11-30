@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import axios from 'axios';
+import { useAuth } from '@/contexts/AuthContext';
 import { getSettings } from '@/utils/settings';
 
 export default function PayPalButton({ amount, cart, shippingData, formData, onSuccess, onError }) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState('');
   const [settings, setSettings] = useState(null);
+  const { api } = useAuth(); // Use the authenticated API client from AuthContext
 
   // Fetch settings to ensure we have the latest
   useEffect(() => {
@@ -60,18 +62,6 @@ export default function PayPalButton({ amount, cart, shippingData, formData, onS
         payer: details.payer
       };
       
-      // Get authentication token from cookies
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
-      
-      // Set up headers with authentication token
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
       // Calculate tax based on settings
       const taxRate = settings?.payment?.taxRate || 5;
       const taxAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0) * (taxRate / 100);
@@ -117,12 +107,12 @@ export default function PayPalButton({ amount, cart, shippingData, formData, onS
         orderStatus: 'Processing' // Set to processing since payment is complete
       };
       
-      // Create order with payment already complete
-      const response = await axios.post('/api/orders/paypal', orderData, { headers });
+      // Create order with payment already complete using authenticated API client
+      const response = await api.post('/orders/paypal', orderData);
       
       // Save address if requested
       if (formData.saveAddress) {
-        await axios.put('/api/auth/update', {
+        await api.put('/auth/update', {
           address: {
             street: shippingData.address,
             city: shippingData.city,
@@ -130,7 +120,7 @@ export default function PayPalButton({ amount, cart, shippingData, formData, onS
             zipCode: shippingData.zipCode,
             country: shippingData.country,
           },
-        }, { headers });
+        });
       }
       
       // Call the success callback with order ID
