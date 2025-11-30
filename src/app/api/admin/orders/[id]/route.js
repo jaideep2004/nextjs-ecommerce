@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
     const decoded = await isAdmin(req);
     await connectToDatabase();
     
-    const { id } = await params;
+    const { id } = params;
     
     const order = await Order.findById(id).populate('user', 'name email');
     
@@ -36,7 +36,7 @@ export async function PUT(req, { params }) {
     const decoded = await isAdmin(req);
     await connectToDatabase();
     
-    const { id } = await params;
+    const { id } = params;
     const { orderStatus, trackingNumber, trackingUrl, statusNote } = await req.json();
     
     const order = await Order.findById(id);
