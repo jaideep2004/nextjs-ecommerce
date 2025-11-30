@@ -5,7 +5,7 @@ import Order from '@/models/Order';
 import { isAuthenticated } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
+import { authOptions } from '../../../auth/[...nextauth]/route';
 
 // Helper function to get user from request (supports both NextAuth and JWT)
 async function getUserFromRequest(req) {
