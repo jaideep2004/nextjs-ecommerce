@@ -158,13 +158,25 @@ const ProfileInfo = ({ user, onUpdate }) => {
       </Box>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {error}
         </Alert>
       )}
       
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <Alert 
+          severity="success" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {success}
         </Alert>
       )}
@@ -287,11 +299,17 @@ const AddressInfo = ({ user, onUpdate }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // States list (simplified for US)
-  const states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+  // Country-State mapping
+  const countryStates = {
+    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
+    'Canada': ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'],
+    'United Kingdom': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
+    'Australia': ['New South Wales', 'Victoria', 'Queensland', 'Western Australia', 'South Australia', 'Tasmania', 'Australian Capital Territory', 'Northern Territory'],
+    'India': ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal']
+  };
   
-  // Countries list (simplified)
-  const countries = ['United States', 'Canada', 'United Kingdom', 'Australia', 'India'];
+  // Countries list
+  const countries = Object.keys(countryStates);
   
   useEffect(() => {
     if (user && user.address) {
@@ -307,7 +325,16 @@ const AddressInfo = ({ user, onUpdate }) => {
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+      
+      // Reset state when country changes
+      if (name === 'country') {
+        newData.state = '';
+      }
+      
+      return newData;
+    });
   };
   
   const handleSubmit = async (e) => {
@@ -404,24 +431,55 @@ const AddressInfo = ({ user, onUpdate }) => {
       </Box>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {error}
         </Alert>
       )}
       
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <Alert 
+          severity="success" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {success}
         </Alert>
       )}
       
       {!editing && hasAddress ? (
         <Box>
-          <Typography variant="body1">{user.address.street}</Typography>
-          <Typography variant="body1">
+          <Typography 
+            variant="body1"
+            sx={{
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+            }}
+          >
+            {user.address.street}
+          </Typography>
+          <Typography 
+            variant="body1"
+            sx={{
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+            }}
+          >
             {user.address.city}, {user.address.state} {user.address.zipCode}
           </Typography>
-          <Typography variant="body1">{user.address.country}</Typography>
+          <Typography 
+            variant="body1"
+            sx={{
+              color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+            }}
+          >
+            {user.address.country}
+          </Typography>
         </Box>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -523,7 +581,7 @@ const AddressInfo = ({ user, onUpdate }) => {
                 }}
               >
                 <option value=""></option>
-                {states.map((state) => (
+                {countryStates[formData.country]?.map((state) => (
                   <option key={state} value={state}>
                     {state}
                   </option>
@@ -691,13 +749,25 @@ const PasswordChange = () => {
       </Typography>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {error}
         </Alert>
       )}
       
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <Alert 
+          severity="success" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {success}
         </Alert>
       )}
@@ -865,7 +935,13 @@ const RecentOrders = () => {
   
   if (error) {
     return (
-      <Alert severity="error" sx={{ mb: 2 }}>
+      <Alert 
+        severity="error" 
+        sx={{ 
+          mb: 2,
+          bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+        }}
+      >
         {error}
       </Alert>
     );
@@ -874,7 +950,12 @@ const RecentOrders = () => {
   if (orders?.length === 0) {
     return (
       <Box sx={{ py: 2 }}>
-        <Typography variant="body1" color="text.secondary">
+        <Typography 
+          variant="body1" 
+          sx={{
+            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+          }}
+        >
           You haven't placed any orders yet.
         </Typography>
         <Button 
@@ -981,7 +1062,14 @@ const RecentOrders = () => {
           </TableHead>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order._id}>
+              <TableRow 
+                key={order._id}
+                sx={{
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f9f9f9',
+                  },
+                }}
+              >
                 <TableCell 
                   component="th" 
                   scope="row"
@@ -1051,6 +1139,7 @@ const CustomerStatCard = ({ title, value, icon, color, description }) => {
       height: '100%',
       bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
       color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+      boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
     }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

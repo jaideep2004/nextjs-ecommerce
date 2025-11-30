@@ -1,5 +1,6 @@
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
+import User from '@/models/User';
 import { isAuthenticated, isAdmin } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 import { getServerSession } from 'next-auth/next';
@@ -52,8 +53,19 @@ export async function GET(req, { params }) {
       );
     }
     
+    // Debug logging
+    console.log('User:', user);
+    console.log('Order user:', order.user);
+    console.log('User ID:', user._id);
+    console.log('Order user ID:', order.user._id);
+    console.log('Is Admin:', user.isAdmin);
+    console.log('User ID type:', typeof user._id);
+    console.log('Order user ID type:', typeof order.user._id);
+    console.log('Comparison result:', order.user._id.toString() !== user._id.toString());
+    
     // Check if the user is authorized to view this order
-    if (!user.isAdmin && order.user._id.toString() !== user._id) {
+    // Convert both IDs to strings for comparison to handle ObjectId vs string differences
+    if (!user.isAdmin && order.user._id.toString() !== user._id.toString()) {
       return Response.json(
         apiError(403, 'Not authorized to view this order'),
         { status: 403 }

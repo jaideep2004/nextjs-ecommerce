@@ -3,6 +3,7 @@ import Order from '@/models/Order';
 import User from '@/models/User';
 import { isAuthenticated } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
+import { sendOrderConfirmation, sendAdminOrderNotification } from '@/utils/email';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
@@ -63,6 +64,37 @@ export async function POST(req) {
     });
 
     const savedOrder = await order.save();
+    
+    // Send email notifications
+    try {
+      // Get user information
+      const dbUser = await User.findById(user._id);
+      
+      if (dbUser) {
+        // Send order confirmation email to customer
+        await sendOrderConfirmation({
+          user: dbUser,
+          order: {
+            ...savedOrder.toObject(),
+            _id: savedOrder._id.toString(),
+            createdAt: savedOrder.createdAt
+          }
+        });
+        
+        // Send order notification email to admin
+        await sendAdminOrderNotification({
+          user: dbUser,
+          order: {
+            ...savedOrder.toObject(),
+            _id: savedOrder._id.toString(),
+            createdAt: savedOrder.createdAt
+          }
+        });
+      }
+    } catch (emailError) {
+      console.error('Failed to send email notifications:', emailError);
+      // Continue with the response even if email fails
+    }
 
     return Response.json(
       apiResponse(201, savedOrder, 'Order created successfully'),

@@ -58,55 +58,123 @@ export const sendOrderConfirmation = async ({ user, order }) => {
   }).join('');
   
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Thank you for your order, ${user.name}!</h2>
-      <p>We've received your order and are working on it right away.</p>
-      
-      <h3>Order Details:</h3>
-      <p><strong>Order ID:</strong> ${order._id}</p>
-      <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-      <p><strong>Status:</strong> ${order.orderStatus}</p>
-      
-      <h3>Items:</h3>
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: #f8f9fa;">
-            <th style="padding: 10px; text-align: left;">Product</th>
-            <th style="padding: 10px; text-align: left;">Quantity</th>
-            <th style="padding: 10px; text-align: left;">Price</th>
-            <th style="padding: 10px; text-align: left;">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsList}
-        </tbody>
-      </table>
-      
-      <div style="margin-top: 20px; text-align: right;">
-        <p><strong>Subtotal:</strong> $${order.itemsPrice.toFixed(2)}</p>
-        <p><strong>Shipping:</strong> $${order.shippingPrice.toFixed(2)}</p>
-        <p><strong>Tax:</strong> $${order.taxPrice.toFixed(2)}</p>
-        <p style="font-size: 18px;"><strong>Total:</strong> $${order.totalPrice.toFixed(2)}</p>
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Thank You for Your Order!</h1>
+        <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">We're excited to fulfill your purchase</p>
       </div>
       
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-        <p>If you have any questions about your order, please contact our customer service team.</p>
-        <p>Thank you for shopping with us!</p>
+      <div style="padding: 30px; background-color: white;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h2 style="color: #333; margin: 0 0 10px 0;">Hello ${user.name}!</h2>
+          <p style="color: #666; margin: 0;">We've received your order and are working on it right away.</p>
+        </div>
+        
+        <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px;">Order Details</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order ID</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order._id}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order Date</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${new Date(order.createdAt).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Status</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px; color: #28a745;">${order.orderStatus}</p>
+            </div>
+          </div>
+        </div>
+        
+        <h3 style="color: #333; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #eee;">Items Purchased</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+          <thead>
+            <tr style="background-color: #e9ecef;">
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #dee2e6;">Product</th>
+              <th style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">Quantity</th>
+              <th style="padding: 12px; text-align: right; border-bottom: 1px solid #dee2e6;">Price</th>
+              <th style="padding: 12px; text-align: right; border-bottom: 1px solid #dee2e6;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsList}
+          </tbody>
+        </table>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+          <div style="display: flex; justify-content: flex-end;">
+            <div style="width: 300px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Subtotal:</span>
+                <span style="font-weight: bold;">$${order.itemsPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Shipping:</span>
+                <span style="font-weight: bold;">$${order.shippingPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Tax:</span>
+                <span style="font-weight: bold;">$${order.taxPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                <span style="font-size: 18px; font-weight: bold;">Total:</span>
+                <span style="font-size: 18px; font-weight: bold; color: #28a745;">$${order.totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; padding: 20px; background-color: #e8f4ff; border-radius: 8px;">
+          <p style="margin: 0; color: #333; font-weight: bold;">Questions about your order?</p>
+          <p style="margin: 10px 0 0 0; color: #666;">Our customer service team is here to help</p>
+        </div>
+      </div>
+      
+      <div style="background-color: #2c3e50; color: white; padding: 20px; text-align: center;">
+        <p style="margin: 0; font-size: 14px;">Thank you for shopping with us!</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">© ${new Date().getFullYear()} NextEcommerce. All rights reserved.</p>
       </div>
     </div>
   `;
   
   const text = `
-    Thank you for your order, ${user.name}!
-    
-    Order Details:
-    Order ID: ${order._id}
-    Date: ${new Date(order.createdAt).toLocaleString()}
-    Status: ${order.orderStatus}
-    
-    Total: $${order.totalPrice.toFixed(2)}
-    
-    Thank you for shopping with us!
+=============================================
+    THANK YOU FOR YOUR ORDER!
+=============================================
+
+Hello ${user.name}!
+
+We've received your order and are working on it right away.
+
+ORDER DETAILS:
+─────────────────────────────────────────────
+Order ID:     ${order._id}
+Order Date:   ${new Date(order.createdAt).toLocaleDateString()}
+Status:       ${order.orderStatus}
+
+ITEMS PURCHASED:
+─────────────────────────────────────────────
+${order.orderItems.map(item => 
+  `${item.name}
+   Quantity: ${item.quantity}  Price: $${item.price.toFixed(2)}  Total: $${(item.price * item.quantity).toFixed(2)}
+`).join('')}
+
+PAYMENT SUMMARY:
+─────────────────────────────────────────────
+Subtotal:     $${order.itemsPrice.toFixed(2)}
+Shipping:     $${order.shippingPrice.toFixed(2)}
+Tax:          $${order.taxPrice.toFixed(2)}
+─────────────────────────────────────────────
+TOTAL:        $${order.totalPrice.toFixed(2)}
+
+Questions about your order?
+Our customer service team is here to help.
+
+Thank you for shopping with us!
+
+© ${new Date().getFullYear()} NextEcommerce. All rights reserved.
   `;
   
   return await sendEmail({
@@ -146,37 +214,80 @@ export const sendOrderStatusUpdate = async ({ user, order }) => {
   }
   
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Order Status Update</h2>
-      <p>Hello ${user.name},</p>
-      <p>${statusMessage}</p>
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Order Status Update</h1>
+        <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">Your order information has been updated</p>
+      </div>
       
-      <h3>Order Details:</h3>
-      <p><strong>Order ID:</strong> ${order._id}</p>
-      <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-      <p><strong>Status:</strong> ${order.orderStatus}</p>
-      ${order.statusNote ? `<p><strong>Note:</strong> ${order.statusNote}</p>` : ''}
+      <div style="padding: 30px; background-color: white;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h2 style="color: #333; margin: 0 0 10px 0;">Hello ${user.name}!</h2>
+          <p style="color: #666; margin: 0; font-size: 16px;">${statusMessage}</p>
+        </div>
+        
+        <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px;">Order Details</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order ID</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order._id}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order Date</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${new Date(order.createdAt).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Current Status</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px; color: #28a745;">${order.orderStatus}</p>
+            </div>
+          </div>
+          ${order.statusNote ? `
+          <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+            <p style="margin: 0; font-weight: bold; color: #856404;">Important Note:</p>
+            <p style="margin: 5px 0 0 0; color: #856404;">${order.statusNote}</p>
+          </div>
+          ` : ''}
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; padding: 20px; background-color: #e8f4ff; border-radius: 8px;">
+          <p style="margin: 0; color: #333; font-weight: bold;">Have questions about your order?</p>
+          <p style="margin: 10px 0 0 0; color: #666;">Our customer service team is ready to assist you</p>
+        </div>
+      </div>
       
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-        <p>If you have any questions about your order, please contact our customer service team.</p>
-        <p>Thank you for shopping with us!</p>
+      <div style="background-color: #2c3e50; color: white; padding: 20px; text-align: center;">
+        <p style="margin: 0; font-size: 14px;">Thank you for shopping with us!</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">© ${new Date().getFullYear()} NextEcommerce. All rights reserved.</p>
       </div>
     </div>
   `;
   
   const text = `
-    Order Status Update
-    
-    Hello ${user.name},
-    ${statusMessage}
-    
-    Order Details:
-    Order ID: ${order._id}
-    Date: ${new Date(order.createdAt).toLocaleString()}
-    Status: ${order.orderStatus}
-    ${order.statusNote ? `Note: ${order.statusNote}` : ''}
-    
-    Thank you for shopping with us!
+=============================================
+    ORDER STATUS UPDATE
+=============================================
+
+Hello ${user.name}!
+
+${statusMessage}
+
+ORDER DETAILS:
+─────────────────────────────────────────────
+Order ID:      ${order._id}
+Order Date:    ${new Date(order.createdAt).toLocaleDateString()}
+Current Status: ${order.orderStatus}
+${order.statusNote ? `
+IMPORTANT NOTE:
+${order.statusNote}
+` : ''}
+
+Have questions about your order?
+Our customer service team is ready to assist you.
+
+Thank you for shopping with us!
+
+© ${new Date().getFullYear()} NextEcommerce. All rights reserved.
   `;
   
   return await sendEmail({
@@ -210,95 +321,199 @@ export const sendAdminOrderNotification = async ({ user, order }) => {
   }).join('');
   
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
-      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0; font-size: 24px;">🔔 New Order Alert!</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9;">A new order has been placed on your store</p>
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 700px; margin: 0 auto; background-color: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: bold;">🔔 New Order Alert!</h1>
+        <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">A new order has been placed on your store</p>
       </div>
       
-      <div style="padding: 20px;">
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 10px 0; color: #333;">Order Information</h3>
-          <p style="margin: 5px 0;"><strong>Order ID:</strong> ${order._id}</p>
-          <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-          <p style="margin: 5px 0;"><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${order.orderStatus}</span></p>
-          <p style="margin: 5px 0;"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-          <p style="margin: 5px 0;"><strong>Paid:</strong> ${order.isPaid ? '✅ Yes' : '❌ No'}</p>
+      <div style="padding: 30px; background-color: white;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+          <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; display: flex; align-items: center;">
+              <span style="background-color: #667eea; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">1</span>
+              Order Information
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+              <div>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order ID</p>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;">${order._id}</p>
+              </div>
+              <div>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order Date</p>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;">${new Date(order.createdAt).toLocaleDateString()}</p>
+              </div>
+              <div>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Status</p>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;"><span style="background: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">${order.orderStatus}</span></p>
+              </div>
+              <div>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Payment Method</p>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.paymentMethod}</p>
+              </div>
+              <div>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Payment Status</p>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.isPaid ? '✅ Paid' : '❌ Pending'}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; display: flex; align-items: center;">
+              <span style="background-color: #667eea; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">2</span>
+              Customer Information
+            </h3>
+            <div style="margin-bottom: 15px;">
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Full Name</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${user.name}</p>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Email Address</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${user.email}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Phone Number</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.phone || 'Not provided'}</p>
+            </div>
+          </div>
         </div>
         
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 10px 0; color: #333;">Customer Information</h3>
-          <p style="margin: 5px 0;"><strong>Name:</strong> ${user.name}</p>
-          <p style="margin: 5px 0;"><strong>Email:</strong> ${user.email}</p>
-          <p style="margin: 5px 0;"><strong>Phone:</strong> ${order.shippingAddress?.phone || 'Not provided'}</p>
+        <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; display: flex; align-items: center;">
+            <span style="background-color: #667eea; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">3</span>
+            Shipping Address
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Recipient</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.fullName || 'Not provided'}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Street Address</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.address || 'Not provided'}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">City & State</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.city}${order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ''}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Postal Code</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.zipCode || 'Not provided'}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Country</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${order.shippingAddress?.country || 'Not provided'}</p>
+            </div>
+          </div>
         </div>
         
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 10px 0; color: #333;">Shipping Address</h3>
-          <p style="margin: 5px 0;">${order.shippingAddress?.fullName}</p>
-          <p style="margin: 5px 0;">${order.shippingAddress?.address}</p>
-          <p style="margin: 5px 0;">${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.zipCode}</p>
-          <p style="margin: 5px 0;">${order.shippingAddress?.country}</p>
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #eee; display: flex; align-items: center;">
+            <span style="background-color: #667eea; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">4</span>
+            Order Items
+          </h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr style="background-color: #e9ecef;">
+                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #dee2e6;">Product</th>
+                <th style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">Quantity</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 1px solid #dee2e6;">Price</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 1px solid #dee2e6;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsList}
+            </tbody>
+          </table>
         </div>
         
-        <h3 style="color: #333; margin-bottom: 15px;">Order Items:</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-          <thead>
-            <tr style="background-color: #e9ecef;">
-              <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Product</th>
-              <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Quantity</th>
-              <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Price</th>
-              <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsList}
-          </tbody>
-        </table>
-        
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: right;">
-          <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.itemsPrice.toFixed(2)}</p>
-          <p style="margin: 5px 0;"><strong>Shipping:</strong> $${order.shippingPrice.toFixed(2)}</p>
-          <p style="margin: 5px 0;"><strong>Tax:</strong> $${order.taxPrice.toFixed(2)}</p>
-          <p style="margin: 10px 0 0 0; font-size: 20px; color: #28a745;"><strong>Total: $${order.totalPrice.toFixed(2)}</strong></p>
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <div style="display: flex; justify-content: flex-end;">
+            <div style="width: 300px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Subtotal:</span>
+                <span style="font-weight: bold;">$${order.itemsPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Shipping:</span>
+                <span style="font-weight: bold;">$${order.shippingPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666;">Tax:</span>
+                <span style="font-weight: bold;">$${order.taxPrice.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                <span style="font-size: 18px; font-weight: bold;">Order Total:</span>
+                <span style="font-size: 18px; font-weight: bold; color: #28a745;">$${order.totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div style="margin-top: 30px; padding: 15px; background: #e7f3ff; border-left: 4px solid #007bff; border-radius: 4px;">
-          <p style="margin: 0; color: #333;"><strong>Next Steps:</strong></p>
-          <p style="margin: 5px 0 0 0; color: #666;">Please log in to your admin dashboard to process this order and update the customer with shipping information.</p>
+        <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-left: 4px solid #007bff; border-radius: 4px;">
+          <h3 style="margin: 0 0 10px 0; color: #333; display: flex; align-items: center;">
+            <span style="background-color: #007bff; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">5</span>
+            Next Steps
+          </h3>
+          <p style="margin: 0; color: #666;">Please log in to your admin dashboard to process this order and update the customer with shipping information.</p>
         </div>
       </div>
       
-      <div style="background: #f8f9fa; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; border-top: 1px solid #ddd;">
-        <p style="margin: 0; color: #666; font-size: 14px;">This is an automated notification from your NextEcommerce store.</p>
+      <div style="background-color: #2c3e50; color: white; padding: 20px; text-align: center;">
+        <p style="margin: 0; font-size: 14px;">This is an automated notification from your NextEcommerce store.</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">© ${new Date().getFullYear()} NextEcommerce. All rights reserved.</p>
       </div>
     </div>
   `;
   
   const text = `
+=============================================
     🔔 NEW ORDER ALERT!
-    
-    Order Information:
-    Order ID: ${order._id}
-    Date: ${new Date(order.createdAt).toLocaleString()}
-    Status: ${order.orderStatus}
-    Payment Method: ${order.paymentMethod}
-    Paid: ${order.isPaid ? 'Yes' : 'No'}
-    
-    Customer Information:
-    Name: ${user.name}
-    Email: ${user.email}
-    Phone: ${order.shippingAddress?.phone || 'Not provided'}
-    
-    Shipping Address:
-    ${order.shippingAddress?.fullName}
-    ${order.shippingAddress?.address}
-    ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.zipCode}
-    ${order.shippingAddress?.country}
-    
-    Order Total: $${order.totalPrice.toFixed(2)}
-    
-    Please log in to your admin dashboard to process this order.
+=============================================
+
+ORDER INFORMATION:
+─────────────────────────────────────────────
+Order ID:        ${order._id}
+Order Date:      ${new Date(order.createdAt).toLocaleDateString()}
+Status:          ${order.orderStatus}
+Payment Method:  ${order.paymentMethod}
+Payment Status:  ${order.isPaid ? '✅ PAID' : '❌ PENDING'}
+
+CUSTOMER INFORMATION:
+─────────────────────────────────────────────
+Full Name:       ${user.name}
+Email Address:   ${user.email}
+Phone Number:    ${order.shippingAddress?.phone || 'Not provided'}
+
+SHIPPING ADDRESS:
+─────────────────────────────────────────────
+Recipient:       ${order.shippingAddress?.fullName || 'Not provided'}
+Street Address:  ${order.shippingAddress?.address || 'Not provided'}
+City & State:    ${order.shippingAddress?.city}${order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ''}
+Postal Code:     ${order.shippingAddress?.zipCode || 'Not provided'}
+Country:         ${order.shippingAddress?.country || 'Not provided'}
+
+ORDER ITEMS:
+─────────────────────────────────────────────
+${order.orderItems.map(item => 
+  `${item.name}
+   Quantity: ${item.quantity}  Price: $${item.price.toFixed(2)}  Total: $${(item.price * item.quantity).toFixed(2)}
+`).join('')}
+
+PAYMENT SUMMARY:
+─────────────────────────────────────────────
+Subtotal:        $${order.itemsPrice.toFixed(2)}
+Shipping:        $${order.shippingPrice.toFixed(2)}
+Tax:             $${order.taxPrice.toFixed(2)}
+─────────────────────────────────────────────
+ORDER TOTAL:     $${order.totalPrice.toFixed(2)}
+
+NEXT STEPS:
+─────────────────────────────────────────────
+Please log in to your admin dashboard to process this order and update the customer with shipping information.
+
+This is an automated notification from your NextEcommerce store.
+© ${new Date().getFullYear()} NextEcommerce. All rights reserved.
   `;
   
   return await sendEmail({
@@ -321,47 +536,95 @@ export const sendAdminOrderStatusUpdate = async ({ user, order, oldStatus }) => 
   const subject = `📦 Order Status Updated - Order #${order._id}`;
   
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
-      <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0; font-size: 24px;">📦 Order Status Updated</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9;">Order #${order._id} status has been changed</p>
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: bold;">📦 Order Status Updated</h1>
+        <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">Order #${order._id} status has been changed</p>
       </div>
       
-      <div style="padding: 20px;">
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 10px 0; color: #333;">Status Change</h3>
-          <p style="margin: 5px 0;"><strong>From:</strong> <span style="background: #6c757d; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${oldStatus}</span></p>
-          <p style="margin: 5px 0;"><strong>To:</strong> <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${order.orderStatus}</span></p>
-          <p style="margin: 5px 0;"><strong>Updated:</strong> ${new Date().toLocaleString()}</p>
+      <div style="padding: 30px; background-color: white;">
+        <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; display: flex; align-items: center;">
+            <span style="background-color: #28a745; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">1</span>
+            Status Change Details
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Previous Status</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;"><span style="background: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">${oldStatus}</span></p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">New Status</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;"><span style="background: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">${order.orderStatus}</span></p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Updated On</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${new Date().toLocaleDateString()}</p>
+            </div>
+          </div>
         </div>
         
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 10px 0; color: #333;">Customer Information</h3>
-          <p style="margin: 5px 0;"><strong>Name:</strong> ${user.name}</p>
-          <p style="margin: 5px 0;"><strong>Email:</strong> ${user.email}</p>
-          <p style="margin: 5px 0;"><strong>Order Total:</strong> $${order.totalPrice.toFixed(2)}</p>
+        <div style="background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; display: flex; align-items: center;">
+            <span style="background-color: #28a745; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">2</span>
+            Customer Information
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Customer Name</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${user.name}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Email Address</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px;">${user.email}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Order Total</p>
+              <p style="margin: 0; font-weight: bold; font-size: 16px; color: #28a745;">$${order.totalPrice.toFixed(2)}</p>
+            </div>
+          </div>
         </div>
         
-        <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 4px;">
-          <p style="margin: 0; color: #333;"><strong>✅ Customer Notified:</strong></p>
-          <p style="margin: 5px 0 0 0; color: #666;">The customer has been automatically notified about this status change via email.</p>
+        <div style="margin-top: 20px; padding: 20px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 4px;">
+          <h3 style="margin: 0 0 10px 0; color: #333; display: flex; align-items: center;">
+            <span style="background-color: #28a745; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px;">✅</span>
+            Customer Notification
+          </h3>
+          <p style="margin: 0; color: #666;">The customer has been automatically notified about this status change via email.</p>
         </div>
+      </div>
+      
+      <div style="background-color: #2c3e50; color: white; padding: 20px; text-align: center;">
+        <p style="margin: 0; font-size: 14px;">This is an automated notification from your NextEcommerce store.</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">© ${new Date().getFullYear()} NextEcommerce. All rights reserved.</p>
       </div>
     </div>
   `;
   
   const text = `
+=============================================
     📦 ORDER STATUS UPDATED
-    
-    Order #${order._id} status has been changed:
-    From: ${oldStatus}
-    To: ${order.orderStatus}
-    Updated: ${new Date().toLocaleString()}
-    
-    Customer: ${user.name} (${user.email})
-    Order Total: $${order.totalPrice.toFixed(2)}
-    
-    The customer has been automatically notified about this status change.
+=============================================
+
+STATUS CHANGE DETAILS:
+─────────────────────────────────────────────
+Order ID:        ${order._id}
+Previous Status: ${oldStatus}
+New Status:      ${order.orderStatus}
+Updated On:      ${new Date().toLocaleDateString()}
+
+CUSTOMER INFORMATION:
+─────────────────────────────────────────────
+Customer Name:   ${user.name}
+Email Address:   ${user.email}
+Order Total:     $${order.totalPrice.toFixed(2)}
+
+CUSTOMER NOTIFICATION:
+─────────────────────────────────────────────
+The customer has been automatically notified about this status change via email.
+
+This is an automated notification from your NextEcommerce store.
+© ${new Date().getFullYear()} NextEcommerce. All rights reserved.
   `;
   
   return await sendEmail({

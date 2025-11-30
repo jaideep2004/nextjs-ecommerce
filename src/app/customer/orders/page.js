@@ -29,10 +29,12 @@ import {
 } from '@mui/material';
 import { NavigateNext, ArrowBack } from '@mui/icons-material';
 import CustomerSidebar from '@/components/customer/CustomerSidebar';
+import { useThemeContext } from '@/theme'; // Import theme context
 
 export default function CustomerOrders() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { theme } = useThemeContext(); // Get theme context
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -146,12 +148,19 @@ export default function CustomerOrders() {
         sx={{
           flexGrow: 1,
           p: 3,
-          bgcolor: '#f5f5f5',
+          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5', // Use theme-aware background
           minHeight: '100vh',
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, mb: 3 }}>
+          <Paper 
+            sx={{ 
+              p: 2, 
+              mb: 3,
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+              boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+            }}
+          >
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
               <Link href="/" passHref>
                 <Typography 
@@ -160,6 +169,7 @@ export default function CustomerOrders() {
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
                     cursor: 'pointer',
+                    color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
                   }}
                 >
                   Home
@@ -172,12 +182,20 @@ export default function CustomerOrders() {
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
                     cursor: 'pointer',
+                    color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
                   }}
                 >
                   My Account
                 </Typography>
               </Link>
-              <Typography color="text.primary">My Orders</Typography>
+              <Typography 
+                color="text.primary"
+                sx={{
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                }}
+              >
+                My Orders
+              </Typography>
             </Breadcrumbs>
           </Paper>
 
@@ -187,165 +205,302 @@ export default function CustomerOrders() {
               variant="h4" 
               sx={{ 
                 fontWeight: 700,
-                color: '#2c3e50',
+                color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#2c3e50',
                 mb: 1,
               }}
             >
               My Orders
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography 
+              variant="body1" 
+              sx={{
+                color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+              }}
+            >
               View and track all your orders
             </Typography>
           </Box>
-
-          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-            {/* Filters */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-              <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel id="status-filter-label">Status</InputLabel>
-                <Select
-                  labelId="status-filter-label"
-                  value={statusFilter}
-                  onChange={handleStatusFilterChange}
-                  label="Status"
-                  size="small"
-                >
-                  <MenuItem value="all">All Orders</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="Processing">Processing</MenuItem>
-                  <MenuItem value="Shipped">Shipped</MenuItem>
-                  <MenuItem value="Delivered">Delivered</MenuItem>
-                  <MenuItem value="Cancelled">Cancelled</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel id="sort-by-label">Sort By</InputLabel>
-                <Select
-                  labelId="sort-by-label"
-                  value={sortBy}
-                  onChange={handleSortChange}
-                  label="Sort By"
-                  size="small"
-                >
-                  <MenuItem value="newest">Newest First</MenuItem>
-                  <MenuItem value="oldest">Oldest First</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-            
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress sx={{ color: '#2196f3' }} />
-              </Box>
-            ) : error ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            ) : orders.length === 0 ? (
-              <Box sx={{ py: 4, textAlign: 'center' }}>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                  {statusFilter === 'all' 
-                    ? "You haven't placed any orders yet." 
-                    : `You don't have any ${statusFilter.toLowerCase()} orders.`}
-                </Typography>
-                {statusFilter !== 'all' ? (
-                  <Button 
-                    onClick={() => setStatusFilter('all')}
-                    variant="outlined"
-                    sx={{ mr: 2 }}
+          
+          {/* Filters */}
+          <Paper 
+            sx={{ 
+              p: 2, 
+              mb: 3,
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+              boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+            }}
+          >
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit',
+                    }}
                   >
-                    View All Orders
-                  </Button>
-                ) : null}
-                <Button 
-                  component={Link} 
-                  href="/products" 
-                  variant="contained"
-                  sx={{ 
-                    bgcolor: '#2196f3',
-                    '&:hover': { bgcolor: '#1976d2' },
-                  }}
-                >
-                  Start Shopping
-                </Button>
-              </Box>
-            ) : (
-              <>
-                <TableContainer>
-                  <Table>
-                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                      <TableRow>
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Items</TableCell>
-                        <TableCell align="right">Total</TableCell>
-                        <TableCell align="center">Status</TableCell>
-                        <TableCell align="right">Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow key={order._id}>
-                          <TableCell component="th" scope="row">
-                            #{order._id && order._id.substring(0, 8)}
-                          </TableCell>
-                          <TableCell>
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            {order.orderItems && order.orderItems.length ? 
-                              `${order.orderItems.length} ${order.orderItems.length === 1 ? 'item' : 'items'}` : 
-                              '0 items'}
-                          </TableCell>
-                          <TableCell align="right">
-                            ${order.totalPrice.toFixed(2)}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Chip 
-                              label={order.orderStatus} 
-                              color={getStatusColor(order.orderStatus)}
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <Button 
-                              component={Link} 
-                              href={`/customer/orders/${order._id}`}
-                              size="small"
-                              variant="outlined"
-                              sx={{ 
-                                borderColor: '#2196f3',
-                                color: '#2196f3',
-                                '&:hover': { borderColor: '#1976d2', color: '#1976d2' },
-                              }}
-                            >
-                              View Details
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', pt: 3 }}>
-                    <Pagination 
-                      count={totalPages} 
-                      page={page} 
-                      onChange={handlePageChange} 
-                      color="primary"
-                      sx={{ 
-                        '& .MuiPaginationItem-root.Mui-selected': { bgcolor: '#2196f3' },
-                      }}
-                    />
-                  </Box>
-                )}
-              </>
-            )}
+                    Status
+                  </InputLabel>
+                  <Select
+                    value={statusFilter}
+                    label="Status"
+                    onChange={handleStatusFilterChange}
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                      '.MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                      },
+                      '.MuiSvgIcon-root': {
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                      },
+                    }}
+                  >
+                    <MenuItem value="all">All Orders</MenuItem>
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="Processing">Processing</MenuItem>
+                    <MenuItem value="Shipped">Shipped</MenuItem>
+                    <MenuItem value="Delivered">Delivered</MenuItem>
+                    <MenuItem value="Cancelled">Cancelled</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit',
+                    }}
+                  >
+                    Sort By
+                  </InputLabel>
+                  <Select
+                    value={sortBy}
+                    label="Sort By"
+                    onChange={handleSortChange}
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                      '.MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.23)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.mode === 'dark' ? '#a29278' : '#a29278',
+                      },
+                      '.MuiSvgIcon-root': {
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                      },
+                    }}
+                  >
+                    <MenuItem value="newest">Newest First</MenuItem>
+                    <MenuItem value="oldest">Oldest First</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
           </Paper>
+
+          {/* Orders Table */}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress sx={{ color: '#8D6E63' }} />
+            </Box>
+          ) : error ? (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 2,
+                bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+              }}
+            >
+              {error}
+            </Alert>
+          ) : orders.length === 0 ? (
+            <Paper 
+              sx={{ 
+                p: 4, 
+                textAlign: 'center',
+                bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+              }}
+            >
+              <Typography 
+                variant="h6" 
+                sx={{
+                  color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  mb: 2,
+                }}
+              >
+                No orders found
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{
+                  color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                  mb: 3,
+                }}
+              >
+                You haven't placed any orders yet.
+              </Typography>
+              <Button 
+                component={Link} 
+                href="/products"
+                variant="contained"
+                sx={{ 
+                  bgcolor: '#8D6E63',
+                  '&:hover': { bgcolor: '#6D4C41' },
+                }}
+              >
+                Start Shopping
+              </Button>
+            </Paper>
+          ) : (
+            <>
+              <TableContainer 
+                component={Paper}
+                sx={{
+                  mb: 3,
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                  boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                }}
+              >
+                <Table>
+                  <TableHead sx={{ 
+                    bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' 
+                  }}>
+                    <TableRow>
+                      <TableCell 
+                        sx={{ 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                        }}
+                      >
+                        Order ID
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                        }}
+                      >
+                        Date
+                      </TableCell>
+                      <TableCell 
+                        align="right" 
+                        sx={{ 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                        }}
+                      >
+                        Total
+                      </TableCell>
+                      <TableCell 
+                        align="center" 
+                        sx={{ 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                        }}
+                      >
+                        Status
+                      </TableCell>
+                      <TableCell 
+                        align="right" 
+                        sx={{ 
+                          color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                        }}
+                      >
+                        Actions
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {orders.map((order) => (
+                      <TableRow 
+                        key={order._id}
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                          '&:hover': {
+                            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f9f9f9',
+                          },
+                        }}
+                      >
+                        <TableCell 
+                          component="th" 
+                          scope="row"
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          #{order._id.substring(0, 8)}
+                        </TableCell>
+                        <TableCell 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit' 
+                          }}
+                        >
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell 
+                          align="right" 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          ${order.totalPrice.toFixed(2)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip 
+                            label={order.orderStatus} 
+                            color={getStatusColor(order.orderStatus)}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Button 
+                            component={Link} 
+                            href={`/customer/orders/${order._id}`}
+                            size="small"
+                            sx={{
+                              color: theme.palette.mode === 'dark' ? '#a29278' : 'primary.main',
+                            }}
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  <Pagination 
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    sx={{
+                      '.MuiPaginationItem-root': {
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                      },
+                      '.Mui-selected': {
+                        bgcolor: theme.palette.mode === 'dark' ? '#a29278' : 'primary.main',
+                        color: theme.palette.mode === 'dark' ? '#000000' : '#FFFFFF',
+                        '&:hover': {
+                          bgcolor: theme.palette.mode === 'dark' ? '#8b7d65' : 'primary.dark',
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+              )}
+            </>
+          )}
         </Container>
       </Box>
     </Box>

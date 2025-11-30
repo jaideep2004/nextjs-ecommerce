@@ -1,24 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   Container,
   Typography,
   Box,
   Grid,
   Paper,
-  Divider,
-  Button,
-  CircularProgress,
-  Alert,
-  Breadcrumbs,
-  Stepper,
-  Step,
-  StepLabel,
   Table,
   TableBody,
   TableCell,
@@ -26,38 +17,34 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemText,
+  Button,
+  CircularProgress,
+  Alert,
+  Stepper,
+  Step,
+  StepLabel,
+  Breadcrumbs,
+  Divider,
 } from '@mui/material';
 import {
   NavigateNext,
   ArrowBack,
-  LocalShipping,
-  Payment,
-  Inventory,
-  CheckCircle,
   AccessTime,
+  Payment,
+  LocalShipping,
+  CheckCircle,
 } from '@mui/icons-material';
+import { useThemeContext } from '@/theme'; // Import theme context
 
 export default function OrderDetails({ params }) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { theme } = useThemeContext(); // Get theme context
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
   const orderId = params.id;
-  
-  // Redirect if user is not logged in
-  useEffect(() => {
-    if (!authLoading && !user && typeof window !== 'undefined') {
-      router.push('/login?redirect=/customer/orders/' + orderId);
-    }
-  }, [user, authLoading, router, orderId]);
-  
+
   // Fetch order details
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -163,21 +150,52 @@ export default function OrderDetails({ params }) {
         sx={{ mb: 3 }}
       >
         <Link href="/" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+          <Typography 
+            color="inherit" 
+            sx={{ 
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+              cursor: 'pointer',
+              color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
+            }}
+          >
             Home
           </Typography>
         </Link>
         <Link href="/customer/dashboard" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+          <Typography 
+            color="inherit" 
+            sx={{ 
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+              cursor: 'pointer',
+              color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
+            }}
+          >
             My Account
           </Typography>
         </Link>
         <Link href="/customer/orders" passHref>
-          <Typography color="inherit" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+          <Typography 
+            color="inherit" 
+            sx={{ 
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+              cursor: 'pointer',
+              color: theme.palette.mode === 'dark' ? '#a29278' : 'inherit',
+            }}
+          >
             My Orders
           </Typography>
         </Link>
-        <Typography color="text.primary">Order Details</Typography>
+        <Typography 
+          color="text.primary"
+          sx={{
+            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+          }}
+        >
+          Order Details
+        </Typography>
       </Breadcrumbs>
       
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -189,7 +207,14 @@ export default function OrderDetails({ params }) {
         >
           Back to Orders
         </Button>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 'bold',
+            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+          }}
+        >
           Order Details
         </Typography>
       </Box>
@@ -199,19 +224,43 @@ export default function OrderDetails({ params }) {
           <CircularProgress sx={{ color: '#8D6E63' }} />
         </Box>
       ) : error ? (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : 'white',
+          }}
+        >
           {error}
         </Alert>
       ) : order ? (
         <>
           {/* Order Status */}
-          <Paper sx={{ p: 3, mb: 4 }}>
+          <Paper 
+            sx={{ 
+              p: 3, 
+              mb: 4,
+              bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+              boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+            }}
+          >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
-                <Typography variant="h6" component="h2">
+                <Typography 
+                  variant="h6" 
+                  component="h2"
+                  sx={{
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  }}
+                >
                   Order #{getOrderId()}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                  }}
+                >
                   Placed on {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
                 </Typography>
               </Box>
@@ -286,10 +335,22 @@ export default function OrderDetails({ params }) {
             )}
             
             {order.orderStatus === 'Cancelled' && (
-              <Alert severity="error" sx={{ mt: 2 }}>
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mt: 2,
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : undefined,
+                }}
+              >
                 This order was cancelled on {formatDate(order.updatedAt)}.
                 {order.cancelReason && (
-                  <Typography variant="body2" sx={{ mt: 1 }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      mt: 1,
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'inherit',
+                    }}
+                  >
                     Reason: {order.cancelReason}
                   </Typography>
                 )}
@@ -297,8 +358,19 @@ export default function OrderDetails({ params }) {
             )}
             
             {order.orderStatus === 'Shipped' && order.trackingNumber && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                <Typography variant="body2">
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mt: 2,
+                  bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : undefined,
+                }}
+              >
+                <Typography 
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  }}
+                >
                   <strong>Tracking Number:</strong> {order.trackingNumber}
                 </Typography>
                 {order.trackingUrl && (
@@ -320,215 +392,367 @@ export default function OrderDetails({ params }) {
           <Grid container spacing={4}>
             {/* Order Items */}
             <Grid item xs={12} md={8}>
-              <Paper sx={{ p: 3, mb: { xs: 4, md: 0 } }}>
-                <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  mb: { xs: 4, md: 0 },
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                  boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  component="h2" 
+                  sx={{ 
+                    mb: 3,
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  }}
+                >
                   Order Items
                 </Typography>
                 
                 <TableContainer>
                   <Table>
-                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableHead sx={{ 
+                      bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' 
+                    }}>
                       <TableRow>
-                        <TableCell>Product</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell align="center">Quantity</TableCell>
-                        <TableCell align="right">Total</TableCell>
+                        <TableCell 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          Product
+                        </TableCell>
+                        <TableCell 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          Price
+                        </TableCell>
+                        <TableCell 
+                          align="center" 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          Quantity
+                        </TableCell>
+                        <TableCell 
+                          align="right" 
+                          sx={{ 
+                            color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                          }}
+                        >
+                          Total
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {order.orderItems && order.orderItems.length > 0 ? (
                         order.orderItems.map((item, index) => (
-                          <TableRow key={item._id || index}>
-                            <TableCell>
+                          <TableRow 
+                            key={index}
+                            sx={{
+                              '&:last-child td, &:last-child th': { border: 0 },
+                            }}
+                          >
+                            <TableCell 
+                              sx={{ 
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                              }}
+                            >
                               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Box sx={{ position: 'relative', width: 60, height: 60, mr: 2 }}>
-                                  <Image
-                                    src={item.image || '/images/placeholder.png'}
-                                    alt={item.name || 'Product'}
-                                    fill
-                                    style={{ objectFit: 'cover' }}
+                                {item.image && (
+                                  <Box
+                                    component="img"
+                                    src={item.image}
+                                    alt={item.name}
+                                    sx={{
+                                      width: 60,
+                                      height: 60,
+                                      objectFit: 'cover',
+                                      borderRadius: 1,
+                                      mr: 2,
+                                    }}
                                   />
-                                </Box>
+                                )}
                                 <Box>
-                                  <Typography variant="body1">
-                                    {item.slug ? (
-                                      <Link href={`/product/${item.slug}`} passHref>
-                                        <Typography 
-                                          component="span" 
-                                          sx={{ 
-                                            color: 'inherit', 
-                                            '&:hover': { color: '#8D6E63' } 
-                                          }}
-                                        >
-                                          {item.name || 'Product Name'}
-                                        </Typography>
-                                      </Link>
-                                    ) : (
-                                      <Typography component="span">
-                                        {item.name || 'Product Name'}
-                                      </Typography>
-                                    )}
+                                  <Typography 
+                                    variant="body1" 
+                                    sx={{
+                                      fontWeight: 'medium',
+                                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                                    }}
+                                  >
+                                    {item.name}
                                   </Typography>
                                   {item.color && (
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography 
+                                      variant="body2" 
+                                      sx={{
+                                        color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                                      }}
+                                    >
                                       Color: {item.color}
                                     </Typography>
                                   )}
                                   {item.size && (
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography 
+                                      variant="body2" 
+                                      sx={{
+                                        color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                                      }}
+                                    >
                                       Size: {item.size}
                                     </Typography>
                                   )}
                                 </Box>
                               </Box>
                             </TableCell>
-                            <TableCell>${(item.price || 0).toFixed(2)}</TableCell>
-                            <TableCell align="center">{item.quantity || 0}</TableCell>
-                            <TableCell align="right">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</TableCell>
+                            <TableCell 
+                              sx={{ 
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                              }}
+                            >
+                              ${item.price.toFixed(2)}
+                            </TableCell>
+                            <TableCell 
+                              align="center" 
+                              sx={{ 
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                              }}
+                            >
+                              {item.quantity}
+                            </TableCell>
+                            <TableCell 
+                              align="right" 
+                              sx={{ 
+                                color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit' 
+                              }}
+                            >
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </TableCell>
                           </TableRow>
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={4} align="center">No items in this order</TableCell>
+                          <TableCell 
+                            colSpan={4} 
+                            align="center"
+                            sx={{ 
+                              color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                              py: 4,
+                            }}
+                          >
+                            No items found
+                          </TableCell>
                         </TableRow>
                       )}
                     </TableBody>
                   </Table>
                 </TableContainer>
+                
+                <Divider sx={{ my: 3 }} />
+                
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography 
+                    variant="body1" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    <strong>Subtotal:</strong> ${order.itemsPrice.toFixed(2)}
+                  </Typography>
+                  <Typography 
+                    variant="body1" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    <strong>Shipping:</strong> ${order.shippingPrice.toFixed(2)}
+                  </Typography>
+                  <Typography 
+                    variant="body1" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    <strong>Tax:</strong> ${order.taxPrice.toFixed(2)}
+                  </Typography>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      mt: 1,
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    <strong>Total:</strong> ${order.totalPrice.toFixed(2)}
+                  </Typography>
+                </Box>
               </Paper>
             </Grid>
             
             {/* Order Summary */}
             <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, mb: 4 }}>
-                <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+              <Paper 
+                sx={{ 
+                  p: 3,
+                  bgcolor: theme.palette.mode === 'dark' ? '#111111' : 'white',
+                  boxShadow: theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  component="h2" 
+                  sx={{ 
+                    mb: 3,
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                  }}
+                >
                   Order Summary
                 </Typography>
                 
-                <List disablePadding>
-                  <ListItem sx={{ py: 1, px: 0 }}>
-                    <ListItemText primary="Subtotal" />
-                    <Typography variant="body2">${(order.itemsPrice || 0).toFixed(2)}</Typography>
-                  </ListItem>
+                <Box sx={{ mb: 3 }}>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      mb: 1,
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    Shipping Address
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    }}
+                  >
+                    {order.shippingAddress?.fullName}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    }}
+                  >
+                    {order.shippingAddress?.address}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    }}
+                  >
+                    {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    }}
+                  >
+                    {order.shippingAddress?.country}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                      mt: 1,
+                    }}
+                  >
+                    <strong>Phone:</strong> {order.shippingAddress?.phone || 'N/A'}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                    }}
+                  >
+                    <strong>Email:</strong> {order.shippingAddress?.email || order.user?.email || 'N/A'}
+                  </Typography>
+                </Box>
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Box sx={{ mb: 3 }}>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      mb: 1,
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    Payment Method
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {order.paymentMethod}
+                  </Typography>
                   
-                  <ListItem sx={{ py: 1, px: 0 }}>
-                    <ListItemText primary="Shipping" />
-                    <Typography variant="body2">${(order.shippingPrice || 0).toFixed(2)}</Typography>
-                  </ListItem>
-                  
-                  <ListItem sx={{ py: 1, px: 0 }}>
-                    <ListItemText primary="Tax" />
-                    <Typography variant="body2">${(order.taxPrice || 0).toFixed(2)}</Typography>
-                  </ListItem>
-                  
-                  {(order.discount || 0) > 0 && (
-                    <ListItem sx={{ py: 1, px: 0 }}>
-                      <ListItemText primary="Discount" />
-                      <Typography variant="body2" color="error.main">
-                        -${(order.discount || 0).toFixed(2)}
+                  {order.isPaid ? (
+                    <Box sx={{ mt: 1 }}>
+                      <Chip 
+                        label="Paid" 
+                        color="success" 
+                        size="small" 
+                        sx={{ mr: 1 }} 
+                      />
+                      <Typography 
+                        variant="body2" 
+                        sx={{
+                          color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                          mt: 1,
+                        }}
+                      >
+                        Paid on {formatDate(order.paidAt)}
                       </Typography>
-                    </ListItem>
+                    </Box>
+                  ) : (
+                    <Chip 
+                      label="Not Paid" 
+                      color="error" 
+                      size="small" 
+                      sx={{ mt: 1 }} 
+                    />
                   )}
-                  
-                  <Divider sx={{ my: 1 }} />
-                  
-                  <ListItem sx={{ py: 1, px: 0 }}>
-                    <ListItemText primary="Total" />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      ${(order.totalPrice || 0).toFixed(2)}
-                    </Typography>
-                  </ListItem>
-                </List>
-              </Paper>
-              
-              {/* Payment Information */}
-              <Paper sx={{ p: 3, mb: 4 }}>
-                <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-                  Payment Information
-                </Typography>
+                </Box>
                 
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Payment Method:</strong> {order.paymentMethod ? order.paymentMethod.toUpperCase() : 'N/A'}
-                </Typography>
+                <Divider sx={{ my: 2 }} />
                 
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Payment Status:</strong> {order.isPaid ? 'Paid' : 'Not Paid'}
-                </Typography>
-                
-                {order.isPaid && order.paidAt && (
-                  <Typography variant="body2">
-                    <strong>Paid On:</strong> {formatDate(order.paidAt)}
+                <Box>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      mb: 1,
+                      color: theme.palette.mode === 'dark' ? '#FFFFFF' : 'inherit',
+                    }}
+                  >
+                    Order ID
                   </Typography>
-                )}
-                
-                {order.paymentResult && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      <strong>Transaction ID:</strong> {order.paymentResult.id}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Status:</strong> {order.paymentResult.status}
-                    </Typography>
-                  </Box>
-                )}
-              </Paper>
-              
-              {/* Shipping Information */}
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-                  Shipping Information
-                </Typography>
-                
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Name:</strong> {order.shippingAddress?.fullName || 'N/A'}
-                </Typography>
-                
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Address:</strong> {order.shippingAddress?.address || 'N/A'}
-                  {order.shippingAddress?.city && `, ${order.shippingAddress.city}`}
-                  {order.shippingAddress?.postalCode && ` ${order.shippingAddress.postalCode}`}
-                  {order.shippingAddress?.country && `, ${order.shippingAddress.country}`}
-                </Typography>
-                
-                {order.shippingAddress?.phone && (
-                  <Typography variant="body2">
-                    <strong>Phone:</strong> {order.shippingAddress.phone}
+                  <Typography 
+                    variant="body2" 
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#CCCCCC' : 'text.secondary',
+                      fontFamily: 'monospace',
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {order._id}
                   </Typography>
-                )}
+                </Box>
               </Paper>
             </Grid>
           </Grid>
-          
-          {/* Action Buttons */}
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-            <Button 
-              component={Link} 
-              href="/customer/orders"
-              startIcon={<ArrowBack />}
-            >
-              Back to Orders
-            </Button>
-            
-            {order.orderStatus === 'Delivered' && order.orderItems && order.orderItems.length > 0 && order.orderItems[0]?.slug && (
-              <Button 
-                component={Link} 
-                href={`/product/${order.orderItems[0].slug}#review`}
-                variant="contained"
-                sx={{ 
-                  bgcolor: '#8D6E63',
-                  '&:hover': { bgcolor: '#6D4C41' },
-                }}
-              >
-                Write a Review
-              </Button>
-            )}
-          </Box>
         </>
-      ) : (
-        <Alert severity="error">
-          Order not found. Please check the order ID and try again.
-        </Alert>
-      )}
+      ) : null}
     </Container>
   );
 }

@@ -90,8 +90,9 @@ export function AuthProvider({ children }) {
           console.log('User authenticated via NextAuth:', session.user.email);
           
           // Convert NextAuth session to our user format
+          // Ensure consistent ID format (convert to string)
           const nextAuthUser = {
-            _id: session.user.userId || session.user.id,
+            _id: (session.user.userId || session.user.id || '').toString(),
             name: session.user.name,
             email: session.user.email,
             image: session.user.image,
