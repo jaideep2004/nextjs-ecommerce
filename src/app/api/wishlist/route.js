@@ -4,15 +4,47 @@ import Product from '@/models/Product';
 import Wishlist from '@/models/Wishlist';
 import { isAuthenticated } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+
+// Helper function to get user from request (supports both NextAuth and JWT)
+async function getUserFromRequest(req) {
+  // First try NextAuth session
+  try {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.email) {
+      await connectToDatabase();
+      const user = await User.findOne({ email: session.user.email });
+      if (user) {
+        return {
+          _id: user._id,
+          isAdmin: user.isAdmin,
+          email: user.email
+        };
+      }
+    }
+  } catch (nextAuthError) {
+    console.log('NextAuth session check failed:', nextAuthError.message);
+  }
+
+  // Fallback to custom JWT authentication
+  try {
+    const decoded = await isAuthenticated(req);
+    return decoded;
+  } catch (jwtError) {
+    console.log('JWT authentication failed:', jwtError.message);
+    throw new Error('Not authenticated, no valid authentication method');
+  }
+}
 
 // Get user's wishlist
 export async function GET(req) {
   return handleApiRequest(req, async () => {
-    const decoded = await isAuthenticated(req);
+    const user = await getUserFromRequest(req);
     await connectToDatabase();
     
     // Find all wishlist items for this user and populate product details
-    const wishlistItems = await Wishlist.find({ user: decoded._id })
+    const wishlistItems = await Wishlist.find({ user: user._id })
       .populate({
         path: 'product',
         select: '_id name slug price image countInStock rating numReviews'
@@ -43,7 +75,7 @@ export async function GET(req) {
 // Add item to wishlist
 export async function POST(req) {
   return handleApiRequest(req, async () => {
-    const decoded = await isAuthenticated(req);
+    const user = await getUserFromRequest(req);
     await connectToDatabase();
     
     const { productId } = await req.json();
@@ -66,7 +98,7 @@ export async function POST(req) {
     
     // Check if already in wishlist
     const existingItem = await Wishlist.findOne({
-      user: decoded._id,
+      user: user._id,
       product: productId
     });
     
@@ -79,7 +111,7 @@ export async function POST(req) {
     
     // Add to wishlist
     const wishlistItem = new Wishlist({
-      user: decoded._id,
+      user: user._id,
       product: productId
     });
     

@@ -4,52 +4,20 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useThemeContext } from '@/theme';
+import { AdminSidebarProvider, useAdminSidebar } from '@/contexts/AdminSidebarContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import {
   Box,
   CssBaseline,
-  Toolbar,
-  CircularProgress,
   Container,
+  CircularProgress,
   Typography,
 } from '@mui/material';
 
-const DRAWER_WIDTH = 280;
-
-export default function AdminLayout({ children }) {
-  const router = useRouter();
-  const { user, loading } = useAuth();
+// Inner component that can access the sidebar context
+function AdminLayoutContent({ children, user }) {
   const { theme } = useThemeContext();
-
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push('/login?redirect=/admin/dashboard');
-      } else if (!user.isAdmin) {
-        router.push('/');
-      }
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5',
-        }}
-      >
-        <CircularProgress sx={{ color: '#8D6E63' }} />
-      </Box>
-    );
-  }
-
-  if (!user || !user.isAdmin) {
-    return null;
-  }
+  const { collapsed, drawerWidth, collapsedDrawerWidth } = useAdminSidebar();
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -63,11 +31,12 @@ export default function AdminLayout({ children }) {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          width: { md: `calc(100% - ${collapsed ? collapsedDrawerWidth : drawerWidth}px)` },
           minHeight: '100vh',
           bgcolor: theme.palette.mode === 'dark' ? '#000000' : '#f8f9fa',
           display: 'flex',
           flexDirection: 'column',
+          transition: 'width 0.3s ease',
         }}
       >
         {/* Admin Header */}
@@ -140,5 +109,48 @@ export default function AdminLayout({ children }) {
         </Box>
       </Box>
     </Box>
+  );
+}
+
+export default function AdminLayout({ children }) {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push('/login?redirect=/admin/dashboard');
+      } else if (!user.isAdmin) {
+        router.push('/');
+      }
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          bgcolor: useThemeContext().theme.palette.mode === 'dark' ? '#000000' : '#f5f5f5',
+        }}
+      >
+        <CircularProgress sx={{ color: '#8D6E63' }} />
+      </Box>
+    );
+  }
+
+  if (!user || !user.isAdmin) {
+    return null;
+  }
+
+  return (
+    <AdminSidebarProvider>
+      <AdminLayoutContent user={user}>
+        {children}
+      </AdminLayoutContent>
+    </AdminSidebarProvider>
   );
 }

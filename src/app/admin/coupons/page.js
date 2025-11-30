@@ -352,7 +352,7 @@ export default function AdminCouponsPage() {
 
         {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} style={{flex:"1"}}>
             <Card sx={{ bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -370,7 +370,7 @@ export default function AdminCouponsPage() {
             </Card>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} style={{flex:"1"}}>
             <Card sx={{ bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -388,7 +388,7 @@ export default function AdminCouponsPage() {
             </Card>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} style={{flex:"1"}}>
             <Card sx={{ bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -406,7 +406,7 @@ export default function AdminCouponsPage() {
             </Card>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} style={{flex:"1"}}>
             <Card sx={{ bgcolor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -577,7 +577,7 @@ export default function AdminCouponsPage() {
             </Alert>
           )}
 
-          <Grid container spacing={3} sx={{ mt: 1 }}>
+          <Grid container spacing={3} sx={{ mt: 1 }} style={{ flexDirection: 'column' }}>
             {/* Basic Information */}
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>

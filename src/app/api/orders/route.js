@@ -1,14 +1,46 @@
 import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
 import User from '@/models/User';
-import { isAuthenticated, isAdmin } from '@/utils/auth';
+import { isAuthenticated } from '@/utils/auth';
 import { apiResponse, apiError, handleApiRequest } from '@/utils/api';
 import { sendOrderConfirmation, sendAdminOrderNotification } from '@/utils/email';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+
+// Helper function to get user from request (supports both NextAuth and JWT)
+async function getUserFromRequest(req) {
+  // First try NextAuth session
+  try {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.email) {
+      await connectToDatabase();
+      const user = await User.findOne({ email: session.user.email });
+      if (user) {
+        return {
+          _id: user._id,
+          isAdmin: user.isAdmin,
+          email: user.email
+        };
+      }
+    }
+  } catch (nextAuthError) {
+    console.log('NextAuth session check failed:', nextAuthError.message);
+  }
+
+  // Fallback to custom JWT authentication
+  try {
+    const decoded = await isAuthenticated(req);
+    return decoded;
+  } catch (jwtError) {
+    console.log('JWT authentication failed:', jwtError.message);
+    throw new Error('Not authenticated, no valid authentication method');
+  }
+}
 
 // Get all orders (admin) or user orders (customer)
 export async function GET(req) {
   return handleApiRequest(req, async () => {
-    const decoded = await isAuthenticated(req);
+    const user = await getUserFromRequest(req);
     await connectToDatabase();
     
     const { searchParams } = new URL(req.url);
@@ -31,8 +63,8 @@ export async function GET(req) {
     if (orderStatus) filter.orderStatus = orderStatus;
     
     // If not admin, only show user's orders
-    if (!decoded.isAdmin) {
-      filter.user = decoded._id;
+    if (!user.isAdmin) {
+      filter.user = user._id;
     }
     
     // Execute query with pagination and sorting
@@ -63,7 +95,7 @@ export async function GET(req) {
 // Create a new order
 export async function POST(req) {
   return handleApiRequest(req, async () => {
-    const decoded = await isAuthenticated(req);
+    const user = await getUserFromRequest(req);
     await connectToDatabase();
     
     const orderData = await req.json();
@@ -96,7 +128,7 @@ export async function POST(req) {
     // Create new order
     const order = new Order({
       ...orderData,
-      user: decoded._id,
+      user: user._id,
     });
     
     // Save the order
@@ -105,12 +137,12 @@ export async function POST(req) {
     // Send email notifications
     try {
       // Get user information
-      const user = await User.findById(decoded._id);
+      const dbUser = await User.findById(user._id);
       
-      if (user) {
+      if (dbUser) {
         // Send order confirmation email to customer
         await sendOrderConfirmation({
-          user,
+          user: dbUser,
           order: {
             ...order.toObject(),
             _id: order._id.toString(),
@@ -120,7 +152,7 @@ export async function POST(req) {
         
         // Send order notification email to admin
         await sendAdminOrderNotification({
-          user,
+          user: dbUser,
           order: {
             ...order.toObject(),
             _id: order._id.toString(),
